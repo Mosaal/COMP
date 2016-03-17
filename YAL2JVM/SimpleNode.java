@@ -9,6 +9,8 @@ class SimpleNode implements Node {
   protected Object value;
   protected YalToJvm parser;
 
+  //added
+
   public SimpleNode(int i) {
     id = i;
   }

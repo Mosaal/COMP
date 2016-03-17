@@ -7,14 +7,20 @@ PARSER_BEGIN(YalToJvm)
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.File;
+import java.util.*;
 
 public class YalToJvm {
+
+	private static String moduleID;
+	private static ArrayList<String> functionArray = new ArrayList<String>();
+	private static HashMap<String,Integer> variableMap = new HashMap<String,Integer>();
+
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
 		File file = new File(args[0]);
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		root.dump("");
+		//root.dump("");
 	}
 }
 
@@ -59,9 +65,12 @@ PARSER_END(YalToJvm)
 	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
 }
 
-SimpleNode Module(): {}
+SimpleNode Module(): {Token module;}
 {
-	<MODULE> <ID> <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
+	<MODULE> module=<ID> {
+		moduleID = module.image;
+		System.out.println("Module: " + module);
+	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
 void Declaration(): {}
@@ -69,9 +78,15 @@ void Declaration(): {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
 }
 
-void Function(): {}
+void Function(): {Token function;}
 {
-	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> <ID> <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> <ID> <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
+	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> function=<ID> {
+		functionArray.add(function.image);
+		System.out.println("Function: " + function.image);
+	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> function=<ID> {
+		functionArray.add(function.image);
+		System.out.println("Function: " + function.image);
+	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
 }
 
 void Varlist(): {}
@@ -81,12 +96,12 @@ void Varlist(): {}
 
 void ArrayElement(): {}
 {
-	<ID> "[" "]" (<ID>)?
+	<ID> "[" "]"
 }
 
 void ScalarElement(): {}
 {
-	<ID> (<ID>)?
+	<ID>
 }
 
 void Stmtlst(): {}
