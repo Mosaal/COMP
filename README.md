@@ -1,6 +1,6 @@
 # COMP
 Para compilar tem de se referir o nome de um fichero de texto que contenha o codigo YAL.
-Por exemplo: java YalToJvm Test.txt
+Por exemplo: `java YalToJvm Test.txt`
 
 ## TODO's
 
