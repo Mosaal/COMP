@@ -16,8 +16,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 /*@egen*/
 
 	private static String moduleID;
-	private static ArrayList<String> functionArray = new ArrayList<String>();
-	private static HashMap<String,Integer> variableMap = new HashMap<String,Integer>();
+	private static ArrayList<Function> functionArray = new ArrayList<Function>();
 
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
 		File file = new File(args[0]);
@@ -143,16 +142,18 @@ void Function(): {/*@bgen(jjtree) Function */
                   SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
                   boolean jjtc000 = true;
                   jjtree.openNodeScope(jjtn000);
-/*@egen*/Token function;}
+/*@egen*/Token functionID;}
 {/*@bgen(jjtree) Function */
         try {
 /*@egen*/
-	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> function=<ID> {
-		functionArray.add(function.image);
-		System.out.println("Function: " + function.image);
-	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> function=<ID> {
-		functionArray.add(function.image);
-		System.out.println("Function: " + function.image);
+	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
+		Function function = new Function(functionID.image);
+		functionArray.add(function);
+		System.out.println("Function: " + function.getFunctionID());
+	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
+		Function function = new Function(functionID.image);
+		functionArray.add(function);
+		System.out.println("Function: " + function.getFunctionID());
 	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -208,14 +209,14 @@ void Varlist(): {/*@bgen(jjtree) Varlist */
 }
 
 void ArrayElement(): {/*@bgen(jjtree) ArrayElement */
-  SimpleNode jjtn000 = new SimpleNode(JJTARRAYELEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                      SimpleNode jjtn000 = new SimpleNode(JJTARRAYELEMENT);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);
+/*@egen*/Token arrayElem;}
 {/*@bgen(jjtree) ArrayElement */
         try {
 /*@egen*/
-	<ID> "[" "]"/*@bgen(jjtree)*/
+	arrayElem=<ID> { System.out.println("ArrayElement: " + arrayElem.image); } "[" "]"/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -225,14 +226,19 @@ void ArrayElement(): {/*@bgen(jjtree) ArrayElement */
 }
 
 void ScalarElement(): {/*@bgen(jjtree) ScalarElement */
-  SimpleNode jjtn000 = new SimpleNode(JJTSCALARELEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
-/*@egen*/}
+                       SimpleNode jjtn000 = new SimpleNode(JJTSCALARELEMENT);
+                       boolean jjtc000 = true;
+                       jjtree.openNodeScope(jjtn000);
+/*@egen*/Token scalarElem;}
 {/*@bgen(jjtree) ScalarElement */
         try {
 /*@egen*/
-	<ID>/*@bgen(jjtree)*/
+	scalarElem=<ID>/*@bgen(jjtree)*/
+                        {
+                          jjtree.closeNodeScope(jjtn000, true);
+                          jjtc000 = false;
+                        }
+/*@egen*/ { System.out.println("ScalarElement: " + scalarElem.image); }/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);

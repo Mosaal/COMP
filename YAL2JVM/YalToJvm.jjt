@@ -12,8 +12,7 @@ import java.util.*;
 public class YalToJvm {
 
 	private static String moduleID;
-	private static ArrayList<String> functionArray = new ArrayList<String>();
-	private static HashMap<String,Integer> variableMap = new HashMap<String,Integer>();
+	private static ArrayList<Function> functionArray = new ArrayList<Function>();
 
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
 		File file = new File(args[0]);
@@ -78,14 +77,16 @@ void Declaration(): {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
 }
 
-void Function(): {Token function;}
+void Function(): {Token functionID;}
 {
-	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> function=<ID> {
-		functionArray.add(function.image);
-		System.out.println("Function: " + function.image);
-	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> function=<ID> {
-		functionArray.add(function.image);
-		System.out.println("Function: " + function.image);
+	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
+		Function function = new Function(functionID.image);
+		functionArray.add(function);
+		System.out.println("Function: " + function.getFunctionID());
+	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
+		Function function = new Function(functionID.image);
+		functionArray.add(function);
+		System.out.println("Function: " + function.getFunctionID());
 	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
 }
 
@@ -94,14 +95,14 @@ void Varlist(): {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
 }
 
-void ArrayElement(): {}
+void ArrayElement(): {Token arrayElem;}
 {
-	<ID> "[" "]"
+	arrayElem=<ID> { System.out.println("ArrayElement: " + arrayElem.image); } "[" "]"
 }
 
-void ScalarElement(): {}
+void ScalarElement(): {Token scalarElem;}
 {
-	<ID>
+	scalarElem=<ID> { System.out.println("ScalarElement: " + scalarElem.image); }
 }
 
 void Stmtlst(): {}

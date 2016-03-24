@@ -8,8 +8,7 @@ import java.util.*;
 public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvmConstants {/*@bgen(jjtree)*/
   protected static JJTYalToJvmState jjtree = new JJTYalToJvmState();
         private static String moduleID;
-        private static ArrayList<String> functionArray = new ArrayList<String>();
-        private static HashMap<String,Integer> variableMap = new HashMap<String,Integer>();
+        private static ArrayList<Function> functionArray = new ArrayList<Function>();
 
         public static void main(String[] args) throws ParseException, FileNotFoundException {
                 File file = new File(args[0]);
@@ -160,7 +159,7 @@ if (jjtc000) {
   static final public void Function() throws ParseException {/*@bgen(jjtree) Function */
                   SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
                   boolean jjtc000 = true;
-                  jjtree.openNodeScope(jjtn000);Token function;
+                  jjtree.openNodeScope(jjtn000);Token functionID;
     try {
       if (jj_2_3(3)) {
         jj_consume_token(FUNCTION);
@@ -179,9 +178,10 @@ if (jjtc000) {
           }
         }
         jj_consume_token(ASSIGN);
-        function = jj_consume_token(ID);
-functionArray.add(function.image);
-                System.out.println("Function: " + function.image);
+        functionID = jj_consume_token(ID);
+Function function = new Function(functionID.image);
+                functionArray.add(function);
+                System.out.println("Function: " + function.getFunctionID());
         jj_consume_token(LPAR);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ID:{
@@ -197,9 +197,10 @@ functionArray.add(function.image);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case FUNCTION:{
           jj_consume_token(FUNCTION);
-          function = jj_consume_token(ID);
-functionArray.add(function.image);
-                System.out.println("Function: " + function.image);
+          functionID = jj_consume_token(ID);
+Function function = new Function(functionID.image);
+                functionArray.add(function);
+                System.out.println("Function: " + function.getFunctionID());
           jj_consume_token(LPAR);
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ID:{
@@ -311,11 +312,12 @@ if (jjtc000) {
   }
 
   static final public void ArrayElement() throws ParseException {/*@bgen(jjtree) ArrayElement */
-  SimpleNode jjtn000 = new SimpleNode(JJTARRAYELEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+                      SimpleNode jjtn000 = new SimpleNode(JJTARRAYELEMENT);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);Token arrayElem;
     try {
-      jj_consume_token(ID);
+      arrayElem = jj_consume_token(ID);
+System.out.println("ArrayElement: " + arrayElem.image);
       jj_consume_token(31);
       jj_consume_token(32);
     } finally {
@@ -326,11 +328,14 @@ if (jjtc000) {
   }
 
   static final public void ScalarElement() throws ParseException {/*@bgen(jjtree) ScalarElement */
-  SimpleNode jjtn000 = new SimpleNode(JJTSCALARELEMENT);
-  boolean jjtc000 = true;
-  jjtree.openNodeScope(jjtn000);
+                       SimpleNode jjtn000 = new SimpleNode(JJTSCALARELEMENT);
+                       boolean jjtc000 = true;
+                       jjtree.openNodeScope(jjtn000);Token scalarElem;
     try {
-      jj_consume_token(ID);
+      scalarElem = jj_consume_token(ID);
+jjtree.closeNodeScope(jjtn000, true);
+                          jjtc000 = false;
+System.out.println("ScalarElement: " + scalarElem.image);
     } finally {
 if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1051,6 +1056,12 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
+  static private boolean jj_3R_17()
+ {
+    if (jj_3R_21()) return true;
+    return false;
+  }
+
   static private boolean jj_3_3()
  {
     if (jj_scan_token(FUNCTION)) return true;
@@ -1061,18 +1072,6 @@ if (jjtc000) {
     if (jj_3R_7()) return true;
     }
     if (jj_scan_token(ASSIGN)) return true;
-    return false;
-  }
-
-  static private boolean jj_3_6()
- {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_17()
- {
-    if (jj_3R_21()) return true;
     return false;
   }
 
@@ -1095,15 +1094,15 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3_1()
- {
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_25()
  {
     if (jj_3R_20()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_1()
+ {
+    if (jj_3R_6()) return true;
     return false;
   }
 
@@ -1190,15 +1189,15 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3R_11()
- {
-    if (jj_scan_token(ID)) return true;
-    return false;
-  }
-
   static private boolean jj_3_5()
  {
     if (jj_3R_6()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11()
+ {
+    if (jj_scan_token(ID)) return true;
     return false;
   }
 
@@ -1224,12 +1223,6 @@ if (jjtc000) {
   static private boolean jj_3_9()
  {
     if (jj_3R_9()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_7()
- {
-    if (jj_3R_11()) return true;
     return false;
   }
 
@@ -1259,6 +1252,12 @@ if (jjtc000) {
     return false;
   }
 
+  static private boolean jj_3R_7()
+ {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_23()
  {
     Token xsp;
@@ -1282,6 +1281,12 @@ if (jjtc000) {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_24()) jj_scanpos = xsp;
+    return false;
+  }
+
+  static private boolean jj_3_6()
+ {
+    if (jj_3R_8()) return true;
     return false;
   }
 
