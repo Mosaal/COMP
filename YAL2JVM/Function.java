@@ -5,27 +5,27 @@ import java.util.*;
 public class Function {
 
 	private String functionID;
-	private ArrayList<Variable> variableList;
+	private ArrayList<Variable> variableArray;
 
 	public Function(String functionID) {
 		this.functionID = functionID;
-		variableList = new ArrayList<Variable>();
+		variableArray = new ArrayList<Variable>();
 	}
 
 	public String getFunctionID() {
 		return functionID;
 	}
 
-	public ArrayList<Variable> getVariableList() {
-		return variableList;
+	public ArrayList<Variable> getVariableArray() {
+		return variableArray;
 	}
 
 	public void addVariable(Variable variable) {
-		variableList.add(variable);
+		variableArray.add(variable);
 	}
 
 	public void setVariableValue(String variableID, int value) {
-		for (Variable array: variableList) {
+		for (Variable array: variableArray) {
 			if (array.getVariableID() == variableID)
 				array.setValue(value);
 		}
