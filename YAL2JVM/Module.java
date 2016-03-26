@@ -27,10 +27,14 @@ public class Module {
 	}
 
 	public void addFunction(Function function) {
-		functionArray.add(function);
+		if (!functionArray.contains(function))
+			functionArray.add(function);
+		else
+			System.out.println("Function \"" + function.getFunctionID() + "\" already exists!");
 	}
 
 	public void addGlobalVariable(Variable globalVariable) {
-		globalVariableArray.add(globalVariable);
+		if (!globalVariableArray.contains(globalVariable))
+			globalVariableArray.add(globalVariable);
 	}
 }

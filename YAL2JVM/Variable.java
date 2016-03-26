@@ -17,6 +17,16 @@ public class Variable {
 		return variableID;
 	}
 
+	@Override
+	public boolean equals(Object object) {
+		Variable variable = (Variable) object;
+
+		if (variableID == variable.getVariableID())
+			return true;
+
+		return false;
+	}
+
 	public void setValue(int value) {
 		this.value = value;
 	}

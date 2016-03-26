@@ -12,12 +12,26 @@ public class Function {
 		variableArray = new ArrayList<Variable>();
 	}
 
+	public int getNumVariable() {
+		return variableArray.size();
+	}
+
 	public String getFunctionID() {
 		return functionID;
 	}
 
 	public ArrayList<Variable> getVariableArray() {
 		return variableArray;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		Function function = (Function) object;
+
+		if (functionID == function.getFunctionID() && getNumVariable() == function.getNumVariable())
+			return true;
+
+		return false;
 	}
 
 	public void addVariable(Variable variable) {
