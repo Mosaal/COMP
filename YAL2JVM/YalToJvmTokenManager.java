@@ -3,7 +3,6 @@
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.File;
-import java.util.*;
 
 /** Token Manager. */
 @SuppressWarnings("unused")public class YalToJvmTokenManager implements YalToJvmConstants {

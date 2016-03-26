@@ -8,15 +8,13 @@ PARSER_BEGIN(YalToJvm)
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.File;
-import java.util.*;
 
 public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
   protected static JJTYalToJvmState jjtree = new JJTYalToJvmState();
 
 /*@egen*/
 
-	private static String moduleID;
-	private static ArrayList<Function> functionArray = new ArrayList<Function>();
+	private static Module module;
 
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
 		File file = new File(args[0]);
@@ -72,13 +70,13 @@ SimpleNode Module(): {/*@bgen(jjtree) Module */
                       SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
                       boolean jjtc000 = true;
                       jjtree.openNodeScope(jjtn000);
-/*@egen*/Token module;}
+/*@egen*/Token moduleID;}
 {/*@bgen(jjtree) Module */
         try {
 /*@egen*/
-	<MODULE> module=<ID> {
-		moduleID = module.image;
-		System.out.println("Module: " + module);
+	<MODULE> moduleID=<ID> {
+		module = new Module(moduleID.image);
+		System.out.println("Module: " + module.getModuleID());
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA>/*@bgen(jjtree)*/
                                                                {
                                                                  jjtree.closeNodeScope(jjtn000, true);
@@ -148,12 +146,12 @@ void Function(): {/*@bgen(jjtree) Function */
 /*@egen*/
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
 		Function function = new Function(functionID.image);
-		functionArray.add(function);
-		System.out.println("Function: " + function.getFunctionID());
+		module.addFunction(function);
+		System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
 		Function function = new Function(functionID.image);
-		functionArray.add(function);
-		System.out.println("Function: " + function.getFunctionID());
+		module.addFunction(function);
+		System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -216,7 +214,7 @@ void ArrayElement(): {/*@bgen(jjtree) ArrayElement */
 {/*@bgen(jjtree) ArrayElement */
         try {
 /*@egen*/
-	arrayElem=<ID> { System.out.println("ArrayElement: " + arrayElem.image); } "[" "]"/*@bgen(jjtree)*/
+	arrayElem=<ID> "[" "]"/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -234,11 +232,6 @@ void ScalarElement(): {/*@bgen(jjtree) ScalarElement */
         try {
 /*@egen*/
 	scalarElem=<ID>/*@bgen(jjtree)*/
-                        {
-                          jjtree.closeNodeScope(jjtn000, true);
-                          jjtc000 = false;
-                        }
-/*@egen*/ { System.out.println("ScalarElement: " + scalarElem.image); }/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);

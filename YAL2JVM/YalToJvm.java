@@ -3,12 +3,10 @@
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.File;
-import java.util.*;
 
 public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvmConstants {/*@bgen(jjtree)*/
   protected static JJTYalToJvmState jjtree = new JJTYalToJvmState();
-        private static String moduleID;
-        private static ArrayList<Function> functionArray = new ArrayList<Function>();
+        private static Module module;
 
         public static void main(String[] args) throws ParseException, FileNotFoundException {
                 File file = new File(args[0]);
@@ -21,12 +19,12 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
   static final public SimpleNode Module() throws ParseException {/*@bgen(jjtree) Module */
                       SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
                       boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);Token module;
+                      jjtree.openNodeScope(jjtn000);Token moduleID;
     try {
       jj_consume_token(MODULE);
-      module = jj_consume_token(ID);
-moduleID = module.image;
-                System.out.println("Module: " + module);
+      moduleID = jj_consume_token(ID);
+module = new Module(moduleID.image);
+                System.out.println("Module: " + module.getModuleID());
       jj_consume_token(LCHAVETA);
       label_1:
       while (true) {
@@ -180,8 +178,8 @@ if (jjtc000) {
         jj_consume_token(ASSIGN);
         functionID = jj_consume_token(ID);
 Function function = new Function(functionID.image);
-                functionArray.add(function);
-                System.out.println("Function: " + function.getFunctionID());
+                module.addFunction(function);
+                System.out.println("Function: " + functionID.image);
         jj_consume_token(LPAR);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ID:{
@@ -199,8 +197,8 @@ Function function = new Function(functionID.image);
           jj_consume_token(FUNCTION);
           functionID = jj_consume_token(ID);
 Function function = new Function(functionID.image);
-                functionArray.add(function);
-                System.out.println("Function: " + function.getFunctionID());
+                module.addFunction(function);
+                System.out.println("Function: " + functionID.image);
           jj_consume_token(LPAR);
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ID:{
@@ -317,7 +315,6 @@ if (jjtc000) {
                       jjtree.openNodeScope(jjtn000);Token arrayElem;
     try {
       arrayElem = jj_consume_token(ID);
-System.out.println("ArrayElement: " + arrayElem.image);
       jj_consume_token(31);
       jj_consume_token(32);
     } finally {
@@ -333,9 +330,6 @@ if (jjtc000) {
                        jjtree.openNodeScope(jjtn000);Token scalarElem;
     try {
       scalarElem = jj_consume_token(ID);
-jjtree.closeNodeScope(jjtn000, true);
-                          jjtc000 = false;
-System.out.println("ScalarElement: " + scalarElem.image);
     } finally {
 if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
@@ -1056,6 +1050,21 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
+  static private boolean jj_3R_20()
+ {
+    if (jj_scan_token(ID)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_24()) jj_scanpos = xsp;
+    return false;
+  }
+
+  static private boolean jj_3_6()
+ {
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_17()
  {
     if (jj_3R_21()) return true;
@@ -1189,15 +1198,15 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3_5()
- {
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_11()
  {
     if (jj_scan_token(ID)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_5()
+ {
+    if (jj_3R_6()) return true;
     return false;
   }
 
@@ -1272,21 +1281,6 @@ if (jjtc000) {
   static private boolean jj_3R_15()
  {
     if (jj_3R_19()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_20()
- {
-    if (jj_scan_token(ID)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_24()) jj_scanpos = xsp;
-    return false;
-  }
-
-  static private boolean jj_3_6()
- {
-    if (jj_3R_8()) return true;
     return false;
   }
 
