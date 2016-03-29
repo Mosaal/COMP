@@ -29,8 +29,6 @@ public class Module {
 	public void addFunction(Function function) {
 		if (!functionArray.contains(function))
 			functionArray.add(function);
-		else
-			System.out.println("Function \"" + function.getFunctionID() + "\" already exists!");
 	}
 
 	public void addGlobalVariable(Variable globalVariable) {
