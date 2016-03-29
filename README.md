@@ -14,5 +14,5 @@ Por exemplo: `java YalToJvm Test.txt`
   * Aceder a elemento do array sem estar inicializado. Ex: a[5]; b = a[3];
   * Ver se a variável existe. Ex: a = b
   * Número e tipo errados de argumentos numa função
-  * Nas comparações verificar se os operandos são do memso tipo.
+  * Nas comparações verificar se os operandos são do mesmo tipo.
   * Pode haver mais ...
