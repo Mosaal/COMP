@@ -4,6 +4,8 @@ Por exemplo: `java YalToJvm Test.txt`
 
 ## TODO's
 
+###Criar AST (Abstract Syntax Tree)
+
 ###Criar hashtables
 
 ### Semantic analysis
