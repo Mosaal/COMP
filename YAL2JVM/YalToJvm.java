@@ -13,18 +13,19 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 FileInputStream fs = new FileInputStream(file);
                 YalToJvm parser = new YalToJvm(fs);
                 SimpleNode root = parser.Module();
-                //root.dump("");
+                root.dump("");
         }
 
   static final public SimpleNode Module() throws ParseException {/*@bgen(jjtree) Module */
-                      SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
-                      boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);Token moduleID;
+                              SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);Token moduleID;
     try {
       jj_consume_token(MODULE);
       moduleID = jj_consume_token(ID);
 module = new Module(moduleID.image);
-                System.out.println("Module: " + module.getModuleID());
+                //System.out.println("Module: " + module.getModuleID());
+
       jj_consume_token(LCHAVETA);
       label_1:
       while (true) {
@@ -78,8 +79,8 @@ if (jjtc000) {
     throw new Error("Missing return statement in function");
   }
 
-  static final public void Declaration() throws ParseException {/*@bgen(jjtree) Declaration */
-  SimpleNode jjtn000 = new SimpleNode(JJTDECLARATION);
+  static final public void Declaration() throws ParseException {/*@bgen(jjtree) ModuleBody */
+  SimpleNode jjtn000 = new SimpleNode(JJTMODULEBODY);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -155,9 +156,9 @@ if (jjtc000) {
   }
 
   static final public void Function() throws ParseException {/*@bgen(jjtree) Function */
-                  SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
-                  boolean jjtc000 = true;
-                  jjtree.openNodeScope(jjtn000);Token functionID;
+                            SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
+                            boolean jjtc000 = true;
+                            jjtree.openNodeScope(jjtn000);Token functionID;
     try {
       if (jj_2_3(3)) {
         jj_consume_token(FUNCTION);
@@ -179,7 +180,8 @@ if (jjtc000) {
         functionID = jj_consume_token(ID);
 Function function = new Function(functionID.image);
                 module.addFunction(function);
-                System.out.println("Function: " + functionID.image);
+                //System.out.println("Function: " + functionID.image);
+
         jj_consume_token(LPAR);
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ID:{
@@ -198,7 +200,8 @@ Function function = new Function(functionID.image);
           functionID = jj_consume_token(ID);
 Function function = new Function(functionID.image);
                 module.addFunction(function);
-                System.out.println("Function: " + functionID.image);
+                //System.out.println("Function: " + functionID.image);
+
           jj_consume_token(LPAR);
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ID:{
@@ -242,8 +245,8 @@ if (jjtc000) {
     }
   }
 
-  static final public void Varlist() throws ParseException {/*@bgen(jjtree) Varlist */
-  SimpleNode jjtn000 = new SimpleNode(JJTVARLIST);
+  static final public void Varlist() throws ParseException {/*@bgen(jjtree) Params */
+  SimpleNode jjtn000 = new SimpleNode(JJTPARAMS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
@@ -337,8 +340,8 @@ if (jjtc000) {
     }
   }
 
-  static final public void Stmtlst() throws ParseException {/*@bgen(jjtree) Stmtlst */
-  SimpleNode jjtn000 = new SimpleNode(JJTSTMTLST);
+  static final public void Stmtlst() throws ParseException {/*@bgen(jjtree) FunctionBody */
+  SimpleNode jjtn000 = new SimpleNode(JJTFUNCTIONBODY);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {

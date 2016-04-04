@@ -2,12 +2,12 @@
 public interface YalToJvmTreeConstants
 {
   public int JJTMODULE = 0;
-  public int JJTDECLARATION = 1;
+  public int JJTMODULEBODY = 1;
   public int JJTFUNCTION = 2;
-  public int JJTVARLIST = 3;
+  public int JJTPARAMS = 3;
   public int JJTARRAYELEMENT = 4;
   public int JJTSCALARELEMENT = 5;
-  public int JJTSTMTLST = 6;
+  public int JJTFUNCTIONBODY = 6;
   public int JJTSTMT = 7;
   public int JJTASSIGN = 8;
   public int JJTLHS = 9;
@@ -27,12 +27,12 @@ public interface YalToJvmTreeConstants
 
   public String[] jjtNodeName = {
     "Module",
-    "Declaration",
+    "ModuleBody",
     "Function",
-    "Varlist",
+    "Params",
     "ArrayElement",
     "ScalarElement",
-    "Stmtlst",
+    "FunctionBody",
     "Stmt",
     "Assign",
     "Lhs",
@@ -50,4 +50,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=d9c974ec0f42f737becf6a4d89dc5bc6 (do not edit this line) */
+/* JavaCC - OriginalChecksum=239bd63106070305c4e1ea1b4d80edcf (do not edit this line) */

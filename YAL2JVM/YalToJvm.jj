@@ -21,7 +21,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		//root.dump("");
+		root.dump("");
 	}
 }
 
@@ -66,17 +66,17 @@ PARSER_END(YalToJvm)
 	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
 }
 
-SimpleNode Module(): {/*@bgen(jjtree) Module */
-                      SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
-                      boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);
+SimpleNode Module()        : {/*@bgen(jjtree) Module */
+                              SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);
 /*@egen*/Token moduleID;}
 {/*@bgen(jjtree) Module */
         try {
 /*@egen*/
 	<MODULE> moduleID=<ID> {
 		module = new Module(moduleID.image);
-		System.out.println("Module: " + module.getModuleID());
+		//System.out.println("Module: " + module.getModuleID());
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA>/*@bgen(jjtree)*/
                                                                {
                                                                  jjtree.closeNodeScope(jjtn000, true);
@@ -105,12 +105,12 @@ SimpleNode Module(): {/*@bgen(jjtree) Module */
 /*@egen*/
 }
 
-void Declaration(): {/*@bgen(jjtree) Declaration */
-  SimpleNode jjtn000 = new SimpleNode(JJTDECLARATION);
+void Declaration()            : {/*@bgen(jjtree) ModuleBody */
+  SimpleNode jjtn000 = new SimpleNode(JJTMODULEBODY);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) Declaration */
+{/*@bgen(jjtree) ModuleBody */
         try {
 /*@egen*/
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>/*@bgen(jjtree)*/
@@ -136,10 +136,10 @@ void Declaration(): {/*@bgen(jjtree) Declaration */
 /*@egen*/
 }
 
-void Function(): {/*@bgen(jjtree) Function */
-                  SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
-                  boolean jjtc000 = true;
-                  jjtree.openNodeScope(jjtn000);
+void Function()          : {/*@bgen(jjtree) Function */
+                            SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
+                            boolean jjtc000 = true;
+                            jjtree.openNodeScope(jjtn000);
 /*@egen*/Token functionID;}
 {/*@bgen(jjtree) Function */
         try {
@@ -147,11 +147,11 @@ void Function(): {/*@bgen(jjtree) Function */
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
-		System.out.println("Function: " + functionID.image);
+		//System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
-		System.out.println("Function: " + functionID.image);
+		//System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
@@ -175,12 +175,12 @@ void Function(): {/*@bgen(jjtree) Function */
 /*@egen*/
 }
 
-void Varlist(): {/*@bgen(jjtree) Varlist */
-  SimpleNode jjtn000 = new SimpleNode(JJTVARLIST);
+void Varlist()        : {/*@bgen(jjtree) Params */
+  SimpleNode jjtn000 = new SimpleNode(JJTPARAMS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) Varlist */
+{/*@bgen(jjtree) Params */
         try {
 /*@egen*/
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*/*@bgen(jjtree)*/
@@ -240,12 +240,12 @@ void ScalarElement(): {/*@bgen(jjtree) ScalarElement */
 /*@egen*/
 }
 
-void Stmtlst(): {/*@bgen(jjtree) Stmtlst */
-  SimpleNode jjtn000 = new SimpleNode(JJTSTMTLST);
+void Stmtlst()              : {/*@bgen(jjtree) FunctionBody */
+  SimpleNode jjtn000 = new SimpleNode(JJTFUNCTIONBODY);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) Stmtlst */
+{/*@bgen(jjtree) FunctionBody */
         try {
 /*@egen*/
 	(Stmt())*/*@bgen(jjtree)*/

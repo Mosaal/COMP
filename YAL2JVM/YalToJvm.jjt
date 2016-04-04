@@ -62,33 +62,33 @@ PARSER_END(YalToJvm)
 	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
 }
 
-SimpleNode Module(): {Token moduleID;}
+SimpleNode Module() #Module: {Token moduleID;}
 {
 	<MODULE> moduleID=<ID> {
 		module = new Module(moduleID.image);
-		System.out.println("Module: " + module.getModuleID());
+		//System.out.println("Module: " + module.getModuleID());
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
-void Declaration(): {}
+void Declaration() #ModuleBody: {}
 {
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
 }
 
-void Function(): {Token functionID;}
+void Function() #Function: {Token functionID;}
 {
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
-		System.out.println("Function: " + functionID.image);
+		//System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
-		System.out.println("Function: " + functionID.image);
+		//System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
 }
 
-void Varlist(): {}
+void Varlist() #Params: {}
 {
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
 }
@@ -103,7 +103,7 @@ void ScalarElement(): {Token scalarElem;}
 	scalarElem=<ID>
 }
 
-void Stmtlst(): {}
+void Stmtlst() #FunctionBody: {}
 {
 	(Stmt())*
 }
