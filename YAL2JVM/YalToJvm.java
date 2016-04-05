@@ -13,7 +13,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 FileInputStream fs = new FileInputStream(file);
                 YalToJvm parser = new YalToJvm(fs);
                 SimpleNode root = parser.Module();
-                root.dump("");
+                //root.dump("");
         }
 
   static final public SimpleNode Module() throws ParseException {/*@bgen(jjtree) Module */

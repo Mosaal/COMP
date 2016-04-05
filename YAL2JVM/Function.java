@@ -5,6 +5,7 @@ import java.util.*;
 public class Function {
 
 	private String functionID;
+	private HashMap<String,Variable> variableMap;
 	private ArrayList<Variable> variableArray;
 
 	public Function(String functionID) {
@@ -41,7 +42,8 @@ public class Function {
 	public void setVariableValue(String variableID, int value) {
 		for (Variable array: variableArray) {
 			if (array.getVariableID() == variableID)
-				array.setValue(value);
+				if(array instanceof Scalar)
+					((Scalar)array).setValue(value);
 		}
 	}
 }
