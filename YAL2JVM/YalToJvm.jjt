@@ -17,7 +17,7 @@ public class YalToJvm {
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		//root.dump("");
+		root.dump("");
 	}
 }
 
@@ -70,7 +70,7 @@ SimpleNode Module() #Module: {Token moduleID;}
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
-void Declaration() #ModuleBody: {}
+void Declaration() #void: {}
 {
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
 }
@@ -93,14 +93,14 @@ void Varlist() #Params: {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
 }
 
-void ArrayElement(): {Token arrayElem;}
+void ArrayElement() #Var: {Token arrayElem;}
 {
-	arrayElem=<ID> "[" "]"
+	arrayElem=<ID> { jjtThis.val = arrayElem.image; } "[" "]"
 }
 
-void ScalarElement(): {Token scalarElem;}
+void ScalarElement() #Var: {Token scalarElem;}
 {
-	scalarElem=<ID>
+	scalarElem=<ID> { jjtThis.val = scalarElem.image; }
 }
 
 void Stmtlst() #FunctionBody: {}
@@ -108,7 +108,7 @@ void Stmtlst() #FunctionBody: {}
 	(Stmt())*
 }
 
-void Stmt(): {}
+void Stmt() #Inst: {}
 {
 	While() | If() | LOOKAHEAD(3) Assign() | Call() <PVIRG>
 }
