@@ -7,18 +7,19 @@ public interface YalToJvmTreeConstants
   public int JJTPARAMS = 3;
   public int JJTVAR = 4;
   public int JJTFUNCTIONBODY = 5;
-  public int JJTASSIGNEMENT = 6;
-  public int JJTARRAYSIZE = 7;
-  public int JJTTERM = 8;
-  public int JJTCONDITION = 9;
-  public int JJTWHILE = 10;
-  public int JJTIF = 11;
-  public int JJTCALL = 12;
-  public int JJTARGUMENTLIST = 13;
-  public int JJTARGUMENT = 14;
-  public int JJTARRAYACCESS = 15;
-  public int JJTSCALARACCESS = 16;
-  public int JJTINDEX = 17;
+  public int JJTBODY = 6;
+  public int JJTASSIGNEMENT = 7;
+  public int JJTARRAYSIZE = 8;
+  public int JJTTERM = 9;
+  public int JJTCONDITION = 10;
+  public int JJTWHILE = 11;
+  public int JJTIF = 12;
+  public int JJTCALL = 13;
+  public int JJTARGUMENTLIST = 14;
+  public int JJTARGUMENT = 15;
+  public int JJTARRAYACCESS = 16;
+  public int JJTSCALARACCESS = 17;
+  public int JJTINDEX = 18;
 
 
   public String[] jjtNodeName = {
@@ -28,6 +29,7 @@ public interface YalToJvmTreeConstants
     "Params",
     "Var",
     "FunctionBody",
+    "Body",
     "Assignement",
     "ArraySize",
     "Term",
@@ -42,4 +44,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=cd6c4e1b1a848be1ffd106bc36aafeca (do not edit this line) */
+/* JavaCC - OriginalChecksum=663a282569e0e254ed75c4b855c94995 (do not edit this line) */

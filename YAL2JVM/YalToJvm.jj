@@ -63,7 +63,7 @@ PARSER_END(YalToJvm)
 	| <ID: <LETTER> (<LETTER> | <DIGIT>)*>
 	| <#LETTER: ["$","A"-"Z","_","a"-"z"]>
 	| <#DIGIT: ["0"-"9"]>
-	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
+	| <STRING: <ASPA> (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ <ASPA>>
 }
 
 SimpleNode Module()        : {/*@bgen(jjtree) Module */
@@ -250,9 +250,35 @@ void FunctionBody()              : {/*@bgen(jjtree) FunctionBody */
 /*@egen*/
 }
 
-void Stmtlst()      : {}
-{
-	(Stmt())*
+void Stmtlst()      : {/*@bgen(jjtree) Body */
+  SimpleNode jjtn000 = new SimpleNode(JJTBODY);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) Body */
+        try {
+/*@egen*/
+	(Stmt())*/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
 }
 
 void Stmt()      : {}
@@ -394,7 +420,7 @@ void Exprtest()           : {/*@bgen(jjtree) Condition */
 /*@egen*/
 }
 
-void While()       : {/*@bgen(jjtree) While */
+void While(): {/*@bgen(jjtree) While */
   SimpleNode jjtn000 = new SimpleNode(JJTWHILE);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
@@ -425,7 +451,7 @@ void While()       : {/*@bgen(jjtree) While */
 /*@egen*/
 }
 
-void If()    : {/*@bgen(jjtree) If */
+void If(): {/*@bgen(jjtree) If */
   SimpleNode jjtn000 = new SimpleNode(JJTIF);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);

@@ -59,7 +59,7 @@ PARSER_END(YalToJvm)
 	| <ID: <LETTER> (<LETTER> | <DIGIT>)*>
 	| <#LETTER: ["$","A"-"Z","_","a"-"z"]>
 	| <#DIGIT: ["0"-"9"]>
-	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
+	| <STRING: <ASPA> (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ <ASPA>>
 }
 
 SimpleNode Module() #Module: {Token moduleID;}
@@ -108,7 +108,7 @@ void FunctionBody() #FunctionBody: {}
 	(Stmt())*
 }
 
-void Stmtlst() #void: {}
+void Stmtlst() #Body: {}
 {
 	(Stmt())*
 }
@@ -148,12 +148,12 @@ void Exprtest() #Condition: {}
 	<LPAR> Lhs() <RELA_OP> Rhs() <RPAR>
 }
 
-void While() #While: {}
+void While(): {}
 {
 	<WHILE> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA>
 }
 
-void If() #If: {}
+void If(): {}
 {
 	<IF> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA> (<ELSE> <LCHAVETA> Stmtlst() <RCHAVETA>)?
 }
