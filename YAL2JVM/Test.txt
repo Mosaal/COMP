@@ -1,4 +1,7 @@
 module while4 {
+	a = 2;
+	b = 4;
+
 	function f1(v[], N, x) {
 		i = 0;
 		while (i < N) {

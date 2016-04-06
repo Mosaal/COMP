@@ -85,7 +85,7 @@ void Function() #Function: {Token functionID;}
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
 		//System.out.println("Function: " + functionID.image);
-	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
+	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> FunctionBody() <RCHAVETA>
 }
 
 void Varlist() #Params: {}
@@ -103,27 +103,32 @@ void ScalarElement() #Var: {Token scalarElem;}
 	scalarElem=<ID> { jjtThis.val = scalarElem.image; }
 }
 
-void Stmtlst() #FunctionBody: {}
+void FunctionBody() #FunctionBody: {}
 {
 	(Stmt())*
 }
 
-void Stmt() #Inst: {}
+void Stmtlst() #void: {}
+{
+	(Stmt())*
+}
+
+void Stmt() #void: {}
 {
 	While() | If() | LOOKAHEAD(3) Assign() | Call() <PVIRG>
 }
 
-void Assign(): {}
+void Assign() #Assignement: {}
 {
 	Lhs() <ASSIGN> Rhs() <PVIRG>
 }
 
-void Lhs(): {}
+void Lhs() #void: {}
 {
 	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
 }
 
-void Rhs(): {}
+void Rhs() #void: {}
 {
 	(Term() ((<ARITH_OP> | <BITWISE_OP> | <ADDSUB_OP>) Term())?) | "[" ArraySize() "]"
 }
@@ -138,17 +143,17 @@ void Term(): {}
 	(<ADDSUB_OP>)? (<INTEGER> | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
 }
 
-void Exprtest(): {}
+void Exprtest() #Condition: {}
 {
 	<LPAR> Lhs() <RELA_OP> Rhs() <RPAR>
 }
 
-void While(): {}
+void While() #While: {}
 {
 	<WHILE> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA>
 }
 
-void If(): {}
+void If() #If: {}
 {
 	<IF> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA> (<ELSE> <LCHAVETA> Stmtlst() <RCHAVETA>)?
 }

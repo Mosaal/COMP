@@ -59,8 +59,7 @@ class SimpleNode implements Node {
      you need to do. */
 
   public String toString() {
-    if (YalToJvmTreeConstants.jjtNodeName[id] != "Var")
-      return YalToJvmTreeConstants.jjtNodeName[id];
+    return YalToJvmTreeConstants.jjtNodeName[id];
   }
   public String toString(String prefix) { return prefix + toString(); }
 
@@ -70,14 +69,11 @@ class SimpleNode implements Node {
   public void dump(String prefix) {
     System.out.println(toString(prefix));
 
-    switch (this.id) {
-      case YalToJvmTreeConstants.JJTPARAMS:
-        for (int i = 0; i < children.length; i++) {
-          SimpleNode temp = (SimpleNode)children[i];
-          System.out.println("\t[ " + temp.val + " ]");
-        }
-        break;
-    }
+    // switch (this.id) {
+    //   case YalToJvmTreeConstants.JJTVAR:
+    //     System.out.print("\t[ " + val + " ]");
+    //     break;
+    // }
 
     if (children != null) {
       for (int i = 0; i < children.length; ++i) {
