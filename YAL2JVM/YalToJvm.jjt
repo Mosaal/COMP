@@ -163,7 +163,7 @@ void Call(): {}
 	<ID> ("." <ID>)? <LPAR> (ArgumentList())? <RPAR>
 }
 
-void ArgumentList(): {}
+void ArgumentList() #Arguments: {}
 {
 	Argument() (<VIRG> Argument())*
 }

@@ -15,7 +15,7 @@ public interface YalToJvmTreeConstants
   public int JJTWHILE = 11;
   public int JJTIF = 12;
   public int JJTCALL = 13;
-  public int JJTARGUMENTLIST = 14;
+  public int JJTARGUMENTS = 14;
   public int JJTARGUMENT = 15;
   public int JJTARRAYACCESS = 16;
   public int JJTSCALARACCESS = 17;
@@ -37,11 +37,11 @@ public interface YalToJvmTreeConstants
     "While",
     "If",
     "Call",
-    "ArgumentList",
+    "Arguments",
     "Argument",
     "ArrayAccess",
     "ScalarAccess",
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=663a282569e0e254ed75c4b855c94995 (do not edit this line) */
+/* JavaCC - OriginalChecksum=7350bfc4bd9a6e32b8c64e6d08bcebc8 (do not edit this line) */

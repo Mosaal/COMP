@@ -513,12 +513,12 @@ void Call(): {/*@bgen(jjtree) Call */
 /*@egen*/
 }
 
-void ArgumentList(): {/*@bgen(jjtree) ArgumentList */
-  SimpleNode jjtn000 = new SimpleNode(JJTARGUMENTLIST);
+void ArgumentList()           : {/*@bgen(jjtree) Arguments */
+  SimpleNode jjtn000 = new SimpleNode(JJTARGUMENTS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
 /*@egen*/}
-{/*@bgen(jjtree) ArgumentList */
+{/*@bgen(jjtree) Arguments */
         try {
 /*@egen*/
 	Argument() (<VIRG> Argument())*/*@bgen(jjtree)*/

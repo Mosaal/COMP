@@ -784,8 +784,8 @@ if (jjtc000) {
     }
   }
 
-  static final public void ArgumentList() throws ParseException {/*@bgen(jjtree) ArgumentList */
-  SimpleNode jjtn000 = new SimpleNode(JJTARGUMENTLIST);
+  static final public void ArgumentList() throws ParseException {/*@bgen(jjtree) Arguments */
+  SimpleNode jjtn000 = new SimpleNode(JJTARGUMENTS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);
     try {
