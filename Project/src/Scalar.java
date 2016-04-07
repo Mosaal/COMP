@@ -2,11 +2,10 @@
 
 public class Scalar extends Variable {
 	private int value;
-	private String variableID;
 
 	public Scalar(String id, int v) {
 		super(id);
-    value = v;
+		value = v;
 	}
 
   public int getValue() {

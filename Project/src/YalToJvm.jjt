@@ -67,7 +67,9 @@ SimpleNode Module() #Module: {Token moduleID;}
 	<MODULE> moduleID=<ID> {
 		module = new Module(moduleID.image);
 		//System.out.println("Module: " + module.getModuleID());
-	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
+	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> {
+		return jjtThis;
+	}
 }
 
 void Declaration() #ModuleBody: {}

@@ -5,7 +5,6 @@ import java.util.*;
 public class Module {
 
 	private String moduleID;
-	private ArrayList<Function> functionArray;
 	private HashMap<String,Function> functionMap;
 	private HashMap<String,Variable> globalVariableMap;
 
@@ -27,13 +26,20 @@ public class Module {
 		return globalVariableMap;
 	}
 
-	public void addFunction(Function function) {
-		if (!functionMap.containsKey(function.getFunctionID()))
+	public boolean addFunction(Function function) {
+		if (!functionMap.containsKey(function.getFunctionID())){
 			functionMap.put(function.getFunctionID(),function);
+			return true;
+		}else{
+			return false;
+		}
 	}
 
-	public void addGlobalVariable(Variable globalVariable) {
-		if (!globalVariableMap.containsKey(globalVariable.getVariableID()))
-			globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
-	}
+	public boolean addGlobalVariable(Variable globalVariable) {
+		if (!globalVariableMap.containsKey(globalVariable.getVariableID())){
+				globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
+				return true;
+		}else
+			return false;
+		}
 }
