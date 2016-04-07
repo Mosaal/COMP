@@ -80,18 +80,24 @@ if (jjtc000) {
   }
 
   static final public void Declaration() throws ParseException {/*@bgen(jjtree) Declaration */
-                                   SimpleNode jjtn000 = new SimpleNode(JJTDECLARATION);
-                                   boolean jjtc000 = true;
-                                   jjtree.openNodeScope(jjtn000);String id; int size; Token integer; Token sign = null;
+        SimpleNode jjtn000 = new SimpleNode(JJTDECLARATION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);String id;
+        boolean array;
+        int size;
+        boolean assignment = false;
+        Token t_int;
+        Token t_sign;
+        String sign = null;
     try {
       if (jj_2_1(2)) {
         id = ArrayElement();
-module.addGlobalVariable(new Array(id,1));
+array = true;
       } else {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ID:{
           id = ScalarElement();
-module.addGlobalVariable(new Variable(id));
+array = false;
           break;
           }
         default:
@@ -115,20 +121,20 @@ module.addGlobalVariable(new Variable(id));
         case INTEGER:{
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ADDSUB_OP:{
-            sign = jj_consume_token(ADDSUB_OP);
+            t_sign = jj_consume_token(ADDSUB_OP);
+sign = t_sign.image;
             break;
             }
           default:
             jj_la1[3] = jj_gen;
             ;
           }
-          integer = jj_consume_token(INTEGER);
-Variable s = module.getGlobalVariable(id);
-                if(s instanceof Variable){
-                        s = new Scalar(id,Integer.parseInt(integer.image));
-                        module.addGlobalVariable(s);
-                        System.out.println("Its a scalar");
-                }
+          t_int = jj_consume_token(INTEGER);
+int mul = 1;
+                                if(sign != null && sign.equals("-"))
+                                         mul = -1;
+                                Scalar scalar = new Scalar(id,mul*Integer.parseInt(t_int.image));
+                                module.addGlobalVariable(scalar);
           break;
           }
         default:
@@ -136,6 +142,7 @@ Variable s = module.getGlobalVariable(id);
           jj_consume_token(-1);
           throw new ParseException();
         }
+assignment = true;
         break;
         }
       default:
@@ -143,6 +150,21 @@ Variable s = module.getGlobalVariable(id);
         ;
       }
       jj_consume_token(PVIRG);
+jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+if(assignment){
+                        if(!module.checkGlobalVariable(id))
+                                System.out.println("ERROR: The variable " + id + " is not declared");
+                }else{
+                        if(module.checkGlobalVariable(id))
+                                System.out.println("ERROR: The variable " + id + " is already declared");
+                        else{
+                                if(array)
+                                        module.addGlobalVariable(new Array(id,1));
+                                else
+                                        module.addGlobalVariable(new Scalar(id));
+                        }
+                }
     } catch (Throwable jjte000) {
 if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -1046,6 +1068,46 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
+  static private boolean jj_3_8()
+ {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_9()
+ {
+    if (jj_3R_13()) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_15()
+ {
+    if (jj_scan_token(33)) return true;
+    if (jj_scan_token(ID)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_20()
+ {
+    if (jj_3R_23()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11()
+ {
+    if (jj_scan_token(ID)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_15()) jj_scanpos = xsp;
+    if (jj_scan_token(LPAR)) return true;
+    xsp = jj_scanpos;
+    if (jj_3R_16()) jj_scanpos = xsp;
+    if (jj_scan_token(RPAR)) return true;
+    return false;
+  }
+
   static private boolean jj_3R_17()
  {
     if (jj_3R_21()) return true;
@@ -1053,12 +1115,6 @@ if (jjtc000) {
   }
 
   static private boolean jj_3_2()
- {
-    if (jj_3R_7()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_1()
  {
     if (jj_3R_7()) return true;
     return false;
@@ -1240,43 +1296,9 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3_8()
+  static private boolean jj_3_1()
  {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_9()
- {
-    if (jj_3R_13()) return true;
-    if (jj_scan_token(ASSIGN)) return true;
-    if (jj_3R_14()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_15()
- {
-    if (jj_scan_token(33)) return true;
-    if (jj_scan_token(ID)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_20()
- {
-    if (jj_3R_23()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_11()
- {
-    if (jj_scan_token(ID)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_15()) jj_scanpos = xsp;
-    if (jj_scan_token(LPAR)) return true;
-    xsp = jj_scanpos;
-    if (jj_3R_16()) jj_scanpos = xsp;
-    if (jj_scan_token(RPAR)) return true;
+    if (jj_3R_7()) return true;
     return false;
   }
 

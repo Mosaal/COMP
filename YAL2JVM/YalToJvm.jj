@@ -106,31 +106,73 @@ SimpleNode Module()        : {/*@bgen(jjtree) Module */
 }
 
 void Declaration()             : {/*@bgen(jjtree) Declaration */
-                                   SimpleNode jjtn000 = new SimpleNode(JJTDECLARATION);
-                                   boolean jjtc000 = true;
-                                   jjtree.openNodeScope(jjtn000);
-/*@egen*/ String id; int size; Token integer; Token sign = null; }
+        SimpleNode jjtn000 = new SimpleNode(JJTDECLARATION);
+        boolean jjtc000 = true;
+        jjtree.openNodeScope(jjtn000);
+/*@egen*/
+	String id;
+	boolean array;
+	int size;
+	boolean assignment = false;
+	Token t_int;
+	Token t_sign;
+	String sign = null;
+}
 {/*@bgen(jjtree) Declaration */
         try {
 /*@egen*/
-	(LOOKAHEAD(2)
-	id=ArrayElement() {
-		module.addGlobalVariable(new Array(id,1));
-	}
-	| id=ScalarElement() {
-		module.addGlobalVariable(new Variable(id));
-	} )
-	(<ASSIGN> (("[" size=ArraySize() "]") {
-
-	}
-	| (sign=<ADDSUB_OP>)? integer=<INTEGER> {
-		Variable s = module.getGlobalVariable(id);
-		if(s instanceof Variable){
-			s = new Scalar(id,Integer.parseInt(integer.image));
-			module.addGlobalVariable(s);
-			System.out.println("Its a scalar");
+	( LOOKAHEAD(2)
+		id = ArrayElement()
+		{
+			array = true;
 		}
-	} ) )? <PVIRG>/*@bgen(jjtree)*/
+		| id = ScalarElement()
+		{
+			array = false;
+		}
+	)
+	(
+		<ASSIGN>
+		(
+			( "[" size = ArraySize() "]" )
+			{
+
+			}
+			| ( t_sign = <ADDSUB_OP> { sign = t_sign.image; } )?
+			t_int = <INTEGER>
+			{
+				int mul = 1;
+				if(sign != null && sign.equals("-"))
+					 mul = -1;
+				Scalar scalar = new Scalar(id,mul*Integer.parseInt(t_int.image));
+				module.addGlobalVariable(scalar);
+			}
+		)
+		{
+			assignment = true;
+		}
+	)?
+	<PVIRG>/*@bgen(jjtree)*/
+        {
+          jjtree.closeNodeScope(jjtn000, true);
+          jjtc000 = false;
+        }
+/*@egen*/
+	{
+		if(assignment){
+			if(!module.checkGlobalVariable(id))
+				System.out.println("ERROR: The variable " + id + " is not declared");
+		}else{
+			if(module.checkGlobalVariable(id))
+				System.out.println("ERROR: The variable " + id + " is already declared");
+			else{
+				if(array)
+					module.addGlobalVariable(new Array(id,1));
+				else
+					module.addGlobalVariable(new Scalar(id));
+			}
+		}
+	}/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
