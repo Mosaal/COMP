@@ -1,0 +1,184 @@
+options {
+	LOOKAHEAD = 1;
+}
+
+PARSER_BEGIN(YalToJvm)
+
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.io.File;
+
+public class YalToJvm {
+
+	private static Module module;
+
+	public static void main(String[] args) throws ParseException, FileNotFoundException {
+		File file = new File(args[0]);
+		FileInputStream fs = new FileInputStream(file);
+		YalToJvm parser = new YalToJvm(fs);
+		SimpleNode root = parser.Module();
+		//root.dump("");
+	}
+}
+
+PARSER_END(YalToJvm)
+
+<DEFAULT> SKIP: {
+	" "
+	| "\t"
+	| "\n"
+	| "\r"
+	| <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+	| <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+<DEFAULT> TOKEN: {
+	<RELA_OP: ">" | "<" | "<=" | ">=" | "==" | "!=">
+	| <ADDSUB_OP: "+" | "-">
+	| <ARITH_OP: "*" | "/" | "<<" | ">>" | ">>>">
+	| <BITWISE_OP: "&" | "|" | "^">
+	| <NOT_OP: "!">
+	| <WHILE: "while">
+	| <IF: "if">
+	| <ELSE: "else">
+	| <ASSIGN: "=">
+	| <ASPA: "\"">
+	| <LPAR: "(">
+	| <RPAR: ")">
+	| <VIRG: ",">
+	| <PVIRG: ";">
+	| <LCHAVETA: "{">
+	| <RCHAVETA: "}">
+	| <FUNCTION: "function">
+	| <MODULE: "module">
+	| <SIZE: "size">
+}
+
+<DEFAULT> TOKEN: {
+	<INTEGER: (<DIGIT>)+>
+	| <ID: <LETTER> (<LETTER> | <DIGIT>)*>
+	| <#LETTER: ["$","A"-"Z","_","a"-"z"]>
+	| <#DIGIT: ["0"-"9"]>
+	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
+}
+
+SimpleNode Module() #Module: {Token moduleID;}
+{
+	<MODULE> moduleID=<ID> {
+		module = new Module(moduleID.image);
+		//System.out.println("Module: " + module.getModuleID());
+	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
+}
+
+void Declaration() #ModuleBody: {}
+{
+	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
+}
+
+void Function() #Function: {Token functionID;}
+{
+	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
+		Function function = new Function(functionID.image);
+		module.addFunction(function);
+		//System.out.println("Function: " + functionID.image);
+	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
+		Function function = new Function(functionID.image);
+		module.addFunction(function);
+		//System.out.println("Function: " + functionID.image);
+	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
+}
+
+void Varlist() #Params: {}
+{
+	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
+}
+
+void ArrayElement(): {Token arrayElem;}
+{
+	arrayElem=<ID> "[" "]"
+}
+
+void ScalarElement(): {Token scalarElem;}
+{
+	scalarElem=<ID>
+}
+
+void Stmtlst() #FunctionBody: {}
+{
+	(Stmt())*
+}
+
+void Stmt(): {}
+{
+	While() | If() | LOOKAHEAD(3) Assign() | Call() <PVIRG>
+}
+
+void Assign(): {}
+{
+	Lhs() <ASSIGN> Rhs() <PVIRG>
+}
+
+void Lhs(): {}
+{
+	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
+}
+
+void Rhs(): {}
+{
+	(Term() ((<ARITH_OP> | <BITWISE_OP> | <ADDSUB_OP>) Term())?) | "[" ArraySize() "]"
+}
+
+void ArraySize(): {}
+{
+	ScalarAccess() | <INTEGER>
+}
+
+void Term(): {}
+{
+	(<ADDSUB_OP>)? (<INTEGER> | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
+}
+
+void Exprtest(): {}
+{
+	<LPAR> Lhs() <RELA_OP> Rhs() <RPAR>
+}
+
+void While(): {}
+{
+	<WHILE> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA>
+}
+
+void If(): {}
+{
+	<IF> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA> (<ELSE> <LCHAVETA> Stmtlst() <RCHAVETA>)?
+}
+
+void Call(): {}
+{
+	<ID> ("." <ID>)? <LPAR> (ArgumentList())? <RPAR>
+}
+
+void ArgumentList(): {}
+{
+	Argument() (<VIRG> Argument())*
+}
+
+void Argument(): {}
+{
+	<ID> | <STRING> | <INTEGER>
+}
+
+void ArrayAccess(): {}
+{
+	<ID> "[" Index() "]"
+}
+
+void ScalarAccess(): {}
+{
+	<ID> ("." <SIZE>)?
+}
+
+void Index(): {}
+{
+	<ID> | <INTEGER>
+}
