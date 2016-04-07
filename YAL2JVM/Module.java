@@ -5,7 +5,6 @@ import java.util.*;
 public class Module {
 
 	private String moduleID;
-	private ArrayList<Function> functionArray;
 	private HashMap<String,Function> functionMap;
 	private HashMap<String,Variable> globalVariableMap;
 
@@ -27,13 +26,34 @@ public class Module {
 		return globalVariableMap;
 	}
 
+	public boolean checkGlobalVariable(String id){
+		return functionMap.containsKey(id);
+	}
+
 	public void addFunction(Function function) {
-		if (!functionMap.containsKey(function.getFunctionID()))
 			functionMap.put(function.getFunctionID(),function);
 	}
 
 	public void addGlobalVariable(Variable globalVariable) {
-		if (!globalVariableMap.containsKey(globalVariable.getVariableID()))
 			globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
+	}
+
+	public Variable getGlobalVariable(String key) {
+		if (globalVariableMap.containsKey(key))
+			return globalVariableMap.get(key);
+		else
+			return null;
+	}
+
+	public void printSymbolTables(){
+		System.out.println("--FUNCTIONS--");
+		for(String key : functionMap.keySet()) {
+     System.out.println(key + " : " + functionMap.get(key));
+	 	}
+		System.out.println("--GLOBAL VARIABLES--");
+		for(String key : globalVariableMap.keySet()) {
+			Variable var = globalVariableMap.get(key);
+			System.out.println(var.toString());
+		}
 	}
 }

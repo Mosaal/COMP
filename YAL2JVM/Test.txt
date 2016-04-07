@@ -1,7 +1,8 @@
 module while4 {
-	a = 2;
-	b = 4;
+	a;
+	b = 3;
 
+/*
 	function f1(v[], N, x) {
 		i = 0;
 		while (i < N) {
@@ -18,4 +19,5 @@ module while4 {
 		A4 = A[4];
 		io.print("A4: ", A4);
 	}
+	*/
 }

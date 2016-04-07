@@ -67,15 +67,32 @@ SimpleNode Module() #Module: {Token moduleID;}
 	<MODULE> moduleID=<ID> {
 		module = new Module(moduleID.image);
 		//System.out.println("Module: " + module.getModuleID());
-	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
+	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { module.printSymbolTables();return jjtThis;  }
 }
 
-void Declaration() #void: {}
+void Declaration() #Declaration: { String id; int size; Token integer; Token sign = null; }
 {
-	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
+	(LOOKAHEAD(2)
+	id=ArrayElement() {
+		module.addGlobalVariable(new Array(id,1));
+	}
+	| id=ScalarElement() {
+		module.addGlobalVariable(new Variable(id));
+	} )
+	(<ASSIGN> (("[" size=ArraySize() "]") {
+
+	}
+	| (sign=<ADDSUB_OP>)? integer=<INTEGER> {
+		Variable s = module.getGlobalVariable(id);
+		if(s instanceof Variable){
+			s = new Scalar(id,Integer.parseInt(integer.image));
+			module.addGlobalVariable(s);
+			System.out.println("Its a scalar");
+		}
+	} ) )? <PVIRG>
 }
 
-void Function() #Function: {Token functionID;}
+void Function() #Function: { Token functionID; }
 {
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
 		Function function = new Function(functionID.image);
@@ -93,14 +110,14 @@ void Varlist() #Params: {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
 }
 
-void ArrayElement() #Var: {Token arrayElem;}
+String ArrayElement() #StoreArray: { Token arrayElem; }
 {
-	arrayElem=<ID> { jjtThis.val = arrayElem.image; } "[" "]"
+	arrayElem=<ID> "[" "]" { return arrayElem.image; }
 }
 
-void ScalarElement() #Var: {Token scalarElem;}
+String ScalarElement() #StoreVariable: { Token scalarElem; }
 {
-	scalarElem=<ID> { jjtThis.val = scalarElem.image; }
+	scalarElem=<ID> { return scalarElem.image; }
 }
 
 void FunctionBody() #FunctionBody: {}
@@ -133,9 +150,9 @@ void Rhs() #void: {}
 	(Term() ((<ARITH_OP> | <BITWISE_OP> | <ADDSUB_OP>) Term())?) | "[" ArraySize() "]"
 }
 
-void ArraySize(): {}
+int ArraySize(): {Token size;}
 {
-	ScalarAccess() | <INTEGER>
+	ScalarAccess() | size=<INTEGER> {return Integer.parseInt(size.image);}
 }
 
 void Term(): {}
