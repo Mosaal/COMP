@@ -1,6 +1,8 @@
 module while4 {
 	a;
-	b = 3;
+	c = -1;
+	a;
+	b = 100;
 
 /*
 	function f1(v[], N, x) {

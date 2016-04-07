@@ -70,26 +70,63 @@ SimpleNode Module() #Module: {Token moduleID;}
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { module.printSymbolTables();return jjtThis;  }
 }
 
-void Declaration() #Declaration: { String id; int size; Token integer; Token sign = null; }
+void Declaration() #Declaration: {
+	String id;
+	boolean array;
+	int size;
+	boolean assignment = false;
+	Token t_int;
+	Token t_sign;
+	String sign = null;
+}
 {
-	(LOOKAHEAD(2)
-	id=ArrayElement() {
-		module.addGlobalVariable(new Array(id,1));
-	}
-	| id=ScalarElement() {
-		module.addGlobalVariable(new Variable(id));
-	} )
-	(<ASSIGN> (("[" size=ArraySize() "]") {
-
-	}
-	| (sign=<ADDSUB_OP>)? integer=<INTEGER> {
-		Variable s = module.getGlobalVariable(id);
-		if(s instanceof Variable){
-			s = new Scalar(id,Integer.parseInt(integer.image));
-			module.addGlobalVariable(s);
-			System.out.println("Its a scalar");
+	( LOOKAHEAD(2)
+		id = ArrayElement()
+		{
+			array = true;
 		}
-	} ) )? <PVIRG>
+		| id = ScalarElement()
+		{
+			array = false;
+		}
+	)
+	(
+		<ASSIGN>
+		(
+			( "[" size = ArraySize() "]" )
+			{
+
+			}
+			| ( t_sign = <ADDSUB_OP> { sign = t_sign.image; } )?
+			t_int = <INTEGER>
+			{
+				int mul = 1;
+				if(sign != null && sign.equals("-"))
+					 mul = -1;
+				Scalar scalar = new Scalar(id,mul*Integer.parseInt(t_int.image));
+				module.addGlobalVariable(scalar);
+			}
+		)
+		{
+			assignment = true;
+		}
+	)?
+	<PVIRG>
+	{
+		if(assignment){
+			if(!module.checkGlobalVariable(id))
+				System.out.println("ERROR: The variable " + id + " is not declared");
+		}else{
+			if(module.checkGlobalVariable(id))
+				System.out.println("ERROR: The variable " + id + " is already declared");
+			else{
+				if(array)
+					module.addGlobalVariable(new Array(id,1));
+				else
+					module.addGlobalVariable(new Scalar(id));
+			}
+		}
+	}
 }
 
 void Function() #Function: { Token functionID; }

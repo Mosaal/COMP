@@ -27,7 +27,7 @@ public class Module {
 	}
 
 	public boolean checkGlobalVariable(String id){
-		return functionMap.containsKey(id);
+		return globalVariableMap.containsKey(id);
 	}
 
 	public void addFunction(Function function) {
