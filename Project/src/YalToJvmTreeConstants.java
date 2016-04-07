@@ -2,52 +2,54 @@
 public interface YalToJvmTreeConstants
 {
   public int JJTMODULE = 0;
-  public int JJTMODULEBODY = 1;
+  public int JJTGLOBAL = 1;
   public int JJTFUNCTION = 2;
   public int JJTPARAMS = 3;
-  public int JJTARRAYELEMENT = 4;
-  public int JJTSCALARELEMENT = 5;
-  public int JJTFUNCTIONBODY = 6;
-  public int JJTSTMT = 7;
-  public int JJTASSIGN = 8;
-  public int JJTLHS = 9;
-  public int JJTRHS = 10;
-  public int JJTARRAYSIZE = 11;
-  public int JJTTERM = 12;
-  public int JJTEXPRTEST = 13;
-  public int JJTWHILE = 14;
-  public int JJTIF = 15;
-  public int JJTCALL = 16;
-  public int JJTARGUMENTLIST = 17;
-  public int JJTARGUMENT = 18;
-  public int JJTARRAYACCESS = 19;
-  public int JJTSCALARACCESS = 20;
-  public int JJTINDEX = 21;
+  public int JJTVAR = 4;
+  public int JJTFUNCTIONBODY = 5;
+  public int JJTWHILEBODY = 6;
+  public int JJTIFBODY = 7;
+  public int JJTELSEBODY = 8;
+  public int JJTVOID = 9;
+  public int JJTASSIGNEMENT = 10;
+  public int JJTRHS = 11;
+  public int JJTARRAYSIZE = 12;
+  public int JJTTERM = 13;
+  public int JJTCONDITION = 14;
+  public int JJTWHILE = 15;
+  public int JJTIF = 16;
+  public int JJTCALL = 17;
+  public int JJTARGUMENTS = 18;
+  public int JJTARGUMENT = 19;
+  public int JJTARRAYACCESS = 20;
+  public int JJTSCALARACCESS = 21;
+  public int JJTINDEX = 22;
 
 
   public String[] jjtNodeName = {
     "Module",
-    "ModuleBody",
+    "Global",
     "Function",
     "Params",
-    "ArrayElement",
-    "ScalarElement",
+    "Var",
     "FunctionBody",
-    "Stmt",
-    "Assign",
-    "Lhs",
+    "WhileBody",
+    "IfBody",
+    "ElseBody",
+    "void",
+    "Assignement",
     "Rhs",
     "ArraySize",
     "Term",
-    "Exprtest",
+    "Condition",
     "While",
     "If",
     "Call",
-    "ArgumentList",
+    "Arguments",
     "Argument",
     "ArrayAccess",
     "ScalarAccess",
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=239bd63106070305c4e1ea1b4d80edcf (do not edit this line) */
+/* JavaCC - OriginalChecksum=09bf94c8f3812100d558a991556f3205 (do not edit this line) */

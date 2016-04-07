@@ -1,4 +1,8 @@
 module while4 {
+	a = 1;
+	b = 2;
+	c;
+
 	function f1(v[], N, x) {
 		i = 0;
 		while (i < N) {
@@ -6,8 +10,6 @@ module while4 {
 			i = i + 1;
 		}
 	}
-
-	function f1(a, b, c) {}
 
 	function main() {
 		A = [5];
