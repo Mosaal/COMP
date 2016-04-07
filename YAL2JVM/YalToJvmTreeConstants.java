@@ -2,34 +2,38 @@
 public interface YalToJvmTreeConstants
 {
   public int JJTMODULE = 0;
-  public int JJTVOID = 1;
+  public int JJTDECLARATION = 1;
   public int JJTFUNCTION = 2;
   public int JJTPARAMS = 3;
-  public int JJTVAR = 4;
-  public int JJTFUNCTIONBODY = 5;
-  public int JJTBODY = 6;
-  public int JJTASSIGNEMENT = 7;
-  public int JJTARRAYSIZE = 8;
-  public int JJTTERM = 9;
-  public int JJTCONDITION = 10;
-  public int JJTWHILE = 11;
-  public int JJTIF = 12;
-  public int JJTCALL = 13;
-  public int JJTARGUMENTLIST = 14;
-  public int JJTARGUMENT = 15;
-  public int JJTARRAYACCESS = 16;
-  public int JJTSCALARACCESS = 17;
-  public int JJTINDEX = 18;
+  public int JJTSTOREARRAY = 4;
+  public int JJTSTOREVARIABLE = 5;
+  public int JJTFUNCTIONBODY = 6;
+  public int JJTBODY = 7;
+  public int JJTVOID = 8;
+  public int JJTASSIGNEMENT = 9;
+  public int JJTARRAYSIZE = 10;
+  public int JJTTERM = 11;
+  public int JJTCONDITION = 12;
+  public int JJTWHILE = 13;
+  public int JJTIF = 14;
+  public int JJTCALL = 15;
+  public int JJTARGUMENTLIST = 16;
+  public int JJTARGUMENT = 17;
+  public int JJTARRAYACCESS = 18;
+  public int JJTSCALARACCESS = 19;
+  public int JJTINDEX = 20;
 
 
   public String[] jjtNodeName = {
     "Module",
-    "void",
+    "Declaration",
     "Function",
     "Params",
-    "Var",
+    "StoreArray",
+    "StoreVariable",
     "FunctionBody",
     "Body",
+    "void",
     "Assignement",
     "ArraySize",
     "Term",
@@ -44,4 +48,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=663a282569e0e254ed75c4b855c94995 (do not edit this line) */
+/* JavaCC - OriginalChecksum=2550d83cce8e5bd9ffabc66a85341acd (do not edit this line) */

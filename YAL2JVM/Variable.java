@@ -1,13 +1,13 @@
 /** This Class shall be used to store information about each variable */
 
 public class Variable {
-	private String variableID;
+	protected String variableID;
 
 	public Variable(String id) {
 		variableID = id;
 	}
 
-	public String getVariableID() {
+	protected String getVariableID() {
 		return variableID;
 	}
 
@@ -18,4 +18,9 @@ public class Variable {
 			return true;
 		return false;
 	}
+
+	public String toString(){
+		return "VARIABLE ID: " + variableID;
+	}
+
 }

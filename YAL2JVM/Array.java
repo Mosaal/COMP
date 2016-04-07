@@ -3,11 +3,16 @@
 public class Array extends Variable {
   private int reference;
   private int[] array;
-  private int size;
+  private Integer size;
 
   public Array(String variableID,int size,int ref) {
     super(variableID);
     array = new int[size];
+    reference = ref;
+	}
+
+  public Array(String variableID,int ref) {
+    super(variableID);
     reference = ref;
 	}
 
