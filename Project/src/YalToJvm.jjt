@@ -70,15 +70,9 @@ SimpleNode Module() #Module: {Token moduleID;}
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
-void Declaration() #Global: {Token op, intID, assign;}
+void Declaration() #void: {}
 {
-	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (assign=<ASSIGN> {
-		jjtThis.assign = assign.image;
-	} (("[" ArraySize() "]") | (op=<ADDSUB_OP> {
-		jjtThis.Op = op.image;
-	})? intID=<INTEGER> {
-		jjtThis.ID = intID.image;
-	}))? <PVIRG>
+	LOOKAHEAD(2) Assign() | LOOKAHEAD(2) (ArrayElement() <PVIRG>) | (ScalarElement() <PVIRG>)
 }
 
 void Function() #Function: {Token functionID;}

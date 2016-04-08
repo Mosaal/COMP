@@ -70,19 +70,10 @@ class SimpleNode implements Node {
 
 	public void dump(String prefix) {
 		//System.out.println(toString(prefix));
-
+		
 		switch (id) {
 		case YalToJvmTreeConstants.JJTMODULE:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
-			break;
-		case YalToJvmTreeConstants.JJTGLOBAL:
-			if (assign != "") {
-				System.out.println(prefix + "[ = ]");
-				if (Op != "" || ID != null)
-					System.out.println(prefix + "[ " + Op + ID + " ]");
-				else
-					System.out.println(prefix + "[ " + ID + " ]");
-			}
 			break;
 		case YalToJvmTreeConstants.JJTFUNCTION:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");

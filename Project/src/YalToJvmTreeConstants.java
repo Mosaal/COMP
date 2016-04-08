@@ -2,7 +2,7 @@
 public interface YalToJvmTreeConstants
 {
   public int JJTMODULE = 0;
-  public int JJTGLOBAL = 1;
+  public int JJTVOID = 1;
   public int JJTFUNCTION = 2;
   public int JJTPARAMS = 3;
   public int JJTVAR = 4;
@@ -10,25 +10,24 @@ public interface YalToJvmTreeConstants
   public int JJTWHILEBODY = 6;
   public int JJTIFBODY = 7;
   public int JJTELSEBODY = 8;
-  public int JJTVOID = 9;
-  public int JJTASSIGNEMENT = 10;
-  public int JJTRHS = 11;
-  public int JJTARRAYSIZE = 12;
-  public int JJTTERM = 13;
-  public int JJTCONDITION = 14;
-  public int JJTWHILE = 15;
-  public int JJTIF = 16;
-  public int JJTCALL = 17;
-  public int JJTARGUMENTS = 18;
-  public int JJTARGUMENT = 19;
-  public int JJTARRAYACCESS = 20;
-  public int JJTSCALARACCESS = 21;
-  public int JJTINDEX = 22;
+  public int JJTASSIGNEMENT = 9;
+  public int JJTRHS = 10;
+  public int JJTARRAYSIZE = 11;
+  public int JJTTERM = 12;
+  public int JJTCONDITION = 13;
+  public int JJTWHILE = 14;
+  public int JJTIF = 15;
+  public int JJTCALL = 16;
+  public int JJTARGUMENTS = 17;
+  public int JJTARGUMENT = 18;
+  public int JJTARRAYACCESS = 19;
+  public int JJTSCALARACCESS = 20;
+  public int JJTINDEX = 21;
 
 
   public String[] jjtNodeName = {
     "Module",
-    "Global",
+    "void",
     "Function",
     "Params",
     "Var",
@@ -36,7 +35,6 @@ public interface YalToJvmTreeConstants
     "WhileBody",
     "IfBody",
     "ElseBody",
-    "void",
     "Assignement",
     "Rhs",
     "ArraySize",
@@ -52,4 +50,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=09bf94c8f3812100d558a991556f3205 (do not edit this line) */
+/* JavaCC - OriginalChecksum=ab3d0f58fdddc7094b0ae790d3f2079d (do not edit this line) */
