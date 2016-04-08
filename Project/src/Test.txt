@@ -1,8 +1,15 @@
 module while4 {
-	a = 1;
-	e = 1;
+	a;
+	b = 1;
+	c = [10];
+	d = [5];
+	e[0] = 1;
 	b = 2;
 	c;
+	
+	function a=f1() {
+		a=2;
+	}
 
 	function f1(v[], N, x) {
 		i = 0;
@@ -12,13 +19,14 @@ module while4 {
 		}
 	}
 
-	function f1(){
+	function f1(a[]){
 		ddv = 0;
 	}
 	
-	function f1(){
+	function f1(a[]){
 		lol = 0;
 		a = 3;
+		b = 8;
 	}
 
 	function main() {

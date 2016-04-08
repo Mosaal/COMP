@@ -7,6 +7,10 @@ public class Scalar extends Variable {
 		super(id);
 		value = v;
 	}
+	
+	public Scalar(String id){
+		super(id);
+	}
 
   public int getValue() {
 		return value;

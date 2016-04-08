@@ -192,12 +192,12 @@ void Varlist()        : {/*@bgen(jjtree) Params */
 /*@egen*/
 }
 
-void ArrayElement()     : {/*@bgen(jjtree) Var */
-                           SimpleNode jjtn000 = new SimpleNode(JJTVAR);
-                           boolean jjtc000 = true;
-                           jjtree.openNodeScope(jjtn000);
-/*@egen*/Token arrayElem;}
-{/*@bgen(jjtree) Var */
+void ArrayElement()       : {/*@bgen(jjtree) Array */
+                              SimpleNode jjtn000 = new SimpleNode(JJTARRAY);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token arrayElem; }
+{/*@bgen(jjtree) Array */
         try {
 /*@egen*/
 	arrayElem=<ID> { jjtn000.ID = arrayElem.image; } "[" "]"/*@bgen(jjtree)*/
@@ -209,12 +209,12 @@ void ArrayElement()     : {/*@bgen(jjtree) Var */
 /*@egen*/
 }
 
-void ScalarElement()     : {/*@bgen(jjtree) Var */
-                            SimpleNode jjtn000 = new SimpleNode(JJTVAR);
-                            boolean jjtc000 = true;
-                            jjtree.openNodeScope(jjtn000);
-/*@egen*/Token scalarElem;}
-{/*@bgen(jjtree) Var */
+void ScalarElement()        : {/*@bgen(jjtree) Scalar */
+                                SimpleNode jjtn000 = new SimpleNode(JJTSCALAR);
+                                boolean jjtc000 = true;
+                                jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token scalarElem; }
+{/*@bgen(jjtree) Scalar */
         try {
 /*@egen*/
 	scalarElem=<ID>/*@bgen(jjtree)*/
