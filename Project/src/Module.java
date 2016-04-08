@@ -27,10 +27,12 @@ public class Module {
 	}
 
 	public boolean addFunction(Function function) {
-		if (!functionMap.containsKey(function.getFunctionID())){
-			functionMap.put(function.getFunctionID(),function);
+		String key = function.toString();
+		if (!functionMap.containsKey(key)){
+			functionMap.put(key,function);
 			return true;
 		}else{
+			YalToJvm.semanticErrorMessages.add("Function " + key + "already exists");
 			return false;
 		}
 	}
@@ -42,4 +44,17 @@ public class Module {
 		}else
 			return false;
 	}
+
+	public void printSymbolTables(){
+		System.out.println("--FUNCTIONS--");
+		for(String key : functionMap.keySet()) {
+			System.out.println(functionMap.get(key));
+	 	}
+		System.out.println("--GLOBAL VARIABLES--");
+		for(String key : globalVariableMap.keySet()) {
+			Variable var = globalVariableMap.get(key);
+			System.out.println(var.toString());
+		}
+	}
+
 }

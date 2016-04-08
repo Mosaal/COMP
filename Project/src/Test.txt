@@ -1,14 +1,24 @@
 module while4 {
 	a = 1;
+	e = 1;
 	b = 2;
 	c;
-	
+
 	function f1(v[], N, x) {
 		i = 0;
 		while (i < N) {
 			v[i] = v[i] + x;
 			i = i + 1;
 		}
+	}
+
+	function f1(){
+		ddv = 0;
+	}
+	
+	function f1(){
+		lol = 0;
+		a = 3;
 	}
 
 	function main() {
