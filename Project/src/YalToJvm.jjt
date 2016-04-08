@@ -72,13 +72,13 @@ SimpleNode Module() #Module: {Token moduleID;}
 
 void Declaration() #Global: {Token op, intID, assign;}
 {
-	LOOKAHEAD(2) Assign() | ((LOOKAHEAD(2) ArrayElement() | ScalarElement()) (assign=<ASSIGN> {
+	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (assign=<ASSIGN> {
 		jjtThis.assign = assign.image;
 	} (("[" ArraySize() "]") | (op=<ADDSUB_OP> {
 		jjtThis.Op = op.image;
 	})? intID=<INTEGER> {
 		jjtThis.ID = intID.image;
-	}))? <PVIRG>)
+	}))? <PVIRG>
 }
 
 void Function() #Function: {Token functionID;}
