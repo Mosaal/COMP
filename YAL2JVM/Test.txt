@@ -1,7 +1,7 @@
 module while4 {
 	a;
-	c = -1;
 	a;
+	c = -1;
 	b = 100;
 
 /*

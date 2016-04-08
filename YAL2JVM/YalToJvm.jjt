@@ -62,7 +62,7 @@ PARSER_END(YalToJvm)
 	| <STRING: <ASPA> (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ <ASPA>>
 }
 
-SimpleNode Module() #Module: {Token moduleID;}
+SimpleNode Module() #Module: { Token moduleID; }
 {
 	<MODULE> moduleID=<ID> {
 		module = new Module(moduleID.image);
@@ -189,7 +189,7 @@ void Rhs() #void: {}
 
 int ArraySize(): {Token size;}
 {
-	ScalarAccess() | size=<INTEGER> {return Integer.parseInt(size.image);}
+	size = ScalarAccess() | size=<INTEGER> {return Integer.parseInt(size.image);}
 }
 
 void Term(): {}
@@ -232,9 +232,15 @@ void ArrayAccess(): {}
 	<ID> "[" Index() "]"
 }
 
-void ScalarAccess(): {}
+int ScalarAccess():
 {
-	<ID> ("." <SIZE>)?
+	Token id;
+}
+{
+	id=<ID> ("." <SIZE>)?
+	{
+		return Integer.parse(id.image);
+	}
 }
 
 void Index(): {}
