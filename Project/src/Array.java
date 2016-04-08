@@ -5,6 +5,10 @@ public class Array extends Variable {
   private int[] array;
   private int size;
 
+  public Array(String variableID){
+	  super(variableID);
+  }
+  
   public Array(String variableID,int size,int ref) {
     super(variableID);
     array = new int[size];

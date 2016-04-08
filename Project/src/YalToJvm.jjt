@@ -105,12 +105,12 @@ void Varlist() #Params: {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
 }
 
-void ArrayElement() #Var: {Token arrayElem;}
+void ArrayElement() #Array: { Token arrayElem; }
 {
 	arrayElem=<ID> { jjtThis.ID = arrayElem.image; } "[" "]"
 }
 
-void ScalarElement() #Var: {Token scalarElem;}
+void ScalarElement() #Scalar: { Token scalarElem; }
 {
 	scalarElem=<ID> { jjtThis.ID = scalarElem.image; }
 }

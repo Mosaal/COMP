@@ -81,8 +81,11 @@ class SimpleNode implements Node {
 		case YalToJvmTreeConstants.JJTPARAMS:
 			System.out.println(toString(prefix));
 			break;
-		case YalToJvmTreeConstants.JJTVAR:
+		case YalToJvmTreeConstants.JJTSCALAR:
 			System.out.println(prefix + "[ " + ID + " ]");
+			break;
+		case YalToJvmTreeConstants.JJTARRAY:
+			System.out.println(prefix + "[ " + ID + "[] ]");
 			break;
 		case YalToJvmTreeConstants.JJTFUNCTIONBODY:
 			System.out.println(toString(prefix));
@@ -134,6 +137,12 @@ class SimpleNode implements Node {
 		}
 	}
 
+	/**
+	 * Analyses the AST tree and looks for functions.
+	 * Adds them in the symbol table and returns any
+	 * kind of semantic error message
+	 * @param prefix
+	 */
 	public void getFunctions(String prefix) {
 		switch (id) {
 		case YalToJvmTreeConstants.JJTFUNCTION:
@@ -161,8 +170,10 @@ class SimpleNode implements Node {
 			int num = paramNode.jjtGetNumChildren();
 			for (int i = 0; i < num; i++) {
 				SimpleNode node = (SimpleNode)paramNode.jjtGetChild(i);
-				//TODO change this
-				params.add(new Scalar(node.ID,1));
+				if(node.id == YalToJvmTreeConstants.JJTSCALAR)
+					params.add(new Scalar(node.ID));
+				else if(node.id == YalToJvmTreeConstants.JJTARRAY)
+					params.add(new Array(node.ID));
 			}
 		}
 		return params;

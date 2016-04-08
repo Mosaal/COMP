@@ -266,10 +266,10 @@ if (jjtc000) {
     }
   }
 
-  static final public void ArrayElement() throws ParseException {/*@bgen(jjtree) Var */
-                           SimpleNode jjtn000 = new SimpleNode(JJTVAR);
-                           boolean jjtc000 = true;
-                           jjtree.openNodeScope(jjtn000);Token arrayElem;
+  static final public void ArrayElement() throws ParseException {/*@bgen(jjtree) Array */
+                              SimpleNode jjtn000 = new SimpleNode(JJTARRAY);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);Token arrayElem;
     try {
       arrayElem = jj_consume_token(ID);
 jjtn000.ID = arrayElem.image;
@@ -282,10 +282,10 @@ if (jjtc000) {
     }
   }
 
-  static final public void ScalarElement() throws ParseException {/*@bgen(jjtree) Var */
-                            SimpleNode jjtn000 = new SimpleNode(JJTVAR);
-                            boolean jjtc000 = true;
-                            jjtree.openNodeScope(jjtn000);Token scalarElem;
+  static final public void ScalarElement() throws ParseException {/*@bgen(jjtree) Scalar */
+                                SimpleNode jjtn000 = new SimpleNode(JJTSCALAR);
+                                boolean jjtc000 = true;
+                                jjtree.openNodeScope(jjtn000);Token scalarElem;
     try {
       scalarElem = jj_consume_token(ID);
 jjtree.closeNodeScope(jjtn000, true);
