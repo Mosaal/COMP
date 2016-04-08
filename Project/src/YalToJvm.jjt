@@ -17,7 +17,7 @@ public class YalToJvm {
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		//root.dump("");
+		root.dump("");
 	}
 }
 
@@ -59,35 +59,33 @@ PARSER_END(YalToJvm)
 	| <ID: <LETTER> (<LETTER> | <DIGIT>)*>
 	| <#LETTER: ["$","A"-"Z","_","a"-"z"]>
 	| <#DIGIT: ["0"-"9"]>
-	| <STRING: "\"" (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ "\"">
+	| <STRING: <ASPA> (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ <ASPA>>
 }
 
 SimpleNode Module() #Module: {Token moduleID;}
 {
 	<MODULE> moduleID=<ID> {
+		jjtThis.ID = moduleID.image;
 		module = new Module(moduleID.image);
-		//System.out.println("Module: " + module.getModuleID());
-	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> {
-		return jjtThis;
-	}
+	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
-void Declaration() #ModuleBody: {}
+void Declaration() #void: {}
 {
-	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<ASSIGN> (("[" ArraySize() "]") | (<ADDSUB_OP>)? <INTEGER>))? <PVIRG>
+	LOOKAHEAD(2) Assign() | LOOKAHEAD(2) (ArrayElement() <PVIRG>) | (ScalarElement() <PVIRG>)
 }
 
 void Function() #Function: {Token functionID;}
 {
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
+		jjtThis.ID = functionID.image;
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
-		//System.out.println("Function: " + functionID.image);
 	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
+		jjtThis.ID = functionID.image;
 		Function function = new Function(functionID.image);
 		module.addFunction(function);
-		//System.out.println("Function: " + functionID.image);
-	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> Stmtlst() <RCHAVETA>
+	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> FunctionBody() <RCHAVETA>
 }
 
 void Varlist() #Params: {}
@@ -95,39 +93,60 @@ void Varlist() #Params: {}
 	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
 }
 
-void ArrayElement(): {Token arrayElem;}
+void ArrayElement() #Var: {Token arrayElem;}
 {
-	arrayElem=<ID> "[" "]"
+	arrayElem=<ID> { jjtThis.ID = arrayElem.image; } "[" "]"
 }
 
-void ScalarElement(): {Token scalarElem;}
+void ScalarElement() #Var: {Token scalarElem;}
 {
-	scalarElem=<ID>
+	scalarElem=<ID> { jjtThis.ID = scalarElem.image; }
 }
 
-void Stmtlst() #FunctionBody: {}
+void FunctionBody(): {}
 {
 	(Stmt())*
 }
 
-void Stmt(): {}
+void WhileBody(): {}
+{
+	(Stmt())*
+}
+
+void IfBody(): {}
+{
+	(Stmt())*
+}
+
+void ElseBody(): {}
+{
+	(Stmt())*
+}
+
+void Stmt() #void: {}
 {
 	While() | If() | LOOKAHEAD(3) Assign() | Call() <PVIRG>
 }
 
-void Assign(): {}
+void Assign() #Assignement: {}
 {
 	Lhs() <ASSIGN> Rhs() <PVIRG>
 }
 
-void Lhs(): {}
+void Lhs() #void: {}
 {
 	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
 }
 
-void Rhs(): {}
+void Rhs(): {Token op;}
 {
-	(Term() ((<ARITH_OP> | <BITWISE_OP> | <ADDSUB_OP>) Term())?) | "[" ArraySize() "]"
+	(Term() ((op=<ARITH_OP> {
+		jjtThis.Op = op.image;
+	} | op=<BITWISE_OP> {
+		jjtThis.Op = op.image;
+	} | op=<ADDSUB_OP> {
+		jjtThis.Op = op.image;
+	}) Term())?) | "[" ArraySize() "]"
 }
 
 void ArraySize(): {}
@@ -135,24 +154,28 @@ void ArraySize(): {}
 	ScalarAccess() | <INTEGER>
 }
 
-void Term(): {}
+void Term(): {Token op, intID;}
 {
-	(<ADDSUB_OP>)? (<INTEGER> | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
+	(op=<ADDSUB_OP> {
+		jjtThis.Op = op.image;
+	})? (intID=<INTEGER> {
+		jjtThis.ID = intID.image;
+	} | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
 }
 
-void Exprtest(): {}
+void Exprtest() #Condition: {Token relaOpID;}
 {
-	<LPAR> Lhs() <RELA_OP> Rhs() <RPAR>
+	<LPAR> Lhs() relaOpID=<RELA_OP> { jjtThis.ID = relaOpID.image; } Rhs() <RPAR>
 }
 
 void While(): {}
 {
-	<WHILE> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA>
+	<WHILE> Exprtest() <LCHAVETA> WhileBody() <RCHAVETA>
 }
 
 void If(): {}
 {
-	<IF> Exprtest() <LCHAVETA> Stmtlst() <RCHAVETA> (<ELSE> <LCHAVETA> Stmtlst() <RCHAVETA>)?
+	<IF> Exprtest() <LCHAVETA> IfBody() <RCHAVETA> (<ELSE> <LCHAVETA> ElseBody() <RCHAVETA>)?
 }
 
 void Call(): {}
@@ -160,7 +183,7 @@ void Call(): {}
 	<ID> ("." <ID>)? <LPAR> (ArgumentList())? <RPAR>
 }
 
-void ArgumentList(): {}
+void ArgumentList() #Arguments: {}
 {
 	Argument() (<VIRG> Argument())*
 }
@@ -170,14 +193,14 @@ void Argument(): {}
 	<ID> | <STRING> | <INTEGER>
 }
 
-void ArrayAccess(): {}
+void ArrayAccess(): {Token arrayID;}
 {
-	<ID> "[" Index() "]"
+	arrayID=<ID> { jjtThis.ID = arrayID.image; } "[" Index() "]"
 }
 
-void ScalarAccess(): {}
+void ScalarAccess(): {Token scalarID;}
 {
-	<ID> ("." <SIZE>)?
+	scalarID=<ID> { jjtThis.ID = scalarID.image; } ("." <SIZE>)?
 }
 
 void Index(): {}

@@ -9,16 +9,16 @@ public class Array extends Variable {
     super(variableID);
     array = new int[size];
     reference = ref;
-	}
+  }
 
   public Array(String variableID,int ref) {
     super(variableID);
     reference = ref;
 	}
 
-	public int get(int index) {
-		return array[index];
-	}
+  public int get(int index) {
+    return array[index];
+  }
 
   public int getReference(){
     return reference;
@@ -36,10 +36,10 @@ public class Array extends Variable {
     array[index] = value;
   }
 
-	@Override
-	public boolean equals(Object other) {
-		if (reference == ((Array) other).getReference())
-			return true;
-		return false;
-	}
+  @Override
+  public boolean equals(Object other) {
+    if (reference == ((Array) other).getReference())
+     return true;
+   return false;
+  }
 }

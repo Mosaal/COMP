@@ -2,23 +2,23 @@
 public interface YalToJvmTreeConstants
 {
   public int JJTMODULE = 0;
-  public int JJTMODULEBODY = 1;
+  public int JJTVOID = 1;
   public int JJTFUNCTION = 2;
   public int JJTPARAMS = 3;
-  public int JJTARRAYELEMENT = 4;
-  public int JJTSCALARELEMENT = 5;
-  public int JJTFUNCTIONBODY = 6;
-  public int JJTSTMT = 7;
-  public int JJTASSIGN = 8;
-  public int JJTLHS = 9;
+  public int JJTVAR = 4;
+  public int JJTFUNCTIONBODY = 5;
+  public int JJTWHILEBODY = 6;
+  public int JJTIFBODY = 7;
+  public int JJTELSEBODY = 8;
+  public int JJTASSIGNEMENT = 9;
   public int JJTRHS = 10;
   public int JJTARRAYSIZE = 11;
   public int JJTTERM = 12;
-  public int JJTEXPRTEST = 13;
+  public int JJTCONDITION = 13;
   public int JJTWHILE = 14;
   public int JJTIF = 15;
   public int JJTCALL = 16;
-  public int JJTARGUMENTLIST = 17;
+  public int JJTARGUMENTS = 17;
   public int JJTARGUMENT = 18;
   public int JJTARRAYACCESS = 19;
   public int JJTSCALARACCESS = 20;
@@ -27,27 +27,27 @@ public interface YalToJvmTreeConstants
 
   public String[] jjtNodeName = {
     "Module",
-    "ModuleBody",
+    "void",
     "Function",
     "Params",
-    "ArrayElement",
-    "ScalarElement",
+    "Var",
     "FunctionBody",
-    "Stmt",
-    "Assign",
-    "Lhs",
+    "WhileBody",
+    "IfBody",
+    "ElseBody",
+    "Assignement",
     "Rhs",
     "ArraySize",
     "Term",
-    "Exprtest",
+    "Condition",
     "While",
     "If",
     "Call",
-    "ArgumentList",
+    "Arguments",
     "Argument",
     "ArrayAccess",
     "ScalarAccess",
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=239bd63106070305c4e1ea1b4d80edcf (do not edit this line) */
+/* JavaCC - OriginalChecksum=ab3d0f58fdddc7094b0ae790d3f2079d (do not edit this line) */

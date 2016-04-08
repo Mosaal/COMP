@@ -37,9 +37,9 @@ public class Module {
 
 	public boolean addGlobalVariable(Variable globalVariable) {
 		if (!globalVariableMap.containsKey(globalVariable.getVariableID())){
-				globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
-				return true;
+			globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
+			return true;
 		}else
 			return false;
-		}
+	}
 }

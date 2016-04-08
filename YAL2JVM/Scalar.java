@@ -5,18 +5,18 @@ public class Scalar extends Variable {
 
 	public Scalar(String id, int v) {
 		super(id);
-    value = v;
+		value = v;
 	}
 
 	public Scalar(String id){
 		super(id);
 	}
 
-  public int getValue() {
+	public int getValue() {
 		return value;
 	}
 
-  public void setValue(int v) {
+	public void setValue(int v) {
 		value = v;
 	}
 
