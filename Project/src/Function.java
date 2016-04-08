@@ -6,23 +6,28 @@ public class Function {
 
 	private String functionID;
 	private HashMap<String,Variable> variableMap;
-	private ArrayList<Variable> variableArray;
+	private ArrayList<Variable> parameters;
 
 	public Function(String functionID) {
 		this.functionID = functionID;
-		variableArray = new ArrayList<Variable>();
+		parameters = new ArrayList<Variable>();
+	}
+
+	public Function(String id, ArrayList<Variable> p){
+		functionID = id;
+		parameters = p;
 	}
 
 	public int getNumVariable() {
-		return variableArray.size();
+		return variableMap.size();
 	}
 
 	public String getFunctionID() {
 		return functionID;
 	}
 
-	public ArrayList<Variable> getVariableArray() {
-		return variableArray;
+	public HashMap<String,Variable> getVariableMap() {
+		return variableMap;
 	}
 
 	@Override
@@ -35,15 +40,34 @@ public class Function {
 		return false;
 	}
 
-	public void addVariable(Variable variable) {
-		variableArray.add(variable);
+	public void addVariable(Variable v) {
+		variableMap.put(v.getVariableID(),v);
 	}
 
 	public void setVariableValue(String variableID, int value) {
-		for (Variable array: variableArray) {
-			if (array.getVariableID() == variableID)
-				if(array instanceof Scalar)
-					((Scalar)array).setValue(value);
-		}
+		Variable v = variableMap.get(variableID);
+		((Scalar)v).setValue(value);
 	}
+
+	public int getNumParameters(){
+		return parameters.size();
+	}
+
+	public void addParameter(Variable v){
+		parameters.add(v);
+	}
+
+	public String toString(){
+		String s = functionID;
+		s += "(";
+		for (int i = 0; i < parameters.size(); i++) {
+			if(parameters.get(i) instanceof Scalar)
+				s += "_s";
+			else if(parameters.get(i) instanceof Array)
+				s += "_a";
+		}
+		s += ")";
+		return s;
+	}
+
 }

@@ -8,6 +8,7 @@ PARSER_BEGIN(YalToJvm)
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.io.File;
+import java.util.*;
 
 public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
   protected static JJTYalToJvmState jjtree = new JJTYalToJvmState();
@@ -15,6 +16,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 /*@egen*/
 
 	private static Module module;
+	public static ArrayList<String> semanticErrorMessages = new ArrayList<String>();
 
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
 		File file = new File(args[0]);
@@ -22,6 +24,20 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
 		root.dump("");
+		root.getFunctions("");
+		module.printSymbolTables();
+		printSemanticErrors();
+	}
+
+	public static Module getModule(){
+		return module;
+	}
+
+	public static void printSemanticErrors(){
+		System.out.println("---------------\nSEMANTIC ERRORS:");
+		for (int i = 0; i < semanticErrorMessages.size(); i++) {
+			System.out.println(semanticErrorMessages.get(i));
+		}
 	}
 }
 
@@ -120,12 +136,8 @@ void Function()          : {/*@bgen(jjtree) Function */
 /*@egen*/
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
 		jjtn000.ID = functionID.image;
-		Function function = new Function(functionID.image);
-		module.addFunction(function);
 	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
 		jjtn000.ID = functionID.image;
-		Function function = new Function(functionID.image);
-		module.addFunction(function);
 	} <LPAR> (Varlist())? <RPAR>)) <LCHAVETA> FunctionBody() <RCHAVETA>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
