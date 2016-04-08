@@ -91,6 +91,16 @@ void Declaration() #void: {}
 	LOOKAHEAD(2) Assign() | LOOKAHEAD(2) (ArrayElement() <PVIRG>) | (ScalarElement() <PVIRG>)
 }
 
+void Declaration() #Global: {}
+{
+	GlobalLeft() ( <ASSIGN> ( ( "[" ArraySize() "]" ) | (<ADDSUB_OP> )? <INTEGER>) )? <PVIRG>
+}
+
+void GlobalLeft() #void: {}
+{
+	LOOKAHEAD(2) ArrayElement() | ScalarElement()
+}
+
 void Function() #Function: {Token functionID;}
 {
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
