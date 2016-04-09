@@ -24,7 +24,8 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
 		root.dump("");
-		root.getFunctions("");
+		root.getFunctions();
+		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
 	}
@@ -121,9 +122,47 @@ SimpleNode Module()        : {/*@bgen(jjtree) Module */
 /*@egen*/
 }
 
-void Declaration()      : {}
+/*
+void Declaration() #void: {}
 {
 	LOOKAHEAD(2) Assign() | LOOKAHEAD(2) (ArrayElement() <PVIRG>) | (ScalarElement() <PVIRG>)
+}
+*/
+
+void Declaration()        : {/*@bgen(jjtree) Global */
+  SimpleNode jjtn000 = new SimpleNode(JJTGLOBAL);
+  boolean jjtc000 = true;
+  jjtree.openNodeScope(jjtn000);
+/*@egen*/}
+{/*@bgen(jjtree) Global */
+        try {
+/*@egen*/
+	GlobalLeft() ( <ASSIGN> ( ( "[" ArraySize() "]" ) | (<ADDSUB_OP> )? <INTEGER>) )? <PVIRG>/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
+        } finally {
+          if (jjtc000) {
+            jjtree.closeNodeScope(jjtn000, true);
+          }
+        }
+/*@egen*/
+}
+
+void GlobalLeft()      : {}
+{
+	LOOKAHEAD(2) ArrayElement() | ScalarElement()
 }
 
 void Function()          : {/*@bgen(jjtree) Function */

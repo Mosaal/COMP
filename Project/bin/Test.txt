@@ -3,10 +3,9 @@ module while4 {
 	b = 1;
 	c = [10];
 	d = [5];
-	e[0] = 1;
 	b = 2;
 	c;
-	
+
 	function a=f1() {
 		a=2;
 	}
@@ -22,7 +21,7 @@ module while4 {
 	function f1(a[]){
 		ddv = 0;
 	}
-	
+
 	function f1(a[]){
 		lol = 0;
 		a = 3;
