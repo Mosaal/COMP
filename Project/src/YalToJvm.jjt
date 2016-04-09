@@ -19,7 +19,7 @@ public class YalToJvm {
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		root.dump("");
+		//root.dump("");
 		root.getFunctions();
 		module.processFunctions();
 		module.printSymbolTables();

@@ -1,2 +1,14 @@
 /YalToJvmTokenManager.class
 /YalToJvmTreeConstants.class
+/Function.class
+/Module.class
+/SimpleNode.class
+/YalToJvm$JJCalls.class
+/YalToJvm$LookaheadSuccess.class
+/YalToJvm.class
+/ParseException.class
+/SimpleCharStream.class
+/Token.class
+/YalToJvm.jj
+/YalToJvmConstants.class
+/TokenMgrError.class
