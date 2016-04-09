@@ -69,10 +69,10 @@ class SimpleNode implements Node {
 		return YalToJvmTreeConstants.jjtNodeName[id];
 	}
 	public String toString(String prefix) { return prefix + toString(); }
-	
+
 	public String newPrefix(String prefix, boolean increase) {
 		String newPrefix = "";
-		
+
 		if (!increase) {
 			for (int i = 0; i < prefix.length() - 1; i++)
 				newPrefix += " ";
@@ -80,7 +80,7 @@ class SimpleNode implements Node {
 			for (int i = 0; i < prefix.length() + 1; i++)
 				newPrefix += " ";
 		}
-		
+
 		return newPrefix;
 	}
 
@@ -90,6 +90,9 @@ class SimpleNode implements Node {
 	public void dump(String prefix) {
 		//System.out.println(toString(prefix));
 		switch (id) {
+		case YalToJvmTreeConstants.JJTVOID:
+			System.out.println(toString(prefix) + " VOID");
+			break;
 		case YalToJvmTreeConstants.JJTMODULE:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
 			break;
@@ -194,48 +197,6 @@ class SimpleNode implements Node {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Analyses the AST tree and looks for functions.
-	 * Adds them in the symbol table and returns any
-	 * kind of semantic error message
-	 * @param prefix
-	 */
-	public void getFunctions() {
-		switch (id) {
-		case YalToJvmTreeConstants.JJTFUNCTION:
-			String name = ID;
-			ArrayList<Variable> params = getParams();
-			Function f = new Function(name,params,(SimpleNode)children[children.length-1]);
-			YalToJvm.getModule().addFunction(f);
-			break;
-		default:
-			if (children != null) {
-				for (int i = 0; i < children.length; ++i) {
-					SimpleNode n = (SimpleNode)children[i];
-					if (n != null) {
-						n.getFunctions();
-					}
-				}
-			}
-		}
-	}
-
-	public ArrayList<Variable> getParams(){
-		ArrayList<Variable> params = new ArrayList<>();
-		SimpleNode paramNode = (SimpleNode)children[0];
-		if(paramNode.id == YalToJvmTreeConstants.JJTPARAMS){
-			int num = paramNode.jjtGetNumChildren();
-			for (int i = 0; i < num; i++) {
-				SimpleNode node = (SimpleNode)paramNode.jjtGetChild(i);
-				if(node.id == YalToJvmTreeConstants.JJTSCALAR)
-					params.add(new Scalar(node.ID));
-				else if(node.id == YalToJvmTreeConstants.JJTARRAY)
-					params.add(new Array(node.ID));
-			}
-		}
-		return params;
 	}
 
 	/**

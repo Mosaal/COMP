@@ -19,8 +19,9 @@ public class YalToJvm {
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
+		module = new Module(root.ID,root);
 		root.dump("");
-		root.getFunctions();
+		module.getFunctions();
 		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
@@ -83,7 +84,6 @@ SimpleNode Module() #Module: {Token moduleID;}
 {
 	<MODULE> moduleID=<ID> {
 		jjtThis.ID = moduleID.image;
-		module = new Module(moduleID.image);
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 

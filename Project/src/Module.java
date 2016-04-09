@@ -8,11 +8,13 @@ public class Module {
 	private HashMap<String,Function> functionMap;
 	private HashMap<String,Variable> globalVariableMap;
 	private Variable ret;
+	private SimpleNode root;
 
-	public Module(String id) {
+	public Module(String id, SimpleNode r) {
 		moduleID = id;
 		functionMap = new HashMap<>();
 		globalVariableMap = new HashMap<>();
+		root = r;
 	}
 
 	public String getModuleID() {
@@ -33,7 +35,7 @@ public class Module {
 			functionMap.put(key,function);
 			return true;
 		}else{
-			YalToJvm.semanticErrorMessages.add("Function " + key + "already exists");
+			YalToJvm.semanticErrorMessages.add("Function " + key + " already exists");
 			return false;
 		}
 	}
@@ -61,6 +63,49 @@ public class Module {
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
 			functionMap.get(id).getBody().processBody();
+		}
+	}
+
+	/**
+	 * Analyses the AST tree and looks for functions.
+	 * Adds them in the symbol table and returns any
+	 * kind of semantic error message
+	 */
+	public void getFunctions() {
+		int num = root.jjtGetNumChildren();
+		for (int i = 0; i < num; i++) {
+			SimpleNode node = (SimpleNode)root.jjtGetChild(i);
+			if(node.getId() == YalToJvmTreeConstants.JJTFUNCTION){
+				ArrayList<Variable> params = getParams(node);
+				String name = node.ID;
+				Function f = new Function(name,params,(SimpleNode)node.jjtGetChild(node.jjtGetNumChildren()-1));
+				addFunction(f);
+			}
+		}
+	}
+
+	public ArrayList<Variable> getParams(SimpleNode node){
+		int num = node.jjtGetNumChildren();
+		ArrayList<Variable> params = new ArrayList<>();
+		for (int i = 0; i < num; i++) {
+			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
+			if(n.getId() == YalToJvmTreeConstants.JJTPARAMS){
+				getVariables(n,params);
+			}
+		}
+		return params;
+	}
+
+	public void getVariables(SimpleNode node, ArrayList<Variable> params){
+		int num = node.jjtGetNumChildren();
+		for (int i = 0; i < num; i++) {
+			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
+			if(n.getId() == YalToJvmTreeConstants.JJTSCALAR){
+				params.add(new Scalar(node.ID));
+			}
+			else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
+				params.add(new Array(node.ID));
+			}
 		}
 	}
 
