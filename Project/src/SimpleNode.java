@@ -143,12 +143,12 @@ class SimpleNode implements Node {
 	 * kind of semantic error message
 	 * @param prefix
 	 */
-	public void getFunctions(String prefix) {
+	public void getFunctions() {
 		switch (id) {
 		case YalToJvmTreeConstants.JJTFUNCTION:
 			String name = ID;
 			ArrayList<Variable> params = getParams();
-			Function f = new Function(name,params);
+			Function f = new Function(name,params,(SimpleNode)children[children.length-1]);
 			YalToJvm.getModule().addFunction(f);
 			break;
 		default:
@@ -156,7 +156,7 @@ class SimpleNode implements Node {
 				for (int i = 0; i < children.length; ++i) {
 					SimpleNode n = (SimpleNode)children[i];
 					if (n != null) {
-						n.getFunctions(prefix + " ");
+						n.getFunctions();
 					}
 				}
 			}
@@ -177,6 +177,13 @@ class SimpleNode implements Node {
 			}
 		}
 		return params;
+	}
+
+	/**
+	* Method used to process the body of a function
+	*/
+	public void processBody(){
+
 	}
 
 	public int getId() {

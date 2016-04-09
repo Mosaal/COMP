@@ -20,7 +20,8 @@ public class YalToJvm {
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
 		root.dump("");
-		root.getFunctions("");
+		root.getFunctions();
+		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
 	}
@@ -86,10 +87,12 @@ SimpleNode Module() #Module: {Token moduleID;}
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
+/*
 void Declaration() #void: {}
 {
 	LOOKAHEAD(2) Assign() | LOOKAHEAD(2) (ArrayElement() <PVIRG>) | (ScalarElement() <PVIRG>)
 }
+*/
 
 void Declaration() #Global: {}
 {
