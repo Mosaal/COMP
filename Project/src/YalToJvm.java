@@ -15,10 +15,9 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 FileInputStream fs = new FileInputStream(file);
                 YalToJvm parser = new YalToJvm(fs);
                 SimpleNode root = parser.Module();
-                //root.dump("");
-
-                // Functions processing
-                root.getFunctions();
+                module = new Module(root.ID,root);
+                root.dump("");
+                module.getFunctions();
                 module.processFunctions();
                 module.printSymbolTables();
                 printSemanticErrors();
@@ -47,7 +46,6 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
       jj_consume_token(MODULE);
       moduleID = jj_consume_token(ID);
 jjtn000.ID = moduleID.image;
-                module = new Module(moduleID.image);
       jj_consume_token(LCHAVETA);
       label_1:
       while (true) {
@@ -1197,6 +1195,23 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
+  static private boolean jj_3R_16()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_20()) {
+    jj_scanpos = xsp;
+    if (jj_3R_21()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_20()
+ {
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
   static private boolean jj_3R_10()
  {
     if (jj_3R_14()) return true;
@@ -1453,23 +1468,6 @@ if (jjtc000) {
   static private boolean jj_3_6()
  {
     if (jj_3R_11()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_16()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_20()) {
-    jj_scanpos = xsp;
-    if (jj_3R_21()) return true;
-    }
-    return false;
-  }
-
-  static private boolean jj_3R_20()
- {
-    if (jj_3R_24()) return true;
     return false;
   }
 

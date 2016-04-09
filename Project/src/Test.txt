@@ -6,20 +6,24 @@ module while4 {
 	b = 2;
 	c;
 
-	function f1(v[], N, x) {
+	function a[]=f1() {
+		a=2;
+	}
+	
+	function f1() {
+		a=2;
+	}
+
+	function a[]=f1(v[], N, x) {
 		i = 0;
 		while (i < N) {
 			v[i] = v[i] + x;
 			i = i + 1;
 		}
-		while (a[0] < N) {
-			v[i] = v[i] + x;
-			i = i + 1;
-		}
-		while (a.size < N) {
-			v[i] = v[i] + x;
-			i = i + 1;
-		}
+	}
+
+	function f1(a[]){
+		ddv = 0;
 	}
 
 	function main() {

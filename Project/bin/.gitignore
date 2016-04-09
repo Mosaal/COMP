@@ -1,4 +1,3 @@
-/.DS_Store
 /Array.class
 /Function.class
 /JJTYalToJvmState.class
@@ -9,6 +8,7 @@
 /SimpleCharStream.class
 /SimpleNode.class
 /Test.txt
+/Test.yal
 /Token.class
 /TokenMgrError.class
 /Variable.class

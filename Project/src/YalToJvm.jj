@@ -23,10 +23,9 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		//root.dump("");
-
-		// Functions processing
-		root.getFunctions();
+		module = new Module(root.ID,root);
+		root.dump("");
+		module.getFunctions();
 		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
@@ -99,7 +98,6 @@ SimpleNode Module()        : {/*@bgen(jjtree) Module */
 /*@egen*/
 	<MODULE> moduleID=<ID> {
 		jjtn000.ID = moduleID.image;
-		module = new Module(moduleID.image);
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA>/*@bgen(jjtree)*/
                                                                {
                                                                  jjtree.closeNodeScope(jjtn000, true);
