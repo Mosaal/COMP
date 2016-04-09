@@ -6,11 +6,11 @@ module while4 {
 	b = 2;
 	c;
 
-	function a=f1() {
+	function a[]=f1() {
 		a=2;
 	}
 
-	function f1(v[], N, x) {
+	function b=f1(v[], N, x) {
 		i = 0;
 		while (i < N) {
 			v[i] = v[i] + x;

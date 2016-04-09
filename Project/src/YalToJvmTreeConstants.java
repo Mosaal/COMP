@@ -4,23 +4,23 @@ public interface YalToJvmTreeConstants
   public int JJTMODULE = 0;
   public int JJTGLOBAL = 1;
   public int JJTVOID = 2;
-  public int JJTFUNCTION = 3;
-  public int JJTPARAMS = 4;
-  public int JJTARRAY = 5;
-  public int JJTSCALAR = 6;
-  public int JJTFUNCTIONBODY = 7;
-  public int JJTWHILEBODY = 8;
-  public int JJTIFBODY = 9;
-  public int JJTELSEBODY = 10;
-  public int JJTASSIGNEMENT = 11;
-  public int JJTRHS = 12;
-  public int JJTARRAYSIZE = 13;
-  public int JJTTERM = 14;
-  public int JJTCONDITION = 15;
-  public int JJTWHILE = 16;
-  public int JJTIF = 17;
-  public int JJTCALL = 18;
-  public int JJTARGUMENTS = 19;
+  public int JJTGLOBALRIGHT = 3;
+  public int JJTFUNCTION = 4;
+  public int JJTPARAMS = 5;
+  public int JJTARRAY = 6;
+  public int JJTSCALAR = 7;
+  public int JJTFUNCTIONBODY = 8;
+  public int JJTWHILEBODY = 9;
+  public int JJTIFBODY = 10;
+  public int JJTELSEBODY = 11;
+  public int JJTASSIGNEMENT = 12;
+  public int JJTRHS = 13;
+  public int JJTARRAYSIZE = 14;
+  public int JJTTERM = 15;
+  public int JJTCONDITION = 16;
+  public int JJTWHILE = 17;
+  public int JJTIF = 18;
+  public int JJTCALL = 19;
   public int JJTARGUMENT = 20;
   public int JJTARRAYACCESS = 21;
   public int JJTSCALARACCESS = 22;
@@ -31,6 +31,7 @@ public interface YalToJvmTreeConstants
     "Module",
     "Global",
     "void",
+    "GlobalRight",
     "Function",
     "Params",
     "Array",
@@ -47,11 +48,10 @@ public interface YalToJvmTreeConstants
     "While",
     "If",
     "Call",
-    "Arguments",
     "Argument",
     "ArrayAccess",
     "ScalarAccess",
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=da7b3c3f2bc27fa729c1818d7ade2d20 (do not edit this line) */
+/* JavaCC - OriginalChecksum=34b34632b113dbdccfce447e3901c281 (do not edit this line) */

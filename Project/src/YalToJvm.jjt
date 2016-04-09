@@ -87,26 +87,28 @@ SimpleNode Module() #Module: {Token moduleID;}
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
-/*
-void Declaration() #void: {}
+void Declaration() #Global: {Token assign;}
 {
-	LOOKAHEAD(2) Assign() | LOOKAHEAD(2) (ArrayElement() <PVIRG>) | (ScalarElement() <PVIRG>)
-}
-*/
-
-void Declaration() #Global: {}
-{
-	GlobalLeft() ( <ASSIGN> ( ( "[" ArraySize() "]" ) | (<ADDSUB_OP> )? <INTEGER>) )? <PVIRG>
+	GlobalLeft() (assign=<ASSIGN> { jjtThis.assign = assign.image; } GlobalRight())? <PVIRG>
 }
 
 void GlobalLeft() #void: {}
 {
-	LOOKAHEAD(2) ArrayElement() | ScalarElement()
+	LOOKAHEAD(2) ArrayElement(false) | ScalarElement(false)
+}
+
+void GlobalRight(): {Token op, intID;}
+{
+	("[" ArraySize() "]") | ((op=<ADDSUB_OP> {
+		jjtThis.Op = op.image;
+	})? intID=<INTEGER> {
+		jjtThis.ID = intID.image;
+	})
 }
 
 void Function() #Function: {Token functionID;}
 {
-	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN> functionID=<ID> {
+	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement(true) | ScalarElement(true)) <ASSIGN> functionID=<ID> {
 		jjtThis.ID = functionID.image;
 	} <LPAR> (Varlist())? <RPAR>) | (<FUNCTION> functionID=<ID> {
 		jjtThis.ID = functionID.image;
@@ -115,17 +117,23 @@ void Function() #Function: {Token functionID;}
 
 void Varlist() #Params: {}
 {
-	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
+	(LOOKAHEAD(2) ArrayElement(false) | ScalarElement(false)) (<VIRG> (LOOKAHEAD(2) ArrayElement(false) | ScalarElement(false)))*
 }
 
-void ArrayElement() #Array: { Token arrayElem; }
+void ArrayElement(boolean ret) #Array: { Token arrayElem; }
 {
-	arrayElem=<ID> { jjtThis.ID = arrayElem.image; } "[" "]"
+	arrayElem=<ID> {
+		if (ret) jjtThis.ret = ret;
+		jjtThis.ID = arrayElem.image;
+	} "[" "]"
 }
 
-void ScalarElement() #Scalar: { Token scalarElem; }
+void ScalarElement(boolean ret) #Scalar: { Token scalarElem; }
 {
-	scalarElem=<ID> { jjtThis.ID = scalarElem.image; }
+	scalarElem=<ID> {
+		if (ret) jjtThis.ret = ret;
+		jjtThis.ID = scalarElem.image;
+	}
 }
 
 void FunctionBody(): {}
@@ -174,9 +182,9 @@ void Rhs(): {Token op;}
 	}) Term())?) | "[" ArraySize() "]"
 }
 
-void ArraySize(): {}
+void ArraySize(): {Token intID;}
 {
-	ScalarAccess() | <INTEGER>
+	ScalarAccess() | intID=<INTEGER> { jjtThis.ID = intID.image; }
 }
 
 void Term(): {Token op, intID;}
@@ -203,19 +211,30 @@ void If(): {}
 	<IF> Exprtest() <LCHAVETA> IfBody() <RCHAVETA> (<ELSE> <LCHAVETA> ElseBody() <RCHAVETA>)?
 }
 
-void Call(): {}
+void Call(): {Token id, callID;}
 {
-	<ID> ("." <ID>)? <LPAR> (ArgumentList())? <RPAR>
+	id=<ID> {
+		jjtThis.ID = id.image;
+	} ("." callID=<ID> {
+		jjtThis.call = true;
+		jjtThis.callID = callID.image;
+	})? <LPAR> (ArgumentList())? <RPAR>
 }
 
-void ArgumentList() #Arguments: {}
+void ArgumentList() #void: {}
 {
 	Argument() (<VIRG> Argument())*
 }
 
-void Argument(): {}
+void Argument(): {Token argID;}
 {
-	<ID> | <STRING> | <INTEGER>
+	argID=<ID> {
+		jjtThis.ID = argID.image;
+	} | argID=<STRING> {
+		jjtThis.ID = argID.image;
+	} | argID=<INTEGER> {
+		jjtThis.ID = argID.image;
+	}
 }
 
 void ArrayAccess(): {Token arrayID;}
@@ -223,12 +242,16 @@ void ArrayAccess(): {Token arrayID;}
 	arrayID=<ID> { jjtThis.ID = arrayID.image; } "[" Index() "]"
 }
 
-void ScalarAccess(): {Token scalarID;}
+void ScalarAccess(): {Token scalarID, size;}
 {
-	scalarID=<ID> { jjtThis.ID = scalarID.image; } ("." <SIZE>)?
+	scalarID=<ID> { jjtThis.ID = scalarID.image; } ("." size=<SIZE> { jjtThis.size = size.image; })?
 }
 
-void Index(): {}
+void Index(): {Token id, intID;}
 {
-	<ID> | <INTEGER>
+	id=<ID> {
+		jjtThis.ID = id.image;
+	} | intID=<INTEGER> {
+		jjtThis.ID = intID.image;
+	}
 }
