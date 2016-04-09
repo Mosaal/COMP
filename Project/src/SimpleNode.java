@@ -237,12 +237,12 @@ class SimpleNode implements Node {
 		}
 		return params;
 	}
-
+	
 	/**
 	* Method used to process the body of a function
 	*/
 	public void processBody(){
-
+		
 	}
 
 	public int getId() {
