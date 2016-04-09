@@ -7,6 +7,7 @@ public class Module {
 	private String moduleID;
 	private HashMap<String,Function> functionMap;
 	private HashMap<String,Variable> globalVariableMap;
+	private Variable ret;
 
 	public Module(String id) {
 		moduleID = id;
@@ -54,6 +55,12 @@ public class Module {
 		for(String key : globalVariableMap.keySet()) {
 			Variable var = globalVariableMap.get(key);
 			System.out.println(var.toString());
+		}
+	}
+
+	public void processFunctions(){
+		for (String id : functionMap.keySet()) {
+			functionMap.get(id).getBody().processBody();
 		}
 	}
 

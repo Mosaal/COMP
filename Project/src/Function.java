@@ -7,15 +7,17 @@ public class Function {
 	private String functionID;
 	private HashMap<String,Variable> variableMap;
 	private ArrayList<Variable> parameters;
+	private SimpleNode body;
 
 	public Function(String functionID) {
 		this.functionID = functionID;
 		parameters = new ArrayList<Variable>();
 	}
 
-	public Function(String id, ArrayList<Variable> p){
+	public Function(String id, ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
 		parameters = p;
+		body = n;
 	}
 
 	public int getNumVariable() {
@@ -28,6 +30,10 @@ public class Function {
 
 	public HashMap<String,Variable> getVariableMap() {
 		return variableMap;
+	}
+
+	public SimpleNode getBody(){
+		return body;
 	}
 
 	@Override
