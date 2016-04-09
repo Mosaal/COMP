@@ -17,4 +17,5 @@ Por exemplo: `java YalToJvm Test.txt`
   * Ver se a variável existe. Ex: a = b
   * Número e tipo errados de argumentos numa função
   * Nas comparações verificar se os operandos são do mesmo tipo.
+  * Ver se a função é única para cada module &#10003;
   * Pode haver mais ...
