@@ -23,7 +23,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		FileInputStream fs = new FileInputStream(file);
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
-		root.dump("");
+		//root.dump("");
 		root.getFunctions();
 		module.processFunctions();
 		module.printSymbolTables();
@@ -36,8 +36,12 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 
 	public static void printSemanticErrors(){
 		System.out.println("---------------\nSEMANTIC ERRORS:");
-		for (int i = 0; i < semanticErrorMessages.size(); i++) {
-			System.out.println(semanticErrorMessages.get(i));
+
+		if (semanticErrorMessages.size() == 0)
+			System.out.println("None!");
+		else {
+			for (int i = 0; i < semanticErrorMessages.size(); i++)
+				System.out.println(semanticErrorMessages.get(i));
 		}
 	}
 }

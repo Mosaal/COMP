@@ -19,11 +19,11 @@ public class Module {
 		return moduleID;
 	}
 
-	public HashMap<String,Function> getFunctionArray() {
+	public HashMap<String,Function> getFunctionMap() {
 		return functionMap;
 	}
 
-	public HashMap<String,Variable> getGlobalVariableArray() {
+	public HashMap<String,Variable> getGlobalVariableMap() {
 		return globalVariableMap;
 	}
 
@@ -42,7 +42,7 @@ public class Module {
 		if (!globalVariableMap.containsKey(globalVariable.getVariableID())){
 			globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
 			return true;
-		}else
+		} else
 			return false;
 	}
 

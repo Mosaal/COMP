@@ -15,7 +15,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 FileInputStream fs = new FileInputStream(file);
                 YalToJvm parser = new YalToJvm(fs);
                 SimpleNode root = parser.Module();
-                root.dump("");
+                //root.dump("");
                 root.getFunctions();
                 module.processFunctions();
                 module.printSymbolTables();
@@ -28,8 +28,12 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
 
         public static void printSemanticErrors(){
                 System.out.println("---------------\u005cnSEMANTIC ERRORS:");
-                for (int i = 0; i < semanticErrorMessages.size(); i++) {
-                        System.out.println(semanticErrorMessages.get(i));
+
+                if (semanticErrorMessages.size() == 0)
+                        System.out.println("None!");
+                else {
+                        for (int i = 0; i < semanticErrorMessages.size(); i++)
+                                System.out.println(semanticErrorMessages.get(i));
                 }
         }
 
@@ -1191,12 +1195,6 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_3_6()
- {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_16()
  {
     Token xsp;
@@ -1464,6 +1462,12 @@ if (jjtc000) {
   static private boolean jj_3_5()
  {
     if (jj_3R_9()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_6()
+ {
+    if (jj_3R_11()) return true;
     return false;
   }
 

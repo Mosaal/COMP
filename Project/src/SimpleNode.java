@@ -197,7 +197,7 @@ class SimpleNode implements Node {
 	}
 
 	/**
-	 * Analyses the AST tree and looks for functions.
+	 * Analyses the AST and looks for functions.
 	 * Adds them in the symbol table and returns any
 	 * kind of semantic error message
 	 * @param prefix
