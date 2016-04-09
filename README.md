@@ -4,7 +4,7 @@ Por exemplo: `java YalToJvm Test.txt`
 
 ## TODO's
 
-###Criar AST (Abstract Syntax Tree) &#10003
+###Criar AST (Abstract Syntax Tree) &#10003;
 
 ###Criar hashtables
 
