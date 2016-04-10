@@ -84,14 +84,14 @@ PARSER_END(YalToJvm)
 	| <STRING: <ASPA> (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ <ASPA>>
 }
 
-SimpleNode Module() #Module: {Token moduleID;}
+SimpleNode Module() #Module: { Token moduleID; }
 {
 	<MODULE> moduleID=<ID> {
 		jjtThis.ID = moduleID.image;
 	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
 }
 
-void Declaration() #Global: {Token assign;}
+void Declaration() #Global: { Token assign; }
 {
 	GlobalLeft() (assign=<ASSIGN> { jjtThis.assign = assign.image; } GlobalRight())? <PVIRG>
 }
@@ -101,7 +101,7 @@ void GlobalLeft() #void: {}
 	LOOKAHEAD(2) ArrayElement(false) | ScalarElement(false)
 }
 
-void GlobalRight(): {Token op, intID;}
+void GlobalRight(): { Token op, intID; }
 {
 	("[" ArraySize() "]") | ((op=<ADDSUB_OP> {
 		jjtThis.Op = op.image;
@@ -110,7 +110,7 @@ void GlobalRight(): {Token op, intID;}
 	})
 }
 
-void Function() #Function: {Token functionID;}
+void Function() #Function: { Token functionID; }
 {
 	(LOOKAHEAD(3) (<FUNCTION> (LOOKAHEAD(2) ArrayElement(true) | ScalarElement(true)) <ASSIGN> functionID=<ID> {
 		jjtThis.ID = functionID.image;
@@ -175,7 +175,7 @@ void Lhs() #void: {}
 	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
 }
 
-void Rhs(): {Token op;}
+void Rhs(): { Token op; }
 {
 	(Term() ((op=<ARITH_OP> {
 		jjtThis.Op = op.image;
@@ -186,12 +186,12 @@ void Rhs(): {Token op;}
 	}) Term())?) | "[" ArraySize() "]"
 }
 
-void ArraySize(): {Token intID;}
+void ArraySize(): { Token intID; }
 {
 	ScalarAccess() | intID=<INTEGER> { jjtThis.ID = intID.image; }
 }
 
-void Term(): {Token op, intID;}
+void Term(): { Token op, intID; }
 {
 	(op=<ADDSUB_OP> {
 		jjtThis.Op = op.image;
@@ -200,7 +200,7 @@ void Term(): {Token op, intID;}
 	} | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
 }
 
-void Exprtest() #Condition: {Token relaOpID;}
+void Exprtest() #Condition: { Token relaOpID; }
 {
 	<LPAR> Lhs() relaOpID=<RELA_OP> { jjtThis.ID = relaOpID.image; } Rhs() <RPAR>
 }
@@ -215,7 +215,7 @@ void If(): {}
 	<IF> Exprtest() <LCHAVETA> IfBody() <RCHAVETA> (<ELSE> <LCHAVETA> ElseBody() <RCHAVETA>)?
 }
 
-void Call(): {Token id, callID;}
+void Call(): { Token id, callID; }
 {
 	id=<ID> {
 		jjtThis.ID = id.image;
@@ -230,7 +230,7 @@ void ArgumentList() #void: {}
 	Argument() (<VIRG> Argument())*
 }
 
-void Argument(): {Token argID;}
+void Argument(): { Token argID; }
 {
 	argID=<ID> {
 		jjtThis.ID = argID.image;
@@ -241,21 +241,23 @@ void Argument(): {Token argID;}
 	}
 }
 
-void ArrayAccess(): {Token arrayID;}
+void ArrayAccess(): { Token arrayID; }
 {
 	arrayID=<ID> { jjtThis.ID = arrayID.image; } "[" Index() "]"
 }
 
-void ScalarAccess(): {Token scalarID, size;}
+void ScalarAccess(): { Token scalarID, size; }
 {
 	scalarID=<ID> { jjtThis.ID = scalarID.image; } ("." size=<SIZE> { jjtThis.size = size.image; })?
 }
 
-void Index(): {Token id, intID;}
+void Index(): { Token id, intID; }
 {
 	id=<ID> {
 		jjtThis.ID = id.image;
+		jjtThis.digit = false;
 	} | intID=<INTEGER> {
 		jjtThis.ID = intID.image;
+		jjtThis.digit = true;
 	}
 }

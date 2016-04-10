@@ -16,6 +16,7 @@ class SimpleNode implements Node {
 	public String assign = "";
 	public boolean ret = false;
 	public boolean call = false;
+	public boolean digit = false;
 
 	public SimpleNode(int i) {
 		id = i;
@@ -215,7 +216,10 @@ class SimpleNode implements Node {
 				
 				//Process lhs
 				if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-					//set value to variable
+					SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
+					
+					
+					//Array arrayVar = new Array(lhs.ID, , ref)
 				} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 					//set value to variable
 				}
