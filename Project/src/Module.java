@@ -62,7 +62,7 @@ public class Module {
 
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
-			functionMap.get(id).getBody().processBody();
+			functionMap.get(id).getBody().processBody(functionMap.get(id));
 		}
 	}
 
@@ -102,8 +102,7 @@ public class Module {
 			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
 			if(n.getId() == YalToJvmTreeConstants.JJTSCALAR){
 				params.add(new Scalar(node.ID));
-			}
-			else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
+			} else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
 				params.add(new Array(node.ID));
 			}
 		}
