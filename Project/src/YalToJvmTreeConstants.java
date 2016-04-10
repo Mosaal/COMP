@@ -54,4 +54,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=34b34632b113dbdccfce447e3901c281 (do not edit this line) */
+/* JavaCC - OriginalChecksum=064d2af5f2386435c65296f460e8a77b (do not edit this line) */

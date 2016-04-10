@@ -39,6 +39,18 @@ public class Module {
 			return false;
 		}
 	}
+	
+	public boolean checkGlobalVariableID(Variable globalVariable) {
+		return globalVariableMap.containsKey(globalVariable.getVariableID());
+	}
+	
+	public Variable getGlobalVariable(Variable globalVariable) {
+		return globalVariableMap.get(globalVariable.getVariableID());
+	}
+	
+	public void replaceGlobalVariable(Variable globalVariable) {
+		globalVariableMap.replace(globalVariable.getVariableID(),globalVariable);
+	}
 
 	public boolean addGlobalVariable(Variable globalVariable) {
 		if (!globalVariableMap.containsKey(globalVariable.getVariableID())){
