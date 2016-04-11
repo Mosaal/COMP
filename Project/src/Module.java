@@ -65,6 +65,10 @@ public class Module {
 			functionMap.get(id).getBody().processBody(functionMap.get(id));
 		}
 	}
+	
+	public boolean functionExists(String functionID) {
+		return false;
+	}
 
 	/**
 	 * Analyses the AST tree and looks for functions.
