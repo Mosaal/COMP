@@ -218,10 +218,13 @@ class SimpleNode implements Node {
 				if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 					
-					
-					//Array arrayVar = new Array(lhs.ID, , ref)
+					if (index.digit) {
+						
+					} else {
+
+					}
 				} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-					//set value to variable
+
 				}
 				
 				//Process rhs
@@ -231,7 +234,7 @@ class SimpleNode implements Node {
 					
 					if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 						if (rhsChild.ID != null) {
-							//set value to variable
+
 						} else {
 							SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 							

@@ -39,9 +39,9 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
         }
 
   static final public SimpleNode Module() throws ParseException {/*@bgen(jjtree) Module */
-                              SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
-                              boolean jjtc000 = true;
-                              jjtree.openNodeScope(jjtn000);Token moduleID;
+                               SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
+                               boolean jjtc000 = true;
+                               jjtree.openNodeScope(jjtn000);Token moduleID;
     try {
       jj_consume_token(MODULE);
       moduleID = jj_consume_token(ID);
@@ -100,9 +100,9 @@ if (jjtc000) {
   }
 
   static final public void Declaration() throws ParseException {/*@bgen(jjtree) Global */
-                             SimpleNode jjtn000 = new SimpleNode(JJTGLOBAL);
-                             boolean jjtc000 = true;
-                             jjtree.openNodeScope(jjtn000);Token assign;
+                              SimpleNode jjtn000 = new SimpleNode(JJTGLOBAL);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);Token assign;
     try {
       GlobalLeft();
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -156,9 +156,9 @@ if (jjtc000) {
   }
 
   static final public void GlobalRight() throws ParseException {/*@bgen(jjtree) GlobalRight */
-                     SimpleNode jjtn000 = new SimpleNode(JJTGLOBALRIGHT);
-                     boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);Token op, intID;
+                      SimpleNode jjtn000 = new SimpleNode(JJTGLOBALRIGHT);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);Token op, intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case 31:{
@@ -212,9 +212,9 @@ if (jjtc000) {
   }
 
   static final public void Function() throws ParseException {/*@bgen(jjtree) Function */
-                            SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
-                            boolean jjtc000 = true;
-                            jjtree.openNodeScope(jjtn000);Token functionID;
+                             SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
+                             boolean jjtc000 = true;
+                             jjtree.openNodeScope(jjtn000);Token functionID;
     try {
       if (jj_2_3(3)) {
         jj_consume_token(FUNCTION);
@@ -638,9 +638,9 @@ if (jjtc000) {
   }
 
   static final public void Rhs() throws ParseException {/*@bgen(jjtree) Rhs */
-             SimpleNode jjtn000 = new SimpleNode(JJTRHS);
-             boolean jjtc000 = true;
-             jjtree.openNodeScope(jjtn000);Token op;
+              SimpleNode jjtn000 = new SimpleNode(JJTRHS);
+              boolean jjtc000 = true;
+              jjtree.openNodeScope(jjtn000);Token op;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADDSUB_OP:
@@ -714,9 +714,9 @@ if (jjtc000) {
   }
 
   static final public void ArraySize() throws ParseException {/*@bgen(jjtree) ArraySize */
-                   SimpleNode jjtn000 = new SimpleNode(JJTARRAYSIZE);
-                   boolean jjtc000 = true;
-                   jjtree.openNodeScope(jjtn000);Token intID;
+                    SimpleNode jjtn000 = new SimpleNode(JJTARRAYSIZE);
+                    boolean jjtc000 = true;
+                    jjtree.openNodeScope(jjtn000);Token intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
@@ -757,9 +757,9 @@ if (jjtc000) {
   }
 
   static final public void Term() throws ParseException {/*@bgen(jjtree) Term */
-              SimpleNode jjtn000 = new SimpleNode(JJTTERM);
-              boolean jjtc000 = true;
-              jjtree.openNodeScope(jjtn000);Token op, intID;
+               SimpleNode jjtn000 = new SimpleNode(JJTTERM);
+               boolean jjtc000 = true;
+               jjtree.openNodeScope(jjtn000);Token op, intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADDSUB_OP:{
@@ -820,9 +820,9 @@ if (jjtc000) {
   }
 
   static final public void Exprtest() throws ParseException {/*@bgen(jjtree) Condition */
-                             SimpleNode jjtn000 = new SimpleNode(JJTCONDITION);
-                             boolean jjtc000 = true;
-                             jjtree.openNodeScope(jjtn000);Token relaOpID;
+                              SimpleNode jjtn000 = new SimpleNode(JJTCONDITION);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);Token relaOpID;
     try {
       jj_consume_token(LPAR);
       Lhs();
@@ -926,9 +926,9 @@ if (jjtc000) {
   }
 
   static final public void Call() throws ParseException {/*@bgen(jjtree) Call */
-              SimpleNode jjtn000 = new SimpleNode(JJTCALL);
-              boolean jjtc000 = true;
-              jjtree.openNodeScope(jjtn000);Token id, callID;
+               SimpleNode jjtn000 = new SimpleNode(JJTCALL);
+               boolean jjtc000 = true;
+               jjtree.openNodeScope(jjtn000);Token id, callID;
     try {
       id = jj_consume_token(ID);
 jjtn000.ID = id.image;
@@ -997,9 +997,9 @@ if (jjtc000) {
   }
 
   static final public void Argument() throws ParseException {/*@bgen(jjtree) Argument */
-                  SimpleNode jjtn000 = new SimpleNode(JJTARGUMENT);
-                  boolean jjtc000 = true;
-                  jjtree.openNodeScope(jjtn000);Token argID;
+                   SimpleNode jjtn000 = new SimpleNode(JJTARGUMENT);
+                   boolean jjtc000 = true;
+                   jjtree.openNodeScope(jjtn000);Token argID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
@@ -1036,9 +1036,9 @@ if (jjtc000) {
   }
 
   static final public void ArrayAccess() throws ParseException {/*@bgen(jjtree) ArrayAccess */
-                     SimpleNode jjtn000 = new SimpleNode(JJTARRAYACCESS);
-                     boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);Token arrayID;
+                      SimpleNode jjtn000 = new SimpleNode(JJTARRAYACCESS);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);Token arrayID;
     try {
       arrayID = jj_consume_token(ID);
 jjtn000.ID = arrayID.image;
@@ -1067,9 +1067,9 @@ if (jjtc000) {
   }
 
   static final public void ScalarAccess() throws ParseException {/*@bgen(jjtree) ScalarAccess */
-                      SimpleNode jjtn000 = new SimpleNode(JJTSCALARACCESS);
-                      boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);Token scalarID, size;
+                       SimpleNode jjtn000 = new SimpleNode(JJTSCALARACCESS);
+                       boolean jjtc000 = true;
+                       jjtree.openNodeScope(jjtn000);Token scalarID, size;
     try {
       scalarID = jj_consume_token(ID);
 jjtn000.ID = scalarID.image;
@@ -1092,9 +1092,9 @@ if (jjtc000) {
   }
 
   static final public void Index() throws ParseException {/*@bgen(jjtree) Index */
-               SimpleNode jjtn000 = new SimpleNode(JJTINDEX);
-               boolean jjtc000 = true;
-               jjtree.openNodeScope(jjtn000);Token id, intID;
+                SimpleNode jjtn000 = new SimpleNode(JJTINDEX);
+                boolean jjtc000 = true;
+                jjtree.openNodeScope(jjtn000);Token id, intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
@@ -1102,6 +1102,7 @@ if (jjtc000) {
 jjtree.closeNodeScope(jjtn000, true);
                   jjtc000 = false;
 jjtn000.ID = id.image;
+                jjtn000.digit = false;
         break;
         }
       case INTEGER:{
@@ -1109,6 +1110,7 @@ jjtn000.ID = id.image;
 jjtree.closeNodeScope(jjtn000, true);
                               jjtc000 = false;
 jjtn000.ID = intID.image;
+                jjtn000.digit = true;
         break;
         }
       default:

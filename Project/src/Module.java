@@ -12,8 +12,8 @@ public class Module {
 
 	public Module(String id, SimpleNode r) {
 		moduleID = id;
-		functionMap = new HashMap<>();
-		globalVariableMap = new HashMap<>();
+		functionMap = new HashMap<String,Function>();
+		globalVariableMap = new HashMap<String,Variable>();
 		root = r;
 	}
 

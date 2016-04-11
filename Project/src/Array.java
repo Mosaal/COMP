@@ -1,18 +1,22 @@
 /** This Class shall be used to store information about each array type */
 
 public class Array extends Variable {
-	private int reference;
-	private int[] array;
+	private int ref;
 	private int size;
+	private int[] array;
+	public static int REFERENCE;
 
-	public Array(String variableID){
+	public Array(String variableID) {
 		super(variableID);
+		ref = REFERENCE;
+		REFERENCE++;
 	}
 
-	public Array(String variableID,int size,int ref) {
+	public Array(String variableID,int size) {
 		super(variableID);
 		array = new int[size];
-		reference = ref;
+		ref = REFERENCE;
+		REFERENCE++;
 	}
 
 	public int get(int index) {
@@ -20,7 +24,7 @@ public class Array extends Variable {
 	}
 
 	public int getReference(){
-		return reference;
+		return ref;
 	}
 
 	public int getSize(){
@@ -37,7 +41,7 @@ public class Array extends Variable {
 
 	@Override
 	public boolean equals(Object other) {
-		if (reference == ((Array) other).getReference())
+		if (ref == ((Array)other).getReference())
 			return true;
 		return false;
 	}

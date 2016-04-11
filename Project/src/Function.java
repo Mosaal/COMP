@@ -12,12 +12,14 @@ public class Function {
 	public Function(String functionID) {
 		this.functionID = functionID;
 		parameters = new ArrayList<Variable>();
+		variableMap = new HashMap<String,Variable>();
 	}
 
 	public Function(String id, ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
 		parameters = p;
 		body = n;
+		variableMap = new HashMap<String,Variable>();
 	}
 
 	public int getNumVariable() {

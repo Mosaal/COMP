@@ -89,10 +89,10 @@ PARSER_END(YalToJvm)
 }
 
 SimpleNode Module()        : {/*@bgen(jjtree) Module */
-                              SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
-                              boolean jjtc000 = true;
-                              jjtree.openNodeScope(jjtn000);
-/*@egen*/Token moduleID;}
+                               SimpleNode jjtn000 = new SimpleNode(JJTMODULE);
+                               boolean jjtc000 = true;
+                               jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token moduleID; }
 {/*@bgen(jjtree) Module */
         try {
 /*@egen*/
@@ -127,10 +127,10 @@ SimpleNode Module()        : {/*@bgen(jjtree) Module */
 }
 
 void Declaration()        : {/*@bgen(jjtree) Global */
-                             SimpleNode jjtn000 = new SimpleNode(JJTGLOBAL);
-                             boolean jjtc000 = true;
-                             jjtree.openNodeScope(jjtn000);
-/*@egen*/Token assign;}
+                              SimpleNode jjtn000 = new SimpleNode(JJTGLOBAL);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token assign; }
 {/*@bgen(jjtree) Global */
         try {
 /*@egen*/
@@ -163,10 +163,10 @@ void GlobalLeft()      : {}
 }
 
 void GlobalRight(): {/*@bgen(jjtree) GlobalRight */
-                     SimpleNode jjtn000 = new SimpleNode(JJTGLOBALRIGHT);
-                     boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);
-/*@egen*/Token op, intID;}
+                      SimpleNode jjtn000 = new SimpleNode(JJTGLOBALRIGHT);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token op, intID; }
 {/*@bgen(jjtree) GlobalRight */
         try {
 /*@egen*/
@@ -203,10 +203,10 @@ void GlobalRight(): {/*@bgen(jjtree) GlobalRight */
 }
 
 void Function()          : {/*@bgen(jjtree) Function */
-                            SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
-                            boolean jjtc000 = true;
-                            jjtree.openNodeScope(jjtn000);
-/*@egen*/Token functionID;}
+                             SimpleNode jjtn000 = new SimpleNode(JJTFUNCTION);
+                             boolean jjtc000 = true;
+                             jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token functionID; }
 {/*@bgen(jjtree) Function */
         try {
 /*@egen*/
@@ -479,10 +479,10 @@ void Lhs()      : {}
 }
 
 void Rhs(): {/*@bgen(jjtree) Rhs */
-             SimpleNode jjtn000 = new SimpleNode(JJTRHS);
-             boolean jjtc000 = true;
-             jjtree.openNodeScope(jjtn000);
-/*@egen*/Token op;}
+              SimpleNode jjtn000 = new SimpleNode(JJTRHS);
+              boolean jjtc000 = true;
+              jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token op; }
 {/*@bgen(jjtree) Rhs */
         try {
 /*@egen*/
@@ -516,10 +516,10 @@ void Rhs(): {/*@bgen(jjtree) Rhs */
 }
 
 void ArraySize(): {/*@bgen(jjtree) ArraySize */
-                   SimpleNode jjtn000 = new SimpleNode(JJTARRAYSIZE);
-                   boolean jjtc000 = true;
-                   jjtree.openNodeScope(jjtn000);
-/*@egen*/Token intID;}
+                    SimpleNode jjtn000 = new SimpleNode(JJTARRAYSIZE);
+                    boolean jjtc000 = true;
+                    jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token intID; }
 {/*@bgen(jjtree) ArraySize */
         try {
 /*@egen*/
@@ -552,10 +552,10 @@ void ArraySize(): {/*@bgen(jjtree) ArraySize */
 }
 
 void Term(): {/*@bgen(jjtree) Term */
-              SimpleNode jjtn000 = new SimpleNode(JJTTERM);
-              boolean jjtc000 = true;
-              jjtree.openNodeScope(jjtn000);
-/*@egen*/Token op, intID;}
+               SimpleNode jjtn000 = new SimpleNode(JJTTERM);
+               boolean jjtc000 = true;
+               jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token op, intID; }
 {/*@bgen(jjtree) Term */
         try {
 /*@egen*/
@@ -592,10 +592,10 @@ void Term(): {/*@bgen(jjtree) Term */
 }
 
 void Exprtest()           : {/*@bgen(jjtree) Condition */
-                             SimpleNode jjtn000 = new SimpleNode(JJTCONDITION);
-                             boolean jjtc000 = true;
-                             jjtree.openNodeScope(jjtn000);
-/*@egen*/Token relaOpID;}
+                              SimpleNode jjtn000 = new SimpleNode(JJTCONDITION);
+                              boolean jjtc000 = true;
+                              jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token relaOpID; }
 {/*@bgen(jjtree) Condition */
         try {
 /*@egen*/
@@ -685,10 +685,10 @@ void If(): {/*@bgen(jjtree) If */
 }
 
 void Call(): {/*@bgen(jjtree) Call */
-              SimpleNode jjtn000 = new SimpleNode(JJTCALL);
-              boolean jjtc000 = true;
-              jjtree.openNodeScope(jjtn000);
-/*@egen*/Token id, callID;}
+               SimpleNode jjtn000 = new SimpleNode(JJTCALL);
+               boolean jjtc000 = true;
+               jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token id, callID; }
 {/*@bgen(jjtree) Call */
         try {
 /*@egen*/
@@ -726,10 +726,10 @@ void ArgumentList()      : {}
 }
 
 void Argument(): {/*@bgen(jjtree) Argument */
-                  SimpleNode jjtn000 = new SimpleNode(JJTARGUMENT);
-                  boolean jjtc000 = true;
-                  jjtree.openNodeScope(jjtn000);
-/*@egen*/Token argID;}
+                   SimpleNode jjtn000 = new SimpleNode(JJTARGUMENT);
+                   boolean jjtc000 = true;
+                   jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token argID; }
 {/*@bgen(jjtree) Argument */
         try {
 /*@egen*/
@@ -764,10 +764,10 @@ void Argument(): {/*@bgen(jjtree) Argument */
 }
 
 void ArrayAccess(): {/*@bgen(jjtree) ArrayAccess */
-                     SimpleNode jjtn000 = new SimpleNode(JJTARRAYACCESS);
-                     boolean jjtc000 = true;
-                     jjtree.openNodeScope(jjtn000);
-/*@egen*/Token arrayID;}
+                      SimpleNode jjtn000 = new SimpleNode(JJTARRAYACCESS);
+                      boolean jjtc000 = true;
+                      jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token arrayID; }
 {/*@bgen(jjtree) ArrayAccess */
         try {
 /*@egen*/
@@ -795,10 +795,10 @@ void ArrayAccess(): {/*@bgen(jjtree) ArrayAccess */
 }
 
 void ScalarAccess(): {/*@bgen(jjtree) ScalarAccess */
-                      SimpleNode jjtn000 = new SimpleNode(JJTSCALARACCESS);
-                      boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);
-/*@egen*/Token scalarID, size;}
+                       SimpleNode jjtn000 = new SimpleNode(JJTSCALARACCESS);
+                       boolean jjtc000 = true;
+                       jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token scalarID, size; }
 {/*@bgen(jjtree) ScalarAccess */
         try {
 /*@egen*/
@@ -812,10 +812,10 @@ void ScalarAccess(): {/*@bgen(jjtree) ScalarAccess */
 }
 
 void Index(): {/*@bgen(jjtree) Index */
-               SimpleNode jjtn000 = new SimpleNode(JJTINDEX);
-               boolean jjtc000 = true;
-               jjtree.openNodeScope(jjtn000);
-/*@egen*/Token id, intID;}
+                SimpleNode jjtn000 = new SimpleNode(JJTINDEX);
+                boolean jjtc000 = true;
+                jjtree.openNodeScope(jjtn000);
+/*@egen*/ Token id, intID; }
 {/*@bgen(jjtree) Index */
         try {
 /*@egen*/
@@ -826,6 +826,7 @@ void Index(): {/*@bgen(jjtree) Index */
                 }
 /*@egen*/ {
 		jjtn000.ID = id.image;
+		jjtn000.digit = false;
 	} | intID=<INTEGER>/*@bgen(jjtree)*/
                             {
                               jjtree.closeNodeScope(jjtn000, true);
@@ -833,6 +834,7 @@ void Index(): {/*@bgen(jjtree) Index */
                             }
 /*@egen*/ {
 		jjtn000.ID = intID.image;
+		jjtn000.digit = true;
 	}/*@bgen(jjtree)*/
         } finally {
           if (jjtc000) {
