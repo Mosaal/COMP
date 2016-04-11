@@ -2,6 +2,8 @@
 
 import java.util.*;
 
+import javax.swing.JViewport;
+
 public class Module {
 
 	private String moduleID;
@@ -80,40 +82,59 @@ public class Module {
 		for (int i = 0; i < num; i++) {
 			SimpleNode node = (SimpleNode)root.jjtGetChild(i);
 			if(node.getId() == YalToJvmTreeConstants.JJTFUNCTION){
-				ArrayList<Variable> params = getParams(node);
+				ArrayList<Variable> params = new ArrayList<>();
+				Variable returnVariable = null;
+				int num2 = node.jjtGetNumChildren();
+				for (int j = 0; j < num2; j++) {
+					SimpleNode n = (SimpleNode)node.jjtGetChild(j);
+					int id = n.getId();
+					if(id == YalToJvmTreeConstants.JJTRETURN){
+						returnVariable = getVariable(n);
+					}else if (id == YalToJvmTreeConstants.JJTPARAMS) {
+						params = getParams(n,node.ID, returnVariable);
+					}
+				}
 				String name = node.ID;
-				Function f = new Function(name,params,(SimpleNode)node.jjtGetChild(node.jjtGetNumChildren()-1));
+				Function f = new Function(name,returnVariable,params,(SimpleNode)node.jjtGetChild(node.jjtGetNumChildren()-1));
 				addFunction(f);
 			}
 		}
 	}
-
-	public ArrayList<Variable> getParams(SimpleNode node){
-		int num = node.jjtGetNumChildren();
-		ArrayList<Variable> params = new ArrayList<>();
-		for (int i = 0; i < num; i++) {
-			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
-			if(n.getId() == YalToJvmTreeConstants.JJTPARAMS){
-				getVariables(n,params);
-			}else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
-				
-			}else if(n.getId() == YalToJvmTreeConstants.JJTSCALAR){
-				
+	
+	public Variable getVariable(SimpleNode n){
+		Variable var = null;
+		if(n.getId() == YalToJvmTreeConstants.JJTRETURN){
+			SimpleNode retVarNode = (SimpleNode)n.jjtGetChild(0);
+			int returnId = retVarNode.getId();
+			if(returnId == YalToJvmTreeConstants.JJTARRAY){
+				var = new Array(retVarNode.ID);
+			}else if(returnId == YalToJvmTreeConstants.JJTSCALAR){
+				var = new Scalar(retVarNode.ID);
 			}
 		}
-		return params;
+		return var;
 	}
 
-	public void getVariables(SimpleNode node, ArrayList<Variable> params){
+	public ArrayList<Variable> getParams(SimpleNode node, String functionId, Variable returnVar){
+		ArrayList<Variable> params = new ArrayList<>();
+		HashSet<String> set = new HashSet<>();
 		int num = node.jjtGetNumChildren();
 		for (int i = 0; i < num; i++) {
 			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
 			if(n.getId() == YalToJvmTreeConstants.JJTSCALAR){
-				params.add(new Scalar(node.ID));
+				params.add(new Scalar(n.ID));
 			} else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
-				params.add(new Array(node.ID));
+				params.add(new Array(n.ID));
+			}
+			if(set.contains(n.ID)){
+				YalToJvm.semanticErrorMessages.add("Function " + functionId + " has parameter: " + n.ID + " duplicated");
+			}else if(returnVar != null && n.ID.equals(returnVar.getVariableID())){
+				YalToJvm.semanticErrorMessages.add("Function " + functionId + " has parameter: " + n.ID + " with the same ID as the return variable");
+			}else {
+				set.add(n.ID);
 			}
 		}
+		return params;
 	}
 
 }

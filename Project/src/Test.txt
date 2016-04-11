@@ -14,7 +14,7 @@ module while4 {
 		a=2;
 	}
 
-	function a[]=f1(v[], N, x) {
+	function a=f1(v[], N, x) {
 		i = 0;
 		while (i < N) {
 			v[i] = v[i] + x;
