@@ -91,6 +91,10 @@ public class Module {
 			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
 			if(n.getId() == YalToJvmTreeConstants.JJTPARAMS){
 				getVariables(n,params);
+			}else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
+				
+			}else if(n.getId() == YalToJvmTreeConstants.JJTSCALAR){
+				
 			}
 		}
 		return params;

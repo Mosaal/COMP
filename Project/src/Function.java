@@ -7,6 +7,7 @@ public class Function {
 	private String functionID;
 	private HashMap<String,Variable> variableMap;
 	private ArrayList<Variable> parameters;
+	private Variable returnVar;
 	private SimpleNode body;
 
 	public Function(String functionID) {
@@ -41,10 +42,8 @@ public class Function {
 	@Override
 	public boolean equals(Object object) {
 		Function function = (Function) object;
-
 		if (functionID == function.getFunctionID() && getNumVariable() == function.getNumVariable())
 			return true;
-
 		return false;
 	}
 
