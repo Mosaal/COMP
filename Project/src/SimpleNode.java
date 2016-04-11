@@ -138,6 +138,7 @@ class SimpleNode implements Node {
 			System.out.println(prefix + "[ = ]");
 			break;
 		case YalToJvmTreeConstants.JJTOPERATOR:
+			System.out.println(prefix + "[ " + Op + " ]");
 			break;
 		case YalToJvmTreeConstants.JJTARRAYSIZE:
 			System.out.println(prefix + "[ [" + ID + "] ]");
