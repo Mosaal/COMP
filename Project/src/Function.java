@@ -16,8 +16,9 @@ public class Function {
 		variableMap = new HashMap<String,Variable>();
 	}
 
-	public Function(String id, ArrayList<Variable> p,SimpleNode n){
+	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
+		returnVar = ret;
 		parameters = p;
 		body = n;
 		variableMap = new HashMap<String,Variable>();
@@ -29,6 +30,10 @@ public class Function {
 
 	public String getFunctionID() {
 		return functionID;
+	}
+	
+	public Variable getReturnVar(){
+		return returnVar;
 	}
 
 	public HashMap<String,Variable> getVariableMap() {
