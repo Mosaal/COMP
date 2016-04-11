@@ -111,7 +111,7 @@ class SimpleNode implements Node {
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
 			break;
 		case YalToJvmTreeConstants.JJTRETURN:
-			System.out.println(toString(prefix) + "lel");
+			System.out.println(toString(prefix));
 			break;
 		case YalToJvmTreeConstants.JJTPARAMS:
 			System.out.println(toString(prefix));
@@ -136,6 +136,8 @@ class SimpleNode implements Node {
 			break;
 		case YalToJvmTreeConstants.JJTASSIGNEMENT:
 			System.out.println(prefix + "[ = ]");
+			break;
+		case YalToJvmTreeConstants.JJTOPERATOR:
 			break;
 		case YalToJvmTreeConstants.JJTARRAYSIZE:
 			System.out.println(prefix + "[ [" + ID + "] ]");

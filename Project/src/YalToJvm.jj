@@ -26,8 +26,8 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		module = new Module(root.ID,root);
 		root.dump("");
 
-		module.getFunctions();
-		module.processFunctions();
+		//module.getFunctions();
+		//module.processFunctions();
 		//module.printSymbolTables();
 		//printSemanticErrors();
 	}
@@ -211,7 +211,7 @@ void Function()          : {/*@bgen(jjtree) Function */
 {/*@bgen(jjtree) Function */
         try {
 /*@egen*/
-	<FUNCTION> (LOOKAHEAD(3) Return())? functionID=<ID> {
+	<FUNCTION> (LOOKAHEAD(3) FunctionReturn())? functionID=<ID> {
 		jjtn000.ID = functionID.image;
 	} <LPAR> (Varlist())? <RPAR> <LCHAVETA> FunctionBody() <RCHAVETA>/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
