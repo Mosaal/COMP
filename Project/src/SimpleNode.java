@@ -117,13 +117,13 @@ class SimpleNode implements Node {
 			break;
 		case YalToJvmTreeConstants.JJTARRAY:
 			if (ret)
-				System.out.println(prefix + "Return\n   [ " + ID + "[] ]");
+				System.out.println(prefix + "Return \"" + ID + "[]\"");
 			else
 				System.out.println(prefix + "[ " + ID + "[] ]");
 			break;
 		case YalToJvmTreeConstants.JJTSCALAR:
 			if (ret)
-				System.out.println(prefix + "Return\n   [ " + ID + " ]");
+				System.out.println(prefix + "Return \"" + ID + "\"");
 			else
 				System.out.println(prefix + "[ " + ID + " ]");
 			break;
