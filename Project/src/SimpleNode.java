@@ -14,8 +14,6 @@ class SimpleNode implements Node {
 	public String Op = "";
 	public String size = "";
 	public String assign = "";
-	public boolean ret = false;
-	public boolean call = false;
 	public boolean digit = false;
 
 	public SimpleNode(int i) {
@@ -112,20 +110,17 @@ class SimpleNode implements Node {
 		case YalToJvmTreeConstants.JJTFUNCTION:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
 			break;
+		case YalToJvmTreeConstants.JJTRETURN:
+			System.out.println(toString(prefix) + "lel");
+			break;
 		case YalToJvmTreeConstants.JJTPARAMS:
 			System.out.println(toString(prefix));
 			break;
 		case YalToJvmTreeConstants.JJTARRAY:
-			if (ret)
-				System.out.println(prefix + "Return \"" + ID + "[]\"");
-			else
-				System.out.println(prefix + "[ " + ID + "[] ]");
+			System.out.println(prefix + "[ " + ID + "[] ]");
 			break;
 		case YalToJvmTreeConstants.JJTSCALAR:
-			if (ret)
-				System.out.println(prefix + "Return \"" + ID + "\"");
-			else
-				System.out.println(prefix + "[ " + ID + " ]");
+			System.out.println(prefix + "[ " + ID + " ]");
 			break;
 		case YalToJvmTreeConstants.JJTFUNCTIONBODY:
 			System.out.println(toString(prefix));
@@ -141,10 +136,6 @@ class SimpleNode implements Node {
 			break;
 		case YalToJvmTreeConstants.JJTASSIGNEMENT:
 			System.out.println(prefix + "[ = ]");
-			break;
-		case YalToJvmTreeConstants.JJTRHS:
-			if (Op != "")
-				System.out.println(prefix + "[ " + Op + " ]");
 			break;
 		case YalToJvmTreeConstants.JJTARRAYSIZE:
 			System.out.println(prefix + "[ [" + ID + "] ]");
@@ -172,7 +163,7 @@ class SimpleNode implements Node {
 			System.out.println(toString(prefix));
 			break;
 		case YalToJvmTreeConstants.JJTCALL:
-			if (!call)
+			if (callID == null)
 				System.out.println(toString(prefix) + " \"" + ID + "\"");
 			else
 				System.out.println(toString(prefix) + " \"" + callID + "\" of \"" + ID + "\"");

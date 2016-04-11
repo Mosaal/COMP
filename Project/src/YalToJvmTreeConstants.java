@@ -6,25 +6,26 @@ public interface YalToJvmTreeConstants
   public int JJTVOID = 2;
   public int JJTGLOBALRIGHT = 3;
   public int JJTFUNCTION = 4;
-  public int JJTPARAMS = 5;
-  public int JJTARRAY = 6;
-  public int JJTSCALAR = 7;
-  public int JJTFUNCTIONBODY = 8;
-  public int JJTWHILEBODY = 9;
-  public int JJTIFBODY = 10;
-  public int JJTELSEBODY = 11;
-  public int JJTASSIGNEMENT = 12;
-  public int JJTRHS = 13;
-  public int JJTARRAYSIZE = 14;
-  public int JJTTERM = 15;
-  public int JJTCONDITION = 16;
-  public int JJTWHILE = 17;
-  public int JJTIF = 18;
-  public int JJTCALL = 19;
-  public int JJTARGUMENT = 20;
-  public int JJTARRAYACCESS = 21;
-  public int JJTSCALARACCESS = 22;
-  public int JJTINDEX = 23;
+  public int JJTRETURN = 5;
+  public int JJTPARAMS = 6;
+  public int JJTARRAY = 7;
+  public int JJTSCALAR = 8;
+  public int JJTFUNCTIONBODY = 9;
+  public int JJTWHILEBODY = 10;
+  public int JJTIFBODY = 11;
+  public int JJTELSEBODY = 12;
+  public int JJTASSIGNEMENT = 13;
+  public int JJTOPERATOR = 14;
+  public int JJTARRAYSIZE = 15;
+  public int JJTTERM = 16;
+  public int JJTCONDITION = 17;
+  public int JJTWHILE = 18;
+  public int JJTIF = 19;
+  public int JJTCALL = 20;
+  public int JJTARGUMENT = 21;
+  public int JJTARRAYACCESS = 22;
+  public int JJTSCALARACCESS = 23;
+  public int JJTINDEX = 24;
 
 
   public String[] jjtNodeName = {
@@ -33,6 +34,7 @@ public interface YalToJvmTreeConstants
     "void",
     "GlobalRight",
     "Function",
+    "Return",
     "Params",
     "Array",
     "Scalar",
@@ -41,7 +43,7 @@ public interface YalToJvmTreeConstants
     "IfBody",
     "ElseBody",
     "Assignement",
-    "Rhs",
+    "Operator",
     "ArraySize",
     "Term",
     "Condition",
@@ -54,4 +56,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=34b34632b113dbdccfce447e3901c281 (do not edit this line) */
+/* JavaCC - OriginalChecksum=746c28d0cf5611c0c0825cdf1b8a13d3 (do not edit this line) */
