@@ -77,4 +77,7 @@ public class Function {
 		return s;
 	}
 
+	public boolean checkExists(String ID) {
+		return false;
+	}
 }

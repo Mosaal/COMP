@@ -16,10 +16,10 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 YalToJvm parser = new YalToJvm(fs);
                 SimpleNode root = parser.Module();
                 module = new Module(root.ID,root);
-                root.dump("");
+                //root.dump("");
 
-                //module.getFunctions();
-                //module.processFunctions();
+                module.getFunctions();
+                module.processFunctions();
                 //module.printSymbolTables();
                 //printSemanticErrors();
         }
