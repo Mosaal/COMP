@@ -18,4 +18,5 @@ Por exemplo: `java YalToJvm Test.txt`
   * Número e tipo errados de argumentos numa função
   * Nas comparações verificar se os operandos são do mesmo tipo.
   * Ver se a função é única para cada module &#10003;
+  * Ver se os parâmetros da função não têm o mesmo nome assim como a variavel de retorno  &#10003;
   * Pode haver mais ...
