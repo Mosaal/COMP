@@ -181,7 +181,7 @@ class SimpleNode implements Node {
 		}
 	}
 
-	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+	public void processAssignement(SimpleNode lhs, SimpleNode termArraySize, Function parentFunction) {
 		//Process lhs
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
@@ -196,56 +196,25 @@ class SimpleNode implements Node {
 		}
 
 		//Process rhs
-		if (rhs.jjtGetNumChildren() == 1) {
-			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-
-			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-				if (rhsChild.ID != null) {
-
-				} else {
-					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
-
-					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-					}
-				}
-			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-
-			}
-		} else if (rhs.jjtGetNumChildren() == 2) {
-			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
-			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(0);
-
-			if (termLeft.ID != null) {
+		if (termArraySize.getId() == YalToJvmTreeConstants.JJTTERM) {
+			if (termArraySize.ID != null) {
 
 			} else {
-				SimpleNode termLeftChild = (SimpleNode)termLeft.jjtGetChild(0);
+				SimpleNode termChild = (SimpleNode)termArraySize.jjtGetChild(0);
 
-				if (termLeftChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 
-				} else if (termLeftChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 
-				} else if (termLeftChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 				}
 			}
-
-			if (termRight.ID != null) {
+		} else if (termArraySize.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
+			if (termArraySize.ID != null) {
 
 			} else {
-				SimpleNode termRightChild = (SimpleNode)termRight.jjtGetChild(0);
 
-				if (termRightChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termRightChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-				} else if (termRightChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-				}
 			}
 		}
 	}
@@ -295,7 +264,7 @@ class SimpleNode implements Node {
 		}
 	}
 
-	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+	public void processCondition(SimpleNode lhs, SimpleNode termArraySize, Function parentFunction) {
 		//Process lhs
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
@@ -310,56 +279,25 @@ class SimpleNode implements Node {
 		}
 
 		//Process rhs
-		if (rhs.jjtGetNumChildren() == 1) {
-			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-
-			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-				if (rhsChild.ID != null) {
-
-				} else {
-					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
-
-					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-					}
-				}
-			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-
-			}
-		} else if (rhs.jjtGetNumChildren() == 2) {
-			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
-			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(0);
-
-			if (termLeft.ID != null) {
+		if (termArraySize.getId() == YalToJvmTreeConstants.JJTTERM) {
+			if (termArraySize.ID != null) {
 
 			} else {
-				SimpleNode termLeftChild = (SimpleNode)termLeft.jjtGetChild(0);
+				SimpleNode termChild = (SimpleNode)termArraySize.jjtGetChild(0);
 
-				if (termLeftChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 
-				} else if (termLeftChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 
-				} else if (termLeftChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 				}
 			}
-
-			if (termRight.ID != null) {
+		} else if (termArraySize.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
+			if (termArraySize.ID != null) {
 
 			} else {
-				SimpleNode termRightChild = (SimpleNode)termRight.jjtGetChild(0);
 
-				if (termRightChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termRightChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-				} else if (termRightChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-				}
 			}
 		}
 	}
@@ -418,46 +356,47 @@ class SimpleNode implements Node {
 
 			switch (child.getId()) {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
-				if (child.jjtGetNumChildren() == 2) {
-					SimpleNode lhs = (SimpleNode)child.jjtGetChild(0); //Scalar or Array Access
-					SimpleNode rhs = (SimpleNode)child.jjtGetChild(1); //RHS
-					processAssignement(lhs, rhs, parentFunction);
-				} else if (child.jjtGetNumChildren() == 3) {
-					SimpleNode lhs = (SimpleNode)child.jjtGetChild(0); //Scalar or Array Access
-					SimpleNode termLeft = (SimpleNode)child.jjtGetChild(1); //Term on the left side
-					SimpleNode termRight = (SimpleNode)child.jjtGetChild(2); //Term on the right side
+				SimpleNode lhs = (SimpleNode)child.jjtGetChild(0); //Scalar or Array Access
+				SimpleNode rhs = (SimpleNode)child.jjtGetChild(1); //RHS
+
+				if (rhs.jjtGetNumChildren() == 1) {
+					SimpleNode termArraySize = (SimpleNode)rhs.jjtGetChild(0);
+					processAssignement(lhs, termArraySize, parentFunction);
+				} else if (rhs.jjtGetNumChildren() == 2) {
+					SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
+					SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
 					processAssignement(lhs, termLeft, termRight, parentFunction);
-				}	
+				}
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode)child.jjtGetChild(0);
-				SimpleNode whileBody = (SimpleNode)child.jjtGetChild(1);
+				SimpleNode lhsWhile = (SimpleNode)whileCondition.jjtGetChild(0); //Scalar or Array Access
+				SimpleNode rhsWhile = (SimpleNode)whileCondition.jjtGetChild(1); //RHS
 
-				if (whileCondition.jjtGetNumChildren() == 2) {
-					SimpleNode lhs = (SimpleNode)whileCondition.jjtGetChild(0); //Scalar or Array Access
-					SimpleNode rhs = (SimpleNode)whileCondition.jjtGetChild(1); //RHS
-					processCondition(lhs, rhs, parentFunction);
-				} else if (whileCondition.jjtGetNumChildren() == 3) {
-					SimpleNode lhs = (SimpleNode)whileCondition.jjtGetChild(0); //Scalar or Array Access
-					SimpleNode termLeft = (SimpleNode)whileCondition.jjtGetChild(1); //Term on the left side
-					SimpleNode termRight = (SimpleNode)whileCondition.jjtGetChild(2); //Term on the right side
-					processCondition(lhs, termLeft, termRight, parentFunction);
+				if (rhsWhile.jjtGetNumChildren() == 1) {
+					SimpleNode termArraySize = (SimpleNode)rhsWhile.jjtGetChild(0);
+					processCondition(lhsWhile, termArraySize, parentFunction);
+				} else if (rhsWhile.jjtGetNumChildren() == 2) {
+					SimpleNode termLeft = (SimpleNode)rhsWhile.jjtGetChild(0);
+					SimpleNode termRight = (SimpleNode)rhsWhile.jjtGetChild(1);
+					processCondition(lhsWhile, termLeft, termRight, parentFunction);
 				}
 
+				SimpleNode whileBody = (SimpleNode)child.jjtGetChild(1);
 				whileBody.processBody(parentFunction);
 				break;
 			case YalToJvmTreeConstants.JJTIF:
 				SimpleNode ifCondition = (SimpleNode)child.jjtGetChild(0);
-
-				if (ifCondition.jjtGetNumChildren() == 2) {
-					SimpleNode lhs = (SimpleNode)ifCondition.jjtGetChild(0); //Scalar or Array Access
-					SimpleNode rhs = (SimpleNode)ifCondition.jjtGetChild(1); //RHS
-					processCondition(lhs, rhs, parentFunction);
-				} else if (ifCondition.jjtGetNumChildren() == 3) {
-					SimpleNode lhs = (SimpleNode)ifCondition.jjtGetChild(0); //Scalar or Array Access
-					SimpleNode termLeft = (SimpleNode)ifCondition.jjtGetChild(1); //Term on the left side
-					SimpleNode termRight = (SimpleNode)ifCondition.jjtGetChild(2); //Term on the right side
-					processCondition(lhs, termLeft, termRight, parentFunction);
+				SimpleNode lhsIf = (SimpleNode)ifCondition.jjtGetChild(0); //Scalar or Array Access
+				SimpleNode rhsIf = (SimpleNode)ifCondition.jjtGetChild(1); //RHS
+				
+				if (rhsIf.jjtGetNumChildren() == 1) {
+					SimpleNode termArraySize = (SimpleNode)rhsIf.jjtGetChild(0);
+					processCondition(lhsIf, termArraySize, parentFunction);
+				} else if (rhsIf.jjtGetNumChildren() == 2) {
+					SimpleNode termLeft = (SimpleNode)rhsIf.jjtGetChild(0);
+					SimpleNode termRight = (SimpleNode)rhsIf.jjtGetChild(1);
+					processCondition(lhsIf, termLeft, termRight, parentFunction);
 				}
 
 				if (child.jjtGetNumChildren() == 2) {
