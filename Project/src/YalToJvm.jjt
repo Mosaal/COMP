@@ -104,11 +104,11 @@ void GlobalLeft() #void: {}
 
 void GlobalRight(): { Token op, intID; }
 {
-	("[" ArraySize() "]") | ((op=<ADDSUB_OP> {
+	((op=<ADDSUB_OP> {
 		jjtThis.Op = op.image;
 	})? intID=<INTEGER> {
 		jjtThis.ID = intID.image;
-	})
+	}) | ("[" ArraySize() "]")
 }
 
 void Function() #Function: { Token functionID; }
@@ -177,20 +177,15 @@ void Lhs() #void: {}
 	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
 }
 
-void Rhs() #void: {}
+void Rhs(): { Token op; }
 {
-	(Term() (Operator() Term())?) | "[" ArraySize() "]"
-}
-
-void Operator(): { Token op; }
-{
-	op=<ARITH_OP> {
+	(Term() ((op=<ADDSUB_OP> {
+		jjtThis.Op = op.image;
+	} | op=<ARITH_OP> {
 		jjtThis.Op = op.image;
 	} | op=<BITWISE_OP> {
 		jjtThis.Op = op.image;
-	} | op=<ADDSUB_OP> {
-		jjtThis.Op = op.image;
-	}
+	}) Term())?) | "[" ArraySize() "]"
 }
 
 void ArraySize(): { Token intID; }

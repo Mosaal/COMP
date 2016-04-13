@@ -15,7 +15,7 @@ public interface YalToJvmTreeConstants
   public int JJTIFBODY = 11;
   public int JJTELSEBODY = 12;
   public int JJTASSIGNEMENT = 13;
-  public int JJTOPERATOR = 14;
+  public int JJTRHS = 14;
   public int JJTARRAYSIZE = 15;
   public int JJTTERM = 16;
   public int JJTCONDITION = 17;
@@ -43,7 +43,7 @@ public interface YalToJvmTreeConstants
     "IfBody",
     "ElseBody",
     "Assignement",
-    "Operator",
+    "Rhs",
     "ArraySize",
     "Term",
     "Condition",
@@ -56,4 +56,4 @@ public interface YalToJvmTreeConstants
     "Index",
   };
 }
-/* JavaCC - OriginalChecksum=746c28d0cf5611c0c0825cdf1b8a13d3 (do not edit this line) */
+/* JavaCC - OriginalChecksum=1523209db2469c154315119a471cfd4e (do not edit this line) */

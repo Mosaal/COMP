@@ -87,9 +87,6 @@ class SimpleNode implements Node {
 	public void dump(String prefix) {
 		//System.out.println(toString(prefix));
 		switch (id) {
-		case YalToJvmTreeConstants.JJTVOID:
-			System.out.println(toString(prefix) + " VOID");
-			break;
 		case YalToJvmTreeConstants.JJTMODULE:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
 			break;
@@ -100,8 +97,8 @@ class SimpleNode implements Node {
 				prefix = newPrefix(prefix, false);
 			break;
 		case YalToJvmTreeConstants.JJTGLOBALRIGHT:
-			if (Op != "" || ID != null)
-				System.out.println(newPrefix(prefix, true) + "[ " + Op + ID + " ]");
+			if (ID != null)
+				System.out.println(prefix + " [ " + Op + ID + " ]");
 			break;
 		case YalToJvmTreeConstants.JJTFUNCTION:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
@@ -133,24 +130,16 @@ class SimpleNode implements Node {
 		case YalToJvmTreeConstants.JJTASSIGNEMENT:
 			System.out.println(prefix + "[ = ]");
 			break;
-		case YalToJvmTreeConstants.JJTOPERATOR:
-			System.out.println(prefix + "[ " + Op + " ]");
+		case YalToJvmTreeConstants.JJTRHS:
+			if (Op != "")
+				System.out.println(prefix + "[ " + Op + " ]");
 			break;
 		case YalToJvmTreeConstants.JJTARRAYSIZE:
 			System.out.println(prefix + "[ [" + ID + "] ]");
 			break;
 		case YalToJvmTreeConstants.JJTTERM:
-			if (Op != "" || ID != null) {
-				SimpleNode temp = (SimpleNode)parent;
-				if (temp.Op.equals("+") || temp.Op.equals("-"))
-					System.out.println(newPrefix(prefix, true) + "[ " + Op + ID + " ]");
-				else if (temp.Op.equals("*") || temp.Op.equals("/") || temp.Op.equals("<<") || temp.Op.equals(">>") || temp.Op.equals(">>>"))
-					System.out.println(newPrefix(prefix, true) + "[ " + Op + ID + " ]");
-				else if (temp.Op.equals("&") || temp.Op.equals("|") || temp.Op.equals("^"))
-					System.out.println(newPrefix(prefix, true) + "[ " + Op + ID + " ]");
-				else
-					System.out.println(prefix + "[ " + Op + ID + " ]");
-			}
+			if (ID != null)
+				System.out.println(prefix + "[ " + Op + ID + " ]");
 			break;
 		case YalToJvmTreeConstants.JJTCONDITION:
 			System.out.println(prefix + "[ " + ID + " ]");

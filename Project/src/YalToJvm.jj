@@ -171,7 +171,7 @@ void GlobalRight(): {/*@bgen(jjtree) GlobalRight */
 {/*@bgen(jjtree) GlobalRight */
         try {
 /*@egen*/
-	("[" ArraySize() "]") | ((op=<ADDSUB_OP> {
+	((op=<ADDSUB_OP> {
 		jjtn000.Op = op.image;
 	})? intID=<INTEGER>/*@bgen(jjtree)*/
                             {
@@ -180,7 +180,7 @@ void GlobalRight(): {/*@bgen(jjtree) GlobalRight */
                             }
 /*@egen*/ {
 		jjtn000.ID = intID.image;
-	})/*@bgen(jjtree)*/
+	}) | ("[" ArraySize() "]")/*@bgen(jjtree)*/
         } catch (Throwable jjte000) {
           if (jjtc000) {
             jjtree.clearNodeScope(jjtn000);
@@ -506,41 +506,35 @@ void Lhs()      : {}
 	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
 }
 
-void Rhs()      : {}
-{
-	(Term() (Operator() Term())?) | "[" ArraySize() "]"
-}
-
-void Operator(): {/*@bgen(jjtree) Operator */
-                   SimpleNode jjtn000 = new SimpleNode(JJTOPERATOR);
-                   boolean jjtc000 = true;
-                   jjtree.openNodeScope(jjtn000);
+void Rhs(): {/*@bgen(jjtree) Rhs */
+              SimpleNode jjtn000 = new SimpleNode(JJTRHS);
+              boolean jjtc000 = true;
+              jjtree.openNodeScope(jjtn000);
 /*@egen*/ Token op; }
-{/*@bgen(jjtree) Operator */
+{/*@bgen(jjtree) Rhs */
         try {
 /*@egen*/
-	op=<ARITH_OP>/*@bgen(jjtree)*/
-                      {
-                        jjtree.closeNodeScope(jjtn000, true);
-                        jjtc000 = false;
-                      }
-/*@egen*/ {
+	(Term() ((op=<ADDSUB_OP> {
 		jjtn000.Op = op.image;
-	} | op=<BITWISE_OP>/*@bgen(jjtree)*/
-                            {
-                              jjtree.closeNodeScope(jjtn000, true);
-                              jjtc000 = false;
-                            }
-/*@egen*/ {
+	} | op=<ARITH_OP> {
 		jjtn000.Op = op.image;
-	} | op=<ADDSUB_OP>/*@bgen(jjtree)*/
-                           {
-                             jjtree.closeNodeScope(jjtn000, true);
-                             jjtc000 = false;
-                           }
-/*@egen*/ {
+	} | op=<BITWISE_OP> {
 		jjtn000.Op = op.image;
-	}/*@bgen(jjtree)*/
+	}) Term())?) | "[" ArraySize() "]"/*@bgen(jjtree)*/
+        } catch (Throwable jjte000) {
+          if (jjtc000) {
+            jjtree.clearNodeScope(jjtn000);
+            jjtc000 = false;
+          } else {
+            jjtree.popNode();
+          }
+          if (jjte000 instanceof RuntimeException) {
+            throw (RuntimeException)jjte000;
+          }
+          if (jjte000 instanceof ParseException) {
+            throw (ParseException)jjte000;
+          }
+          throw (Error)jjte000;
         } finally {
           if (jjtc000) {
             jjtree.closeNodeScope(jjtn000, true);
