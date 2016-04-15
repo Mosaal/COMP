@@ -22,6 +22,7 @@ public class YalToJvm {
 		module = new Module(root.ID,root);
 		//root.dump("");
 
+		module.getAttributes();
 		module.getFunctions();
 		module.processFunctions();
 		//module.printSymbolTables();
