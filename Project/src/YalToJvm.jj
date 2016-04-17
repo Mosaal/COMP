@@ -7,8 +7,7 @@ PARSER_BEGIN(YalToJvm)
 
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
-import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
 
 public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ {/*@bgen(jjtree)*/
   protected static JJTYalToJvmState jjtree = new JJTYalToJvmState();
@@ -19,18 +18,16 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 	public static ArrayList<String> semanticErrorMessages = new ArrayList<String>();
 
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
-		File file = new File(args[0]);
-		FileInputStream fs = new FileInputStream(file);
-		YalToJvm parser = new YalToJvm(fs);
+		YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
 		SimpleNode root = parser.Module();
-		module = new Module(root.ID,root);
-		root.dump("");
+		//root.dump("");
 
-		//module.getAttributes();
+		module = new Module(root.ID, root);
+		// module.getAttributes();
 		module.getFunctions();
-		//module.processFunctions();
-		module.printSymbolTables();
-		printSemanticErrors();
+		module.processFunctions();
+		// module.printSymbolTables();
+		// printSemanticErrors();
 	}
 
 	public static Module getModule(){

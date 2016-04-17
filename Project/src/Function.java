@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Function {
 
-	private String functionID;
-	private HashMap<String,Variable> variableMap;
-	private ArrayList<Variable> parameters;
-	private Variable returnVar;
 	private SimpleNode body;
+	private String functionID;
+	private Variable returnVar;
+	private ArrayList<Variable> parameters;
+	private HashMap<String,Variable> variableMap;
 
 	public Function(String functionID) {
 		this.functionID = functionID;
@@ -34,6 +34,10 @@ public class Function {
 	
 	public Variable getReturnVar(){
 		return returnVar;
+	}
+	
+	public ArrayList<Variable> getParameters() {
+		return parameters;
 	}
 
 	public HashMap<String,Variable> getVariableMap() {
@@ -81,8 +85,11 @@ public class Function {
 		s += ")";
 		return s;
 	}
-
-	public boolean checkExists(String ID) {
+	
+	public boolean checkParams(String varID) {
+		for (int i = 0; i < parameters.size(); i++)
+			if (parameters.get(i).getVariableID() == varID)
+				return true;
 		return false;
 	}
 }
