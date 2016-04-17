@@ -8,13 +8,8 @@ class SimpleNode implements Node {
 	protected Object value;
 	protected YalToJvm parser;
 
-	//added
+	//Value stored in each node
 	public String ID;
-	public String callID;
-	public String Op = "";
-	public String size = "";
-	public String assign = "";
-	public boolean digit = false;
 
 	public SimpleNode(int i) {
 		id = i;
@@ -80,25 +75,39 @@ class SimpleNode implements Node {
 
 		return newPrefix;
 	}
+	
+	public boolean dot(String callID) {
+		for (int i = 0; i < callID.length(); i++)
+			if (callID.charAt(i) == '.')
+				return true;
+		return false;
+	}
+	
+	public String[] separateString(String callID) {
+		return callID.split("\\.");
+	}
 
 	/* Override this method if you want to customize how the node dumps
      out its children. */
 
-	public void dump(String prefix) {
-		//System.out.println(toString(prefix));
+	public void dump(String prefix) {		
 		switch (id) {
 		case YalToJvmTreeConstants.JJTMODULE:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
 			break;
 		case YalToJvmTreeConstants.JJTGLOBAL:
-			if (assign != "")
-				System.out.println(prefix + "[ = ]");
+			if (ID != null)
+				System.out.println(prefix + "[ " + ID + " ]");
 			else
 				prefix = newPrefix(prefix, false);
 			break;
 		case YalToJvmTreeConstants.JJTGLOBALRIGHT:
 			if (ID != null)
-				System.out.println(prefix + " [ " + Op + ID + " ]");
+				System.out.println(prefix + "[ " + ID + " ]");
+			else {
+				SimpleNode arraySize = (SimpleNode)jjtGetChild(0);
+				System.out.println(prefix + "[ [" + arraySize.ID + "] ]");
+			}
 			break;
 		case YalToJvmTreeConstants.JJTFUNCTION:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
@@ -130,20 +139,6 @@ class SimpleNode implements Node {
 		case YalToJvmTreeConstants.JJTASSIGNEMENT:
 			System.out.println(prefix + "[ = ]");
 			break;
-		case YalToJvmTreeConstants.JJTRHS:
-			if (Op != "")
-				System.out.println(prefix + "[ " + Op + " ]");
-			break;
-		case YalToJvmTreeConstants.JJTARRAYSIZE:
-			System.out.println(prefix + "[ [" + ID + "] ]");
-			break;
-		case YalToJvmTreeConstants.JJTTERM:
-			if (ID != null)
-				System.out.println(prefix + "[ " + Op + ID + " ]");
-			break;
-		case YalToJvmTreeConstants.JJTCONDITION:
-			System.out.println(prefix + "[ " + ID + " ]");
-			break;
 		case YalToJvmTreeConstants.JJTWHILE:
 			System.out.println(toString(prefix));
 			break;
@@ -151,24 +146,22 @@ class SimpleNode implements Node {
 			System.out.println(toString(prefix));
 			break;
 		case YalToJvmTreeConstants.JJTCALL:
-			if (callID == null)
-				System.out.println(toString(prefix) + " \"" + ID + "\"");
+			if (dot(ID))
+				System.out.println(toString(prefix) + " \"" + separateString(ID)[1] + "\" of \"" + separateString(ID)[0] + "\"");
 			else
-				System.out.println(toString(prefix) + " \"" + callID + "\" of \"" + ID + "\"");
-			break;
-		case YalToJvmTreeConstants.JJTARGUMENT:
-			System.out.println(prefix + "[ " + ID + " ]");
+				System.out.println(toString(prefix) + " \"" + ID + "\"");
 			break;
 		case YalToJvmTreeConstants.JJTARRAYACCESS:
-			SimpleNode temp = (SimpleNode)children[0];
-			System.out.println(prefix + "[ " + ID + "[" + temp.ID + "]" + " ]");
+			SimpleNode index = (SimpleNode)jjtGetChild(0);
+			System.out.println(prefix + "[ " + ID + "[" + index.ID + "] ]");
 			break;
-		case YalToJvmTreeConstants.JJTSCALARACCESS:
-			if (size == "")
-				System.out.println(prefix + "[ " + ID + " ]");
-			else
-				System.out.println(prefix + "[ " + ID + ".size ]");
-			break;
+		default:
+			if (id != YalToJvmTreeConstants.JJTARRAYSIZE && id != YalToJvmTreeConstants.JJTINDEX) {
+				if (ID != null)
+					System.out.println(prefix + "[ " + ID + " ]");
+				else
+					prefix = newPrefix(prefix, false);
+			}
 		}
 
 		if (children != null) {
@@ -186,11 +179,6 @@ class SimpleNode implements Node {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 
-			if (index.digit) {
-
-			} else {
-
-			}
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 		}
@@ -224,11 +212,6 @@ class SimpleNode implements Node {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 
-			if (index.digit) {
-
-			} else {
-
-			}
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 		}
@@ -269,11 +252,6 @@ class SimpleNode implements Node {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 
-			if (index.digit) {
-
-			} else {
-
-			}
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 		}
@@ -307,11 +285,6 @@ class SimpleNode implements Node {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 
-			if (index.digit) {
-
-			} else {
-
-			}
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 		}
@@ -389,7 +362,7 @@ class SimpleNode implements Node {
 				SimpleNode ifCondition = (SimpleNode)child.jjtGetChild(0);
 				SimpleNode lhsIf = (SimpleNode)ifCondition.jjtGetChild(0); //Scalar or Array Access
 				SimpleNode rhsIf = (SimpleNode)ifCondition.jjtGetChild(1); //RHS
-				
+
 				if (rhsIf.jjtGetNumChildren() == 1) {
 					SimpleNode termArraySize = (SimpleNode)rhsIf.jjtGetChild(0);
 					processCondition(lhsIf, termArraySize, parentFunction);
@@ -410,11 +383,6 @@ class SimpleNode implements Node {
 				}
 				break;
 			case YalToJvmTreeConstants.JJTCALL:
-				if (child.callID != "") {
-
-				} else {
-
-				}
 				break;
 			}
 		}

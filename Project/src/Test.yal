@@ -1,14 +1,27 @@
 module while4 {
 	a;
-	b = 1;
+	b = -1;
 	c[] = [10];
 	d = [5];
 	b = 2;
 	c;
 
-	function a=f1(v[], N, x) {
+	function f1(v[], N, x) {
 		i = 1;
 		i = 1 + 3;
+		i = A[1];
+		
+		if (i < N) {
+			s = 4;
+		} else {
+			s = 5;
+		}
+		
+		while (f > j) {
+			g = h;
+		}
+		
+		lel.f2(a, d, f);
 	}
 
 	/*function main() {

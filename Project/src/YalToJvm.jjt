@@ -20,13 +20,13 @@ public class YalToJvm {
 		YalToJvm parser = new YalToJvm(fs);
 		SimpleNode root = parser.Module();
 		module = new Module(root.ID,root);
-		//root.dump("");
+		root.dump("");
 
-		module.getAttributes();
+		//module.getAttributes();
 		module.getFunctions();
-		module.processFunctions();
-		//module.printSymbolTables();
-		//printSemanticErrors();
+		//module.processFunctions();
+		module.printSymbolTables();
+		printSemanticErrors();
 	}
 
 	public static Module getModule(){
@@ -95,7 +95,7 @@ SimpleNode Module() #Module: { Token moduleID; }
 
 void Declaration() #Global: { Token assign; }
 {
-	GlobalLeft() (assign=<ASSIGN> { jjtThis.assign = assign.image; } GlobalRight())? <PVIRG>
+	GlobalLeft() (assign=<ASSIGN> { jjtThis.ID = assign.image; } GlobalRight())? <PVIRG>
 }
 
 void GlobalLeft() #void: {}
@@ -103,12 +103,15 @@ void GlobalLeft() #void: {}
 	LOOKAHEAD(2) ArrayElement() | ScalarElement()
 }
 
-void GlobalRight(): { Token op, intID; }
+void GlobalRight() #GlobalRight: { Token op, intID; }
 {
 	((op=<ADDSUB_OP> {
-		jjtThis.Op = op.image;
+		jjtThis.ID = op.image;
 	})? intID=<INTEGER> {
-		jjtThis.ID = intID.image;
+		if (jjtThis.ID != null)
+			jjtThis.ID += intID.image;
+		else
+			jjtThis.ID = intID.image;
 	}) | ("[" ArraySize() "]")
 }
 
@@ -143,22 +146,22 @@ void ScalarElement() #Scalar: { Token scalarElem; }
 	}
 }
 
-void FunctionBody(): {}
+void FunctionBody() #FunctionBody: {}
 {
 	(Stmt())*
 }
 
-void WhileBody(): {}
+void WhileBody() #WhileBody: {}
 {
 	(Stmt())*
 }
 
-void IfBody(): {}
+void IfBody() #IfBody: {}
 {
 	(Stmt())*
 }
 
-void ElseBody(): {}
+void ElseBody() #ElseBody: {}
 {
 	(Stmt())*
 }
@@ -178,28 +181,31 @@ void Lhs() #void: {}
 	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
 }
 
-void Rhs(): { Token op; }
+void Rhs() #Rhs: { Token op; }
 {
 	(Term() ((op=<ADDSUB_OP> {
-		jjtThis.Op = op.image;
+		jjtThis.ID = op.image;
 	} | op=<ARITH_OP> {
-		jjtThis.Op = op.image;
+		jjtThis.ID = op.image;
 	} | op=<BITWISE_OP> {
-		jjtThis.Op = op.image;
+		jjtThis.ID = op.image;
 	}) Term())?) | "[" ArraySize() "]"
 }
 
-void ArraySize(): { Token intID; }
+void ArraySize() #ArraySize: { Token intID; }
 {
 	ScalarAccess() | intID=<INTEGER> { jjtThis.ID = intID.image; }
 }
 
-void Term(): { Token op, intID; }
+void Term() #Term: { Token op, intID; }
 {
 	(op=<ADDSUB_OP> {
-		jjtThis.Op = op.image;
+		jjtThis.ID = op.image;
 	})? (intID=<INTEGER> {
-		jjtThis.ID = intID.image;
+		if (jjtThis.ID != null)
+			jjtThis.ID += intID.image;
+		else
+			jjtThis.ID = intID.image;
 	} | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
 }
 
@@ -208,22 +214,22 @@ void Exprtest() #Condition: { Token relaOpID; }
 	<LPAR> Lhs() relaOpID=<RELA_OP> { jjtThis.ID = relaOpID.image; } Rhs() <RPAR>
 }
 
-void While(): {}
+void While() #While: {}
 {
 	<WHILE> Exprtest() <LCHAVETA> WhileBody() <RCHAVETA>
 }
 
-void If(): {}
+void If() #If: {}
 {
 	<IF> Exprtest() <LCHAVETA> IfBody() <RCHAVETA> (<ELSE> <LCHAVETA> ElseBody() <RCHAVETA>)?
 }
 
-void Call(): { Token id, callID; }
+void Call() #Call: { Token id, callID; }
 {
 	id=<ID> {
 		jjtThis.ID = id.image;
 	} ("." callID=<ID> {
-		jjtThis.callID = callID.image;
+		jjtThis.ID += "." + callID.image;
 	})? <LPAR> (ArgumentList())? <RPAR>
 }
 
@@ -232,7 +238,7 @@ void ArgumentList() #void: {}
 	Argument() (<VIRG> Argument())*
 }
 
-void Argument(): { Token argID; }
+void Argument() #Argument: { Token argID; }
 {
 	argID=<ID> {
 		jjtThis.ID = argID.image;
@@ -243,23 +249,25 @@ void Argument(): { Token argID; }
 	}
 }
 
-void ArrayAccess(): { Token arrayID; }
+void ArrayAccess() #ArrayAccess: { Token arrayID; }
 {
 	arrayID=<ID> { jjtThis.ID = arrayID.image; } "[" Index() "]"
 }
 
-void ScalarAccess(): { Token scalarID, size; }
+void ScalarAccess() #ScalarAccess: { Token scalarID, size; }
 {
-	scalarID=<ID> { jjtThis.ID = scalarID.image; } ("." size=<SIZE> { jjtThis.size = size.image; })?
+	scalarID=<ID> {
+		jjtThis.ID = scalarID.image;
+	} ("." size=<SIZE> {
+		jjtThis.ID += "." + size.image;
+	})?
 }
 
-void Index(): { Token id, intID; }
+void Index() #Index: { Token id, intID; }
 {
 	id=<ID> {
 		jjtThis.ID = id.image;
-		jjtThis.digit = false;
 	} | intID=<INTEGER> {
 		jjtThis.ID = intID.image;
-		jjtThis.digit = true;
 	}
 }

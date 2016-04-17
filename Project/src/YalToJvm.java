@@ -16,12 +16,13 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 YalToJvm parser = new YalToJvm(fs);
                 SimpleNode root = parser.Module();
                 module = new Module(root.ID,root);
-                //root.dump("");
+                root.dump("");
 
+                //module.getAttributes();
                 module.getFunctions();
-                module.processFunctions();
-                //module.printSymbolTables();
-                //printSemanticErrors();
+                //module.processFunctions();
+                module.printSymbolTables();
+                printSemanticErrors();
         }
 
         public static Module getModule(){
@@ -109,7 +110,7 @@ if (jjtc000) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ASSIGN:{
         assign = jj_consume_token(ASSIGN);
-jjtn000.assign = assign.image;
+jjtn000.ID = assign.image;
         GlobalRight();
         break;
         }
@@ -157,9 +158,9 @@ if (jjtc000) {
   }
 
   static final public void GlobalRight() throws ParseException {/*@bgen(jjtree) GlobalRight */
-                      SimpleNode jjtn000 = new SimpleNode(JJTGLOBALRIGHT);
-                      boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);Token op, intID;
+                                   SimpleNode jjtn000 = new SimpleNode(JJTGLOBALRIGHT);
+                                   boolean jjtc000 = true;
+                                   jjtree.openNodeScope(jjtn000);Token op, intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADDSUB_OP:
@@ -167,7 +168,7 @@ if (jjtc000) {
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case ADDSUB_OP:{
           op = jj_consume_token(ADDSUB_OP);
-jjtn000.Op = op.image;
+jjtn000.ID = op.image;
           break;
           }
         default:
@@ -177,7 +178,10 @@ jjtn000.Op = op.image;
         intID = jj_consume_token(INTEGER);
 jjtree.closeNodeScope(jjtn000, true);
                               jjtc000 = false;
-jjtn000.ID = intID.image;
+if (jjtn000.ID != null)
+                        jjtn000.ID += intID.image;
+                else
+                        jjtn000.ID = intID.image;
         break;
         }
       case 31:{
@@ -642,9 +646,9 @@ if (jjtc000) {
   }
 
   static final public void Rhs() throws ParseException {/*@bgen(jjtree) Rhs */
-              SimpleNode jjtn000 = new SimpleNode(JJTRHS);
-              boolean jjtc000 = true;
-              jjtree.openNodeScope(jjtn000);Token op;
+                   SimpleNode jjtn000 = new SimpleNode(JJTRHS);
+                   boolean jjtc000 = true;
+                   jjtree.openNodeScope(jjtn000);Token op;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADDSUB_OP:
@@ -658,17 +662,17 @@ if (jjtc000) {
           switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
           case ADDSUB_OP:{
             op = jj_consume_token(ADDSUB_OP);
-jjtn000.Op = op.image;
+jjtn000.ID = op.image;
             break;
             }
           case ARITH_OP:{
             op = jj_consume_token(ARITH_OP);
-jjtn000.Op = op.image;
+jjtn000.ID = op.image;
             break;
             }
           case BITWISE_OP:{
             op = jj_consume_token(BITWISE_OP);
-jjtn000.Op = op.image;
+jjtn000.ID = op.image;
             break;
             }
           default:
@@ -718,9 +722,9 @@ if (jjtc000) {
   }
 
   static final public void ArraySize() throws ParseException {/*@bgen(jjtree) ArraySize */
-                    SimpleNode jjtn000 = new SimpleNode(JJTARRAYSIZE);
-                    boolean jjtc000 = true;
-                    jjtree.openNodeScope(jjtn000);Token intID;
+                               SimpleNode jjtn000 = new SimpleNode(JJTARRAYSIZE);
+                               boolean jjtc000 = true;
+                               jjtree.openNodeScope(jjtn000);Token intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
@@ -761,14 +765,14 @@ if (jjtc000) {
   }
 
   static final public void Term() throws ParseException {/*@bgen(jjtree) Term */
-               SimpleNode jjtn000 = new SimpleNode(JJTTERM);
-               boolean jjtc000 = true;
-               jjtree.openNodeScope(jjtn000);Token op, intID;
+                     SimpleNode jjtn000 = new SimpleNode(JJTTERM);
+                     boolean jjtc000 = true;
+                     jjtree.openNodeScope(jjtn000);Token op, intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ADDSUB_OP:{
         op = jj_consume_token(ADDSUB_OP);
-jjtn000.Op = op.image;
+jjtn000.ID = op.image;
         break;
         }
       default:
@@ -780,7 +784,10 @@ jjtn000.Op = op.image;
         intID = jj_consume_token(INTEGER);
 jjtree.closeNodeScope(jjtn000, true);
                                jjtc000 = false;
-jjtn000.ID = intID.image;
+if (jjtn000.ID != null)
+                        jjtn000.ID += intID.image;
+                else
+                        jjtn000.ID = intID.image;
         break;
         }
       default:
@@ -930,9 +937,9 @@ if (jjtc000) {
   }
 
   static final public void Call() throws ParseException {/*@bgen(jjtree) Call */
-               SimpleNode jjtn000 = new SimpleNode(JJTCALL);
-               boolean jjtc000 = true;
-               jjtree.openNodeScope(jjtn000);Token id, callID;
+                     SimpleNode jjtn000 = new SimpleNode(JJTCALL);
+                     boolean jjtc000 = true;
+                     jjtree.openNodeScope(jjtn000);Token id, callID;
     try {
       id = jj_consume_token(ID);
 jjtn000.ID = id.image;
@@ -940,7 +947,7 @@ jjtn000.ID = id.image;
       case 33:{
         jj_consume_token(33);
         callID = jj_consume_token(ID);
-jjtn000.callID = callID.image;
+jjtn000.ID += "." + callID.image;
         break;
         }
       default:
@@ -1000,9 +1007,9 @@ if (jjtc000) {
   }
 
   static final public void Argument() throws ParseException {/*@bgen(jjtree) Argument */
-                   SimpleNode jjtn000 = new SimpleNode(JJTARGUMENT);
-                   boolean jjtc000 = true;
-                   jjtree.openNodeScope(jjtn000);Token argID;
+                             SimpleNode jjtn000 = new SimpleNode(JJTARGUMENT);
+                             boolean jjtc000 = true;
+                             jjtree.openNodeScope(jjtn000);Token argID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
@@ -1039,9 +1046,9 @@ if (jjtc000) {
   }
 
   static final public void ArrayAccess() throws ParseException {/*@bgen(jjtree) ArrayAccess */
-                      SimpleNode jjtn000 = new SimpleNode(JJTARRAYACCESS);
-                      boolean jjtc000 = true;
-                      jjtree.openNodeScope(jjtn000);Token arrayID;
+                                   SimpleNode jjtn000 = new SimpleNode(JJTARRAYACCESS);
+                                   boolean jjtc000 = true;
+                                   jjtree.openNodeScope(jjtn000);Token arrayID;
     try {
       arrayID = jj_consume_token(ID);
 jjtn000.ID = arrayID.image;
@@ -1070,9 +1077,9 @@ if (jjtc000) {
   }
 
   static final public void ScalarAccess() throws ParseException {/*@bgen(jjtree) ScalarAccess */
-                       SimpleNode jjtn000 = new SimpleNode(JJTSCALARACCESS);
-                       boolean jjtc000 = true;
-                       jjtree.openNodeScope(jjtn000);Token scalarID, size;
+                                     SimpleNode jjtn000 = new SimpleNode(JJTSCALARACCESS);
+                                     boolean jjtc000 = true;
+                                     jjtree.openNodeScope(jjtn000);Token scalarID, size;
     try {
       scalarID = jj_consume_token(ID);
 jjtn000.ID = scalarID.image;
@@ -1080,7 +1087,7 @@ jjtn000.ID = scalarID.image;
       case 33:{
         jj_consume_token(33);
         size = jj_consume_token(SIZE);
-jjtn000.size = size.image;
+jjtn000.ID += "." + size.image;
         break;
         }
       default:
@@ -1095,9 +1102,9 @@ if (jjtc000) {
   }
 
   static final public void Index() throws ParseException {/*@bgen(jjtree) Index */
-                SimpleNode jjtn000 = new SimpleNode(JJTINDEX);
-                boolean jjtc000 = true;
-                jjtree.openNodeScope(jjtn000);Token id, intID;
+                       SimpleNode jjtn000 = new SimpleNode(JJTINDEX);
+                       boolean jjtc000 = true;
+                       jjtree.openNodeScope(jjtn000);Token id, intID;
     try {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case ID:{
@@ -1105,7 +1112,6 @@ if (jjtc000) {
 jjtree.closeNodeScope(jjtn000, true);
                   jjtc000 = false;
 jjtn000.ID = id.image;
-                jjtn000.digit = false;
         break;
         }
       case INTEGER:{
@@ -1113,7 +1119,6 @@ jjtn000.ID = id.image;
 jjtree.closeNodeScope(jjtn000, true);
                               jjtc000 = false;
 jjtn000.ID = intID.image;
-                jjtn000.digit = true;
         break;
         }
       default:
@@ -1200,20 +1205,9 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_3R_15()
+  static private boolean jj_3R_36()
  {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
-    }
-    return false;
-  }
-
-  static private boolean jj_3_7()
- {
-    if (jj_3R_12()) return true;
+    if (jj_scan_token(INTEGER)) return true;
     return false;
   }
 
@@ -1222,12 +1216,6 @@ if (jjtc000) {
     if (jj_3R_15()) return true;
     if (jj_scan_token(ASSIGN)) return true;
     if (jj_3R_16()) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_36()
- {
-    if (jj_scan_token(INTEGER)) return true;
     return false;
   }
 
@@ -1248,6 +1236,13 @@ if (jjtc000) {
     return false;
   }
 
+  static private boolean jj_3R_28()
+ {
+    if (jj_scan_token(33)) return true;
+    if (jj_scan_token(SIZE)) return true;
+    return false;
+  }
+
   static private boolean jj_3R_31()
  {
     if (jj_3R_24()) return true;
@@ -1263,17 +1258,17 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3R_14()
- {
-    if (jj_3R_19()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_12()
  {
     if (jj_scan_token(ID)) return true;
     if (jj_scan_token(31)) return true;
     if (jj_3R_27()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_14()
+ {
+    if (jj_3R_19()) return true;
     return false;
   }
 
@@ -1327,14 +1322,6 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3R_9()
- {
-    if (jj_scan_token(ID)) return true;
-    if (jj_scan_token(31)) return true;
-    if (jj_scan_token(32)) return true;
-    return false;
-  }
-
   static private boolean jj_3_9()
  {
     if (jj_3R_12()) return true;
@@ -1348,15 +1335,11 @@ if (jjtc000) {
     return false;
   }
 
-  static private boolean jj_3_4()
+  static private boolean jj_3R_9()
  {
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  static private boolean jj_3_2()
- {
-    if (jj_3R_10()) return true;
+    if (jj_scan_token(ID)) return true;
+    if (jj_scan_token(31)) return true;
+    if (jj_scan_token(32)) return true;
     return false;
   }
 
@@ -1370,6 +1353,18 @@ if (jjtc000) {
     xsp = jj_scanpos;
     if (jj_3R_18()) jj_scanpos = xsp;
     if (jj_scan_token(RPAR)) return true;
+    return false;
+  }
+
+  static private boolean jj_3_4()
+ {
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  static private boolean jj_3_2()
+ {
+    if (jj_3R_10()) return true;
     return false;
   }
 
@@ -1406,13 +1401,6 @@ if (jjtc000) {
   static private boolean jj_3R_30()
  {
     if (jj_scan_token(INTEGER)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_28()
- {
-    if (jj_scan_token(33)) return true;
-    if (jj_scan_token(SIZE)) return true;
     return false;
   }
 
@@ -1479,6 +1467,23 @@ if (jjtc000) {
   static private boolean jj_3R_21()
  {
     if (jj_3R_25()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_15()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3_7()
+ {
+    if (jj_3R_12()) return true;
     return false;
   }
 
