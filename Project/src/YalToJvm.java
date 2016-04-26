@@ -12,14 +12,14 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
         public static void main(String[] args) throws ParseException, FileNotFoundException {
                 YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
                 SimpleNode root = parser.Module();
-                //root.dump("");
+                root.dump("");
 
                 module = new Module(root.ID, root);
                 // module.getAttributes();
                 module.getFunctions();
                 module.processFunctions();
-                // module.printSymbolTables();
-                // printSemanticErrors();
+                module.printSymbolTables();
+                printSemanticErrors();
         }
 
         public static Module getModule(){
