@@ -14,15 +14,20 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 //TreeViewer tv = new TreeViewer();
                 YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
                 SimpleNode root = parser.Module();
-                root.dump("");
+                // root.dump("");
 
                 module = new Module(root.ID, root);
                 // module.getAttributes();
                 module.getFunctions();
                 module.processFunctions();
+<<<<<<< Updated upstream
                 module.printSymbolTables();
                 printSemanticErrors();
                 //tv.run();
+=======
+                // module.printSymbolTables();
+                // printSemanticErrors();
+>>>>>>> Stashed changes
         }
 
         public static Module getModule(){

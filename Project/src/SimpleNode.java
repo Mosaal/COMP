@@ -182,7 +182,7 @@ class SimpleNode implements Node {
 		}
 
 		if (rhs.jjtGetNumChildren() == 1) {
-			SimpleNode rhsChild = (SimpleNode)jjtGetChild(0);
+			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 
@@ -190,8 +190,8 @@ class SimpleNode implements Node {
 
 			}
 		} else if (rhs.jjtGetNumChildren() == 2) {
-			SimpleNode termLeft = (SimpleNode)jjtGetChild(0);
-			SimpleNode termRight = (SimpleNode)jjtGetChild(1);
+			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
+			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
 
 			if (termLeft.ID != null) {
 
@@ -224,23 +224,35 @@ class SimpleNode implements Node {
 	}
 
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+<<<<<<< Updated upstream
 		Variable v = new Variable(lhs.ID);
 		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			
 		}else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			
+=======
+		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+
+		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+
+>>>>>>> Stashed changes
 		}
 		if (rhs.jjtGetNumChildren() == 1) {
+<<<<<<< Updated upstream
 			SimpleNode rhsChild = (SimpleNode)jjtGetChild(0);
 			
+=======
+			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
+
+>>>>>>> Stashed changes
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 				
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-
+				
 			}
 		} else if (rhs.jjtGetNumChildren() == 2) {
-			SimpleNode termLeft = (SimpleNode)jjtGetChild(0);
-			SimpleNode termRight = (SimpleNode)jjtGetChild(1);
+			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
+			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
 
 			if (termLeft.ID != null) {
 
