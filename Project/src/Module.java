@@ -2,8 +2,6 @@
 
 import java.util.*;
 
-import javax.swing.JViewport;
-
 public class Module {
 
 	private String moduleID;
