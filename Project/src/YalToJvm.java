@@ -3,6 +3,7 @@
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+//import UI.TreeViewer;
 
 public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvmConstants {/*@bgen(jjtree)*/
   protected static JJTYalToJvmState jjtree = new JJTYalToJvmState();
@@ -10,6 +11,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
         public static ArrayList<String> semanticErrorMessages = new ArrayList<String>();
 
         public static void main(String[] args) throws ParseException, FileNotFoundException {
+                //TreeViewer tv = new TreeViewer();
                 YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
                 SimpleNode root = parser.Module();
                 root.dump("");
@@ -20,6 +22,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 module.processFunctions();
                 module.printSymbolTables();
                 printSemanticErrors();
+                //tv.run();
         }
 
         public static Module getModule(){
@@ -1202,23 +1205,6 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_3R_15()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) {
-    jj_scanpos = xsp;
-    if (jj_3R_20()) return true;
-    }
-    return false;
-  }
-
-  static private boolean jj_3_7()
- {
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_36()
  {
     if (jj_scan_token(INTEGER)) return true;
@@ -1481,6 +1467,23 @@ if (jjtc000) {
   static private boolean jj_3R_21()
  {
     if (jj_3R_25()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_15()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_7()) {
+    jj_scanpos = xsp;
+    if (jj_3R_20()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3_7()
+ {
+    if (jj_3R_12()) return true;
     return false;
   }
 

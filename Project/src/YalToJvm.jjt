@@ -7,6 +7,7 @@ PARSER_BEGIN(YalToJvm)
 import java.io.FileNotFoundException;
 import java.io.FileInputStream;
 import java.util.ArrayList;
+//import UI.TreeViewer;
 
 public class YalToJvm {
 
@@ -14,6 +15,7 @@ public class YalToJvm {
 	public static ArrayList<String> semanticErrorMessages = new ArrayList<String>();
 
 	public static void main(String[] args) throws ParseException, FileNotFoundException {
+		//TreeViewer tv = new TreeViewer();
 		YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
 		SimpleNode root = parser.Module();
 		root.dump("");
@@ -24,6 +26,7 @@ public class YalToJvm {
 		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
+		//tv.run();
 	}
 
 	public static Module getModule(){

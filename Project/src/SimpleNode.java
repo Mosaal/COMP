@@ -173,12 +173,12 @@ class SimpleNode implements Node {
 			}
 		}
 	}
-	
+
 	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-			
+
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-			
+
 		}
 
 		if (rhs.jjtGetNumChildren() == 1) {
@@ -224,17 +224,17 @@ class SimpleNode implements Node {
 	}
 
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+		Variable v = new Variable(lhs.ID);
+		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			
-		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+		}else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			
 		}
-
 		if (rhs.jjtGetNumChildren() == 1) {
 			SimpleNode rhsChild = (SimpleNode)jjtGetChild(0);
-
+			
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-
+				
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
 
 			}
@@ -250,9 +250,9 @@ class SimpleNode implements Node {
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
+					
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
+					
 				}
 			}
 
@@ -290,7 +290,7 @@ class SimpleNode implements Node {
 				SimpleNode whileLhs = (SimpleNode)whileCondition.jjtGetChild(0);
 				SimpleNode whileRhs = (SimpleNode)whileCondition.jjtGetChild(1);
 				processCondition(whileLhs, whileRhs, parentFunction);
-				
+
 				SimpleNode whileBody = (SimpleNode)bodyChild.jjtGetChild(1);
 				whileBody.processBody(parentFunction);
 				break;
@@ -299,10 +299,10 @@ class SimpleNode implements Node {
 				SimpleNode ifLhs = (SimpleNode)ifCondition.jjtGetChild(0);
 				SimpleNode ifRhs = (SimpleNode)ifCondition.jjtGetChild(1);
 				processCondition(ifLhs, ifRhs, parentFunction);
-				
+
 				SimpleNode ifBody = (SimpleNode)bodyChild.jjtGetChild(1);
 				ifBody.processBody(parentFunction);
-				
+
 				if (bodyChild.jjtGetNumChildren() == 3) {
 					SimpleNode elseBody = (SimpleNode)bodyChild.jjtGetChild(2);
 					elseBody.processBody(parentFunction);
