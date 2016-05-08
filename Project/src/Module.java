@@ -50,6 +50,9 @@ public class Module {
 			return false;
 	}
 
+	/**
+	* Prints the functions and variables symbol functions
+	*/
 	public void printSymbolTables(){
 		System.out.println("--FUNCTIONS--");
 		for(String key : functionMap.keySet()) {
@@ -62,24 +65,25 @@ public class Module {
 		}
 	}
 
+	/**
+	* Analyses the body of each function to check if there are any semantic errors
+	*/
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
 			functionMap.get(id).getBody().processBody(functionMap.get(id));
 		}
 	}
-	
+
 	public boolean functionExists(String functionID) {
 		return false;
 	}
 
+
 	public void getAttributes() {
 		int num = root.jjtGetNumChildren();
-
 		for (int i = 0; i < num; i++) {
 			SimpleNode node = (SimpleNode)root.jjtGetChild(i);
-
 			if (node.getId() == YalToJvmTreeConstants.JJTGLOBAL) {
-
 			}
 		}
 	}
@@ -91,63 +95,59 @@ public class Module {
 	 */
 	public void getFunctions() {
 		int num = root.jjtGetNumChildren();
-
 		for (int i = 0; i < num; i++) {
 			SimpleNode node = (SimpleNode)root.jjtGetChild(i);
-
 			if(node.getId() == YalToJvmTreeConstants.JJTFUNCTION){
 				ArrayList<Variable> params = new ArrayList<>();
 				Variable returnVariable = null;
 				int num2 = node.jjtGetNumChildren();
-
 				for (int j = 0; j < num2; j++) {
 					SimpleNode n = (SimpleNode)node.jjtGetChild(j);
 					int id = n.getId();
 					if(id == YalToJvmTreeConstants.JJTRETURN){
-						returnVariable = getVariable(n);
+						returnVariable = getReturnVariable(n);
 					}else if (id == YalToJvmTreeConstants.JJTPARAMS) {
 						params = getParams(n,node.ID, returnVariable);
 					}
 				}
-
 				String name = node.ID;
 				Function f = new Function(name,returnVariable,params,(SimpleNode)node.jjtGetChild(node.jjtGetNumChildren()-1));
 				addFunction(f);
 			}
 		}
 	}
-	
-	public Variable getVariable(SimpleNode n){
-		Variable var = null;
 
+	/**
+	*	Gets the return variable of a function
+	*/
+	public Variable getReturnVariable(SimpleNode n){
+		Variable var = null;
 		if(n.getId() == YalToJvmTreeConstants.JJTRETURN){
 			SimpleNode retVarNode = (SimpleNode)n.jjtGetChild(0);
 			int returnId = retVarNode.getId();
-
 			if(returnId == YalToJvmTreeConstants.JJTARRAY){
 				var = new Array(retVarNode.ID);
 			}else if(returnId == YalToJvmTreeConstants.JJTSCALAR){
 				var = new Scalar(retVarNode.ID);
 			}
 		}
-
 		return var;
 	}
 
+	/**
+	*	Gets the parameters of the function and checks for any semantic
+	*/
 	public ArrayList<Variable> getParams(SimpleNode node, String functionId, Variable returnVar){
 		ArrayList<Variable> params = new ArrayList<>();
 		HashSet<String> set = new HashSet<>();
 		int num = node.jjtGetNumChildren();
-
 		for (int i = 0; i < num; i++) {
 			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
-
 			if(n.getId() == YalToJvmTreeConstants.JJTSCALAR){
 				params.add(new Scalar(n.ID));
 			} else if(n.getId() == YalToJvmTreeConstants.JJTARRAY){
 				params.add(new Array(n.ID));
 			}
-
 			if(set.contains(n.ID)){
 				YalToJvm.semanticErrorMessages.add("Function " + functionId + " has parameter: " + n.ID + " duplicated");
 			}else if(returnVar != null && n.ID.equals(returnVar.getVariableID())){
@@ -156,7 +156,6 @@ public class Module {
 				set.add(n.ID);
 			}
 		}
-		
 		return params;
 	}
 
