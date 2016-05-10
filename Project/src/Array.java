@@ -48,7 +48,7 @@ public class Array extends Variable {
 	}
 	
 	public String toString(){
-		String s = variableID + " = [";
+		String s = "  Array: " + variableID + " = [";
 		for (int i = 0; i < array.length; i++) {
 			s += array[i];
 			if(i < array.length-1)
@@ -56,5 +56,12 @@ public class Array extends Variable {
 		}
 		s += "]"; 
 		return s;
+	}
+	
+	public boolean is(String type){
+		if(type.equals("Array"))
+			return true;
+		else
+			return false;
 	}
 }

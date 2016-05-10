@@ -21,14 +21,6 @@ public class Module {
 		return moduleID;
 	}
 
-	public HashMap<String,Function> getFunctionMap() {
-		return functionMap;
-	}
-
-	public HashMap<String,Variable> getGlobalVariableMap() {
-		return globalVariableMap;
-	}
-
 	public boolean addFunction(Function function) {
 		String key = function.toString();
 		if (!functionMap.containsKey(key)){
@@ -53,6 +45,10 @@ public class Module {
 			return true;
 		else
 			return false;
+	}
+	
+	public Variable getGlobalVariable(String id){
+		return globalVariableMap.get(id);
 	}
 
 	/**

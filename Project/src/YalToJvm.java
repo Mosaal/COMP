@@ -38,7 +38,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                         System.out.println("None!");
                 else {
                         for (int i = 0; i < semanticErrorMessages.size(); i++)
-                                System.out.println(semanticErrorMessages.get(i));
+                                System.err.println(semanticErrorMessages.get(i));
                 }
         }
 
