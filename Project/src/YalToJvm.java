@@ -20,14 +20,11 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 // module.getAttributes();
                 module.getFunctions();
                 module.processFunctions();
-<<<<<<< Updated upstream
                 module.printSymbolTables();
                 printSemanticErrors();
                 //tv.run();
-=======
                 // module.printSymbolTables();
                 // printSemanticErrors();
->>>>>>> Stashed changes
         }
 
         public static Module getModule(){
@@ -1210,12 +1207,6 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_3R_36()
- {
-    if (jj_scan_token(INTEGER)) return true;
-    return false;
-  }
-
   static private boolean jj_3R_11()
  {
     if (jj_3R_15()) return true;
@@ -1489,6 +1480,12 @@ if (jjtc000) {
   static private boolean jj_3_7()
  {
     if (jj_3R_12()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_36()
+ {
+    if (jj_scan_token(INTEGER)) return true;
     return false;
   }
 

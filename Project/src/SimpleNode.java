@@ -224,27 +224,22 @@ class SimpleNode implements Node {
 	}
 
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-<<<<<<< Updated upstream
 		Variable v = new Variable(lhs.ID);
 		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			
-		}else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			
-=======
+		}
+
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
->>>>>>> Stashed changes
 		}
+		
 		if (rhs.jjtGetNumChildren() == 1) {
-<<<<<<< Updated upstream
-			SimpleNode rhsChild = (SimpleNode)jjtGetChild(0);
-			
-=======
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-
->>>>>>> Stashed changes
+			
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 				
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {

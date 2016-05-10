@@ -28,14 +28,11 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		// module.getAttributes();
 		module.getFunctions();
 		module.processFunctions();
-<<<<<<< Updated upstream
 		module.printSymbolTables();
 		printSemanticErrors();
 		//tv.run();
-=======
 		// module.printSymbolTables();
 		// printSemanticErrors();
->>>>>>> Stashed changes
 	}
 
 	public static Module getModule(){

@@ -1,3 +1,4 @@
+/.DS_Store
 /Array.class
 /Function.class
 /JJTYalToJvmState.class
@@ -11,6 +12,7 @@
 /Test.yal
 /Token.class
 /TokenMgrError.class
+/UI/
 /Variable.class
 /YalToJvm$JJCalls.class
 /YalToJvm$LookaheadSuccess.class
@@ -20,5 +22,3 @@
 /YalToJvmConstants.class
 /YalToJvmTokenManager.class
 /YalToJvmTreeConstants.class
-/.DS_Store
-/SymbolTable.class
