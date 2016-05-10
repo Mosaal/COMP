@@ -91,7 +91,6 @@ class SimpleNode implements Node {
      out its children. */
 
 	public void dump(String prefix) {
-		System.out.print(YalToJvmTreeConstants.jjtNodeName[id]);
 		switch (id) {
 		case YalToJvmTreeConstants.JJTMODULE:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
@@ -237,42 +236,76 @@ class SimpleNode implements Node {
 	}
 
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		Variable v = new Variable(lhs.ID);
+		Variable lhsVariable = new Variable(lhs.ID);
 		boolean valid = true;
-		String type = null;
-		String variableType = null;
-		if(parentFunction.getReturnVar() != null && parentFunction.getReturnVar().getVariableID().equals(lhs.ID)){
-			type = "return";
-		}else if(parentFunction.checkParams(lhs.ID)){
-			type = "param";
-		}else if(YalToJvm.getModule().checkGlobalVariable(lhs.ID)){
-			type = "global";
-		}else if(parentFunction.checkLocalVariable(lhs.ID)){
-			type = "local";
-		}else{
-			type = "new";
+		String scope = null;
+		String lhsType = null;
+		/**
+		 * Check the type of the scope of the variable
+		 */
+		scope = getVariableScope(parentFunction, lhs.ID);
+		if(!scope.equals("new")){
+			lhsVariable = getVariableByScope(parentFunction,lhs.ID,scope);
 		}
+		/**
+		 * Check the type of the variable of the left hand side
+		 */
 		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-			variableType = "arrayAccess";
+			if(scope.equals("new")){
+				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +  "The variable: " + lhs.ID + " on left hand side of the assignment does not exist");
+			}
+			lhsType = "arrayAccess";
 		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-			variableType ="scalarAccess";
+			lhsType ="scalarAccess";
 		}
-		
+		/**
+		 * This part of the function processes the right hand side of the assignment
+		 */
 		if (rhs.jjtGetNumChildren() == 1) {
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-			
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
+				/**
+				 * If the right hand side of the assignement is a hardcoded integer;
+				 */
 				if (rhsChild.ID != null) {
-					
+					if(scope.equals("new")){
+						lhsVariable = new Scalar(lhsVariable.getVariableID(),Integer.parseInt(rhsChild.ID));
+					}else{
+						((Scalar)lhsVariable).setValue(Integer.parseInt(rhsChild.ID));
+					}
 				} else {
 					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
+					String rhsScope = getVariableScope(parentFunction, termChild.ID);
+					Variable rhsVariable = getVariableByScope(parentFunction, termChild.ID, rhsScope);
+					if(rhsVariable == null){
+						valid = false;
+						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement for variable: " + lhsVariable.getVariableID() + " does not exist" );
+					}else{
+						if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 
-					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-						
+						} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+							
+						} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+							if(scope.equals("new")){
+								if(rhsVariable.is("Array")){
+									valid = false;
+									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement for variable: " + lhsVariable.getVariableID() + " cannot be an array");
+								}else{
+									lhsVariable = new Scalar(lhsVariable.getVariableID(),((Scalar)rhsVariable).getValue());
+								}
+							}else{
+								System.out.println(rhsVariable);
+								if(rhsVariable.is("Scalar")){
+									((Scalar)lhsVariable).setValue(((Scalar)rhsVariable).getValue());
+								}else if(rhsVariable.is("Array")){
+									valid = false;
+									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement for variable: " + lhsVariable.getVariableID() + " cannot be an array");
+								}else{
+									valid = false;
+									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement should be a scalar for variable: " + lhsVariable.getVariableID() );
+								}
+							}
+						}
 					}
 				}
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
@@ -281,21 +314,18 @@ class SimpleNode implements Node {
 		} else if (rhs.jjtGetNumChildren() == 2) {
 			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
 			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
-
 			if (termLeft.ID != null) {
 
 			} else {
 				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
-
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+				}else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+					
+				}else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 					
 				}
 			}
-
 			if (termRight.ID != null) {
 
 			} else {
@@ -310,10 +340,206 @@ class SimpleNode implements Node {
 				}
 			}
 		}
+		/**
+		 * Check if the assignment is a valid one
+		 */
 		if(valid){
-			if(type.equals("new")){
-				parentFunction.addVariable(v);
+			if(scope.equals("new")){
+				parentFunction.addVariable(lhsVariable);
 			}
+		}
+	}
+	
+	public void processAssignement2(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+		//VARS
+		boolean twoSides = false;
+		String lhsId = null;
+		String lhsType = null;
+		String lhsAccess = null;
+		String lhsArrayAccessId = null;
+		String lhsArrayAccess = null, rhsArrayAccess = null;
+		
+		//LHS
+		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+			lhsAccess = "array";
+			lhsId = lhs.ID;
+			lhsArrayAccessId = ((SimpleNode)lhs.jjtGetChild(0)).ID;
+		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+			if(dot(lhs.ID)){
+				lhsAccess = "size";
+				lhsId = separateString(lhs.ID)[0];
+			}else{
+				lhsAccess = "scalar";
+				lhsId = lhs.ID;
+			}
+		}
+		
+		//RHS 1
+		String rhs1Id = null;
+		String rhs1Type = null;
+		String rhs1Access = null;
+		String rhs1ArrayAccessId = null;
+		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
+		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
+			if (rhsChild.ID != null) {
+				rhs1Id = rhsChild.ID;
+				rhs1Access = "integer";
+			} else {
+				SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
+				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+					rhs1Access = "array";
+					rhs1Id = termChild.ID;
+					rhs1ArrayAccessId = ((SimpleNode)termChild.jjtGetChild(0)).ID;
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+					if(dot(lhs.ID)){
+						rhs1Access = "size";
+						rhs1Id = separateString(termChild.ID)[0];
+					}else{
+						rhs1Access = "scalar";
+						rhs1Id = termChild.ID;
+					}
+				}
+			}
+		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
+			System.out.println("sou um arraysize");
+		}
+		
+		//RHS 2
+		String rhs2Id = null;
+		String rhs2Type = null;
+		String rhs2Access = null;
+		String rhs2ArrayAccessId = null;
+		if(rhs.jjtGetNumChildren() == 2){
+			twoSides = true;
+			SimpleNode rhs2Child = (SimpleNode)rhs.jjtGetChild(1);
+			if (rhs2Child.getId() == YalToJvmTreeConstants.JJTTERM) {
+				if (rhs2Child.ID != null) {
+					rhs2Id = rhs2Child.ID;
+					rhs2Access = "integer";
+				} else {
+					SimpleNode termChild = (SimpleNode)rhs2Child.jjtGetChild(0);
+					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+						
+					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+						rhs2Access = "array";
+						rhs2Id = termChild.ID;
+						rhs2ArrayAccessId = ((SimpleNode)termChild.jjtGetChild(0)).ID;
+					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+						if(dot(lhs.ID)){
+							rhs2Access = "size";
+							rhs2Id = separateString(termChild.ID)[0];
+						}else{
+							rhs2Access = "scalar";
+							rhs2Id = termChild.ID;
+						}
+					}
+				}
+			} else if (rhs2Child.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
+				System.out.println("sou um arraysize");
+			}
+		}
+		
+		//EVAL
+		System.out.println("LHS");
+		System.out.println(" " + lhsId);
+		System.out.println(" " + lhsAccess);
+		System.out.println("RHS1");
+		System.out.println(" " + rhs1Id);
+		System.out.print(" " + rhs1Access);
+		if(rhs1Access.equals("array")){
+			System.out.println(" [" + rhs1ArrayAccessId + "]");
+		}else{
+			System.out.println("");
+		}
+		if(twoSides){
+			System.out.println("RHS2");
+			System.out.println(" " + rhs2Id);
+			System.out.print(" " + rhs2Access);
+			if(rhs1Access.equals("array")){
+				System.out.println(" [" + rhs2ArrayAccessId + "]");
+			}else{
+				System.out.println("");
+			}
+		}
+		
+		boolean newVariable = false;
+		
+		// Check if the variables exist or not
+		if(!checkVariable(parentFunction, rhs1Id)){
+			newVariable = true;
+		}
+		if(!rhs1Access.equals("integer") && !checkVariable(parentFunction, rhs1Id)){
+			YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+		}
+		if(twoSides){
+			if(!rhs2Access.equals("integer") && !checkVariable(parentFunction, rhs2Id)){
+				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+			}
+		}
+		
+		//Add a new local variable
+		if(newVariable){
+			parentFunction.addVariable(new Scalar(lhsId));
+		}
+		
+	}
+	
+	private String getVariableScope(Function f, String id){
+		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
+			return "return";
+		}else if(f.checkParams(id)){
+			return "param";
+		}else if(YalToJvm.getModule().checkGlobalVariable(id)){
+			return "global";
+		}else if(f.checkLocalVariable(id)){
+			return "local";
+		}else{
+			return "new";
+		}
+	}
+	
+	private Variable getVariableByScope(Function f, String id, String scope){
+		switch(scope){
+			case "local":
+				return f.getVariable(id);
+			case "param":
+				return f.getParameter(id);
+			case "return":
+				return f.getReturnVar();
+			case "global":
+				return YalToJvm.getModule().getGlobalVariable(id);
+			default:
+				return null;
+		}
+	}
+	
+	private Variable getVariable(Function f, String id){
+		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
+			return f.getReturnVar();
+		}else if(f.checkParams(id)){
+			return f.getParameter(id);
+		}else if(f.checkLocalVariable(id)){
+			return f.getVariable(id);
+		}else if(YalToJvm.getModule().checkGlobalVariable(id)){
+			return YalToJvm.getModule().getGlobalVariable(id);
+		}else{
+			return null;
+		}
+	}
+	
+	private boolean checkVariable(Function f, String id){
+		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
+			return true;
+		}else if(f.checkParams(id)){
+			return true;
+		}else if(f.checkLocalVariable(id)){
+			return true;
+		}else if(YalToJvm.getModule().checkGlobalVariable(id)){
+			return true;
+		}else{
+			return false;
 		}
 	}
 
@@ -323,12 +549,11 @@ class SimpleNode implements Node {
 	public void processBody(Function parentFunction) {
 		for (int i = 0; i < children.length; i++) {
 			SimpleNode bodyChild = (SimpleNode)children[i];
-
 			switch (bodyChild.getId()) {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
-				processAssignement(lhs, rhs, parentFunction);
+				processAssignement2(lhs, rhs, parentFunction);
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode)bodyChild.jjtGetChild(0);

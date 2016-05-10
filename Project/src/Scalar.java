@@ -28,6 +28,13 @@ public class Scalar extends Variable {
 	}
 	
 	public String toString(){
-		return variableID + " = " + value;
+		return "  Scalar: " + variableID + " = " + value;
+	}
+	
+	public boolean is(String type){
+		if(type.equals("Scalar"))
+			return true;
+		else
+			return false;
 	}
 }

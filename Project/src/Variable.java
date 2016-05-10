@@ -20,6 +20,14 @@ public class Variable {
 	}
 	
 	public String toString(){
-		return variableID;
+		return "  Variable: " + variableID;
 	}
+	
+	public boolean is(String type){
+		if(type.equals("Variable"))
+			return true;
+		else
+			return false;
+	}
+	
 }

@@ -10,12 +10,6 @@ public class Function {
 	private ArrayList<Variable> parameters;
 	private HashMap<String,Variable> variableMap;
 
-	public Function(String functionID) {
-		this.functionID = functionID;
-		parameters = new ArrayList<Variable>();
-		variableMap = new HashMap<String,Variable>();
-	}
-
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
 		returnVar = ret;
@@ -35,14 +29,6 @@ public class Function {
 	public Variable getReturnVar(){
 		return returnVar;
 	}
-	
-	public ArrayList<Variable> getParameters() {
-		return parameters;
-	}
-
-	public HashMap<String,Variable> getVariableMap() {
-		return variableMap;
-	}
 
 	public SimpleNode getBody(){
 		return body;
@@ -56,6 +42,10 @@ public class Function {
 		return false;
 	}
 
+	public Variable getVariable(String id){
+		return variableMap.get(id);
+	}
+	
 	public void addVariable(Variable v) {
 		variableMap.put(v.getVariableID(),v);
 	}
@@ -107,6 +97,13 @@ public class Function {
 			if (parameters.get(i).getVariableID().equals(varID))
 				return true;
 		return false;
+	}
+	
+	public boolean checkReturnVariable(String id){
+		if(returnVar.getVariableID().equals(id))
+			return true;
+		else
+			return false;
 	}
 	
 	public void printData(){
