@@ -8,6 +8,7 @@ public class Array extends Variable {
 
 	public Array(String variableID) {
 		super(variableID);
+		array = new int[0];
 		ref = REFERENCE;
 		REFERENCE++;
 	}
@@ -44,5 +45,16 @@ public class Array extends Variable {
 		if (ref == ((Array)other).getReference())
 			return true;
 		return false;
+	}
+	
+	public String toString(){
+		String s = variableID + " = [";
+		for (int i = 0; i < array.length; i++) {
+			s += array[i];
+			if(i < array.length-1)
+				s += ", ";
+		}
+		s += "]"; 
+		return s;
 	}
 }

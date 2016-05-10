@@ -59,6 +59,13 @@ public class Function {
 	public void addVariable(Variable v) {
 		variableMap.put(v.getVariableID(),v);
 	}
+	
+	public boolean checkLocalVariable(String id){
+		if(variableMap.containsKey(id))
+			return true;
+		else
+			return false;
+	}
 
 	public void setVariableValue(String variableID, int value) {
 		Variable v = variableMap.get(variableID);
@@ -71,6 +78,15 @@ public class Function {
 
 	public void addParameter(Variable v){
 		parameters.add(v);
+	}
+	
+	public Variable getParameter(String id){
+		for (int i = 0; i < parameters.size(); i++) {
+			if(parameters.get(i).getVariableID().equals(id)){
+				return parameters.get(i);
+			}
+		}
+		return null;
 	}
 
 	public String toString(){
@@ -88,8 +104,20 @@ public class Function {
 	
 	public boolean checkParams(String varID) {
 		for (int i = 0; i < parameters.size(); i++)
-			if (parameters.get(i).getVariableID() == varID)
+			if (parameters.get(i).getVariableID().equals(varID))
 				return true;
 		return false;
+	}
+	
+	public void printData(){
+		System.out.println("  PARAMETERS:");
+		for (int i = 0; i < parameters.size(); i++) {
+			System.out.println("  " + parameters.get(i));
+		}
+		System.out.println("  LOCAL:");
+		for(String key : variableMap.keySet()) {
+			Variable v = variableMap.get(key);
+			System.out.println("  " + v);
+	 	}
 	}
 }

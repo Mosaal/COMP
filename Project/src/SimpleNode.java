@@ -91,6 +91,7 @@ class SimpleNode implements Node {
      out its children. */
 
 	public void dump(String prefix) {
+		System.out.print(YalToJvmTreeConstants.jjtNodeName[id]);
 		switch (id) {
 		case YalToJvmTreeConstants.JJTMODULE:
 			System.out.println(toString(prefix) + " \"" + ID + "\"");
@@ -185,7 +186,19 @@ class SimpleNode implements Node {
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
+				if (rhsChild.ID != null) {
+					System.out.println(rhsChild.ID);
+				} else {
+					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 
+					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+
+					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+
+					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+						System.out.println(termChild.ID);
+					}
+				}
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
 
 			}
@@ -225,23 +238,43 @@ class SimpleNode implements Node {
 
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		Variable v = new Variable(lhs.ID);
-		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-			
-		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-			
+		boolean valid = true;
+		String type = null;
+		String variableType = null;
+		if(parentFunction.getReturnVar() != null && parentFunction.getReturnVar().getVariableID().equals(lhs.ID)){
+			type = "return";
+		}else if(parentFunction.checkParams(lhs.ID)){
+			type = "param";
+		}else if(YalToJvm.getModule().checkGlobalVariable(lhs.ID)){
+			type = "global";
+		}else if(parentFunction.checkLocalVariable(lhs.ID)){
+			type = "local";
+		}else{
+			type = "new";
 		}
-
-		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
+		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+			variableType = "arrayAccess";
+		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+			variableType ="scalarAccess";
 		}
 		
 		if (rhs.jjtGetNumChildren() == 1) {
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 			
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-				
+				if (rhsChild.ID != null) {
+					
+				} else {
+					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
+
+					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+
+					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+
+					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+						
+					}
+				}
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
 				
 			}
@@ -275,6 +308,11 @@ class SimpleNode implements Node {
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 
 				}
+			}
+		}
+		if(valid){
+			if(type.equals("new")){
+				parentFunction.addVariable(v);
 			}
 		}
 	}

@@ -26,4 +26,8 @@ public class Scalar extends Variable {
 			return true;
 		return false;
 	}
+	
+	public String toString(){
+		return variableID + " = " + value;
+	}
 }

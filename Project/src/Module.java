@@ -47,6 +47,13 @@ public class Module {
 		} else
 			return false;
 	}
+	
+	public boolean checkGlobalVariable(String id) {
+		if (globalVariableMap.containsKey(id))
+			return true;
+		else
+			return false;
+	}
 
 	/**
 	* Prints the functions and variables symbol functions
@@ -54,7 +61,9 @@ public class Module {
 	public void printSymbolTables(){
 		System.out.println("--FUNCTIONS--");
 		for(String key : functionMap.keySet()) {
-			System.out.println(functionMap.get(key));
+			Function f = functionMap.get(key);
+			System.out.println(f);
+			f.printData();
 	 	}
 		System.out.println("--GLOBAL VARIABLES--");
 		for(String key : globalVariableMap.keySet()) {
