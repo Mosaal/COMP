@@ -1,0 +1,275 @@
+options {
+	LOOKAHEAD = 1;
+}
+
+PARSER_BEGIN(YalToJvm)
+
+import java.io.FileNotFoundException;
+import java.io.FileInputStream;
+import java.util.ArrayList;
+//import UI.TreeViewer;
+
+public class YalToJvm {
+
+	private static Module module;
+	public static ArrayList<String> semanticErrorMessages = new ArrayList<String>();
+
+	public static void main(String[] args) throws ParseException, FileNotFoundException {
+		//TreeViewer tv = new TreeViewer();
+		YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
+		SimpleNode root = parser.Module();
+		root.dump("");
+
+		module = new Module(root.ID, root);
+		// module.getAttributes();
+		module.getFunctions();
+		module.processFunctions();
+		module.printSymbolTables();
+		printSemanticErrors();
+		//tv.run();
+		// module.printSymbolTables();
+		// printSemanticErrors();
+	}
+
+	public static Module getModule(){
+		return module;
+	}
+
+	public static void printSemanticErrors(){
+		System.out.println("---------------\nSEMANTIC ERRORS:");
+
+		if (semanticErrorMessages.size() == 0)
+			System.out.println("None!");
+		else {
+			for (int i = 0; i < semanticErrorMessages.size(); i++)
+				System.err.println(semanticErrorMessages.get(i));
+		}
+	}
+}
+
+PARSER_END(YalToJvm)
+
+<DEFAULT> SKIP: {
+	" "
+	| "\t"
+	| "\n"
+	| "\r"
+	| <"//" (~["\n","\r"])* ("\n" | "\r" | "\r\n")>
+	| <"/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+<DEFAULT> TOKEN: {
+	<RELA_OP: ">" | "<" | "<=" | ">=" | "==" | "!=">
+	| <ADDSUB_OP: "+" | "-">
+	| <ARITH_OP: "*" | "/" | "<<" | ">>" | ">>>">
+	| <BITWISE_OP: "&" | "|" | "^">
+	| <NOT_OP: "!">
+	| <WHILE: "while">
+	| <IF: "if">
+	| <ELSE: "else">
+	| <ASSIGN: "=">
+	| <ASPA: "\"">
+	| <LPAR: "(">
+	| <RPAR: ")">
+	| <VIRG: ",">
+	| <PVIRG: ";">
+	| <LCHAVETA: "{">
+	| <RCHAVETA: "}">
+	| <FUNCTION: "function">
+	| <MODULE: "module">
+	| <SIZE: "size">
+}
+
+<DEFAULT> TOKEN: {
+	<INTEGER: (<DIGIT>)+>
+	| <ID: <LETTER> (<LETTER> | <DIGIT>)*>
+	| <#LETTER: ["$","A"-"Z","_","a"-"z"]>
+	| <#DIGIT: ["0"-"9"]>
+	| <STRING: <ASPA> (["a"-"z","A"-"Z","0"-"9",":"," ","="])+ <ASPA>>
+}
+
+SimpleNode Module() #Module: { Token moduleID; }
+{
+	<MODULE> moduleID=<ID> {
+		jjtThis.ID = moduleID.image;
+	} <LCHAVETA> (Declaration())* (Function())* <RCHAVETA> { return jjtThis; }
+}
+
+void Declaration() #Global: { Token assign; }
+{
+	GlobalLeft() (assign=<ASSIGN> { jjtThis.ID = assign.image; } GlobalRight())? <PVIRG>
+}
+
+void GlobalLeft() #void: {}
+{
+	LOOKAHEAD(2) ArrayElement() | ScalarElement()
+}
+
+void GlobalRight() #GlobalRight: { Token op, intID; }
+{
+	((op=<ADDSUB_OP> {
+		jjtThis.ID = op.image;
+	})? intID=<INTEGER> {
+		if (jjtThis.ID != null)
+			jjtThis.ID += intID.image;
+		else
+			jjtThis.ID = intID.image;
+	}) | ("[" ArraySize() "]")
+}
+
+void Function() #Function: { Token functionID; }
+{
+	<FUNCTION> (LOOKAHEAD(3) FunctionReturn())? functionID=<ID> {
+		jjtThis.ID = functionID.image;
+	} <LPAR> (Varlist())? <RPAR> <LCHAVETA> FunctionBody() <RCHAVETA>
+}
+
+void FunctionReturn() #Return: {}
+{
+	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) <ASSIGN>
+}
+
+void Varlist() #Params: {}
+{
+	(LOOKAHEAD(2) ArrayElement() | ScalarElement()) (<VIRG> (LOOKAHEAD(2) ArrayElement() | ScalarElement()))*
+}
+
+void ArrayElement() #Array: { Token arrayElem; }
+{
+	arrayElem=<ID> {
+		jjtThis.ID = arrayElem.image;
+	} "[" "]"
+}
+
+void ScalarElement() #Scalar: { Token scalarElem; }
+{
+	scalarElem=<ID> {
+		jjtThis.ID = scalarElem.image;
+	}
+}
+
+void FunctionBody() #FunctionBody: {}
+{
+	(Stmt())*
+}
+
+void WhileBody() #WhileBody: {}
+{
+	(Stmt())*
+}
+
+void IfBody() #IfBody: {}
+{
+	(Stmt())*
+}
+
+void ElseBody() #ElseBody: {}
+{
+	(Stmt())*
+}
+
+void Stmt() #void: {}
+{
+	While() | If() | LOOKAHEAD(3) Assign() | Call() <PVIRG>
+}
+
+void Assign() #Assignement: {}
+{
+	Lhs() <ASSIGN> Rhs() <PVIRG>
+}
+
+void Lhs() #void: {}
+{
+	LOOKAHEAD(2) ArrayAccess() | ScalarAccess()
+}
+
+void Rhs() #Rhs: { Token op; }
+{
+	(Term() ((op=<ADDSUB_OP> {
+		jjtThis.ID = op.image;
+	} | op=<ARITH_OP> {
+		jjtThis.ID = op.image;
+	} | op=<BITWISE_OP> {
+		jjtThis.ID = op.image;
+	}) Term())?) | "[" ArraySize() "]"
+}
+
+void ArraySize() #ArraySize: { Token intID; }
+{
+	ScalarAccess() | intID=<INTEGER> { jjtThis.ID = intID.image; }
+}
+
+void Term() #Term: { Token op, intID; }
+{
+	(op=<ADDSUB_OP> {
+		jjtThis.ID = op.image;
+	})? (intID=<INTEGER> {
+		if (jjtThis.ID != null)
+			jjtThis.ID += intID.image;
+		else
+			jjtThis.ID = intID.image;
+	} | LOOKAHEAD(3) Call() | LOOKAHEAD(2) ArrayAccess() | ScalarAccess())
+}
+
+void Exprtest() #Condition: { Token relaOpID; }
+{
+	<LPAR> Lhs() relaOpID=<RELA_OP> { jjtThis.ID = relaOpID.image; } Rhs() <RPAR>
+}
+
+void While() #While: {}
+{
+	<WHILE> Exprtest() <LCHAVETA> WhileBody() <RCHAVETA>
+}
+
+void If() #If: {}
+{
+	<IF> Exprtest() <LCHAVETA> IfBody() <RCHAVETA> (<ELSE> <LCHAVETA> ElseBody() <RCHAVETA>)?
+}
+
+void Call() #Call: { Token id, callID; }
+{
+	id=<ID> {
+		jjtThis.ID = id.image;
+	} ("." callID=<ID> {
+		jjtThis.ID += "." + callID.image;
+	})? <LPAR> (ArgumentList())? <RPAR>
+}
+
+void ArgumentList() #void: {}
+{
+	Argument() (<VIRG> Argument())*
+}
+
+void Argument() #Argument: { Token argID; }
+{
+	argID=<ID> {
+		jjtThis.ID = argID.image;
+	} | argID=<STRING> {
+		jjtThis.ID = argID.image;
+	} | argID=<INTEGER> {
+		jjtThis.ID = argID.image;
+	}
+}
+
+void ArrayAccess() #ArrayAccess: { Token arrayID; }
+{
+	arrayID=<ID> { jjtThis.ID = arrayID.image; } "[" Index() "]"
+}
+
+void ScalarAccess() #ScalarAccess: { Token scalarID, size; }
+{
+	scalarID=<ID> {
+		jjtThis.ID = scalarID.image;
+	} ("." size=<SIZE> {
+		jjtThis.ID += "." + size.image;
+	})?
+}
+
+void Index() #Index: { Token id, intID; }
+{
+	id=<ID> {
+		jjtThis.ID = id.image;
+	} | intID=<INTEGER> {
+		jjtThis.ID = intID.image;
+	}
+}
