@@ -23,6 +23,10 @@ public class Variable {
 		return "  Variable: " + variableID;
 	}
 	
+	public String getType(){
+		return "variable";
+	}
+	
 	public boolean is(String type){
 		if(type.equals("Variable"))
 			return true;

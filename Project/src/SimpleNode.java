@@ -442,6 +442,7 @@ class SimpleNode implements Node {
 		}
 		
 		//EVAL
+		/*
 		System.out.println("LHS");
 		System.out.println(" " + lhsId);
 		System.out.println(" " + lhsAccess);
@@ -462,20 +463,34 @@ class SimpleNode implements Node {
 			}else{
 				System.out.println("");
 			}
-		}
+		}*/
 		
 		boolean newVariable = false;
 		
-		// Check if the variables exist or not
+		// Check if the variables exist or not and then process further
 		if(!checkVariable(parentFunction, rhs1Id)){
 			newVariable = true;
 		}
+		//ERRO
 		if(!rhs1Access.equals("integer") && !checkVariable(parentFunction, rhs1Id)){
 			YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+		}else{
+			rhs1Type = getVariable(parentFunction,rhs1Id).getType();
+			if(rhs1Access.equals("array")){
+			}else if(rhs1Access.equals("scalar")){
+				//ERRO //TODO
+				if(rhs1Type.equals("array")){
+					YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
+				}
+			}
 		}
 		if(twoSides){
+			//ERRO
 			if(!rhs2Access.equals("integer") && !checkVariable(parentFunction, rhs2Id)){
 				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+			}else{
+				rhs2Type = getVariable(parentFunction,rhs2Id).getType();
+				System.out.println(rhs2Type);
 			}
 		}
 		

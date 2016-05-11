@@ -58,6 +58,10 @@ public class Array extends Variable {
 		return s;
 	}
 	
+	public String getType(){
+		return "array";
+	}
+	
 	public boolean is(String type){
 		if(type.equals("Array"))
 			return true;
