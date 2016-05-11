@@ -31,6 +31,10 @@ public class Scalar extends Variable {
 		return "  Scalar: " + variableID + " = " + value;
 	}
 	
+	public String getType(){
+		return "scalar";
+	}
+	
 	public boolean is(String type){
 		if(type.equals("Scalar"))
 			return true;
