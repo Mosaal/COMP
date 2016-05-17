@@ -356,14 +356,19 @@ class SimpleNode implements Node {
 		String lhsId = null;
 		String lhsType = null;
 		String lhsAccess = null;
-		String lhsArrayAccessId = null;
-		String lhsArrayAccess = null, rhsArrayAccess = null;
+		String lhsArrayIndexId = null;
+		String lhsArrayAccess = null;
 		
 		//LHS
 		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			lhsAccess = "array";
 			lhsId = lhs.ID;
-			lhsArrayAccessId = ((SimpleNode)lhs.jjtGetChild(0)).ID;
+			SimpleNode arrayIndex = (SimpleNode)(lhs.jjtGetChild(0));
+			try{
+				  Integer.parseInt(arrayIndex.ID);
+				} catch (NumberFormatException e) {
+					lhsArrayIndexId  = arrayIndex.ID;
+				}
 		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			if(dot(lhs.ID)){
 				lhsAccess = "size";
@@ -378,7 +383,7 @@ class SimpleNode implements Node {
 		String rhs1Id = null;
 		String rhs1Type = null;
 		String rhs1Access = null;
-		String rhs1ArrayAccessId = null;
+		String rhs1ArrayIndexId = null;
 		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 			if (rhsChild.ID != null) {
@@ -387,11 +392,17 @@ class SimpleNode implements Node {
 			} else {
 				SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-					
+					rhs1Access = "call";
+					rhs1Id = termChild.ID;
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					rhs1Access = "array";
 					rhs1Id = termChild.ID;
-					rhs1ArrayAccessId = ((SimpleNode)termChild.jjtGetChild(0)).ID;
+					SimpleNode arrayIndex = (SimpleNode)(termChild.jjtGetChild(0));
+					try{
+					  Integer.parseInt(arrayIndex.ID);
+					} catch (NumberFormatException e) {
+						rhs1ArrayIndexId = arrayIndex.ID;
+					}
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 					if(dot(lhs.ID)){
 						rhs1Access = "size";
@@ -403,14 +414,14 @@ class SimpleNode implements Node {
 				}
 			}
 		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-			System.out.println("sou um arraysize");
+			//TODO System.out.println("sou um arraysize");
 		}
 		
 		//RHS 2
 		String rhs2Id = null;
 		String rhs2Type = null;
 		String rhs2Access = null;
-		String rhs2ArrayAccessId = null;
+		String rhs2ArrayIndexId = null;
 		if(rhs.jjtGetNumChildren() == 2){
 			twoSides = true;
 			SimpleNode rhs2Child = (SimpleNode)rhs.jjtGetChild(1);
@@ -425,7 +436,7 @@ class SimpleNode implements Node {
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 						rhs2Access = "array";
 						rhs2Id = termChild.ID;
-						rhs2ArrayAccessId = ((SimpleNode)termChild.jjtGetChild(0)).ID;
+						rhs2ArrayIndexId = ((SimpleNode)termChild.jjtGetChild(0)).ID;
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 						if(dot(lhs.ID)){
 							rhs2Access = "size";
@@ -437,60 +448,112 @@ class SimpleNode implements Node {
 					}
 				}
 			} else if (rhs2Child.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-				System.out.println("sou um arraysize");
+				// System.out.println("sou um arraysize");
 			}
 		}
 		
-		//EVAL
-		/*
-		System.out.println("LHS");
-		System.out.println(" " + lhsId);
-		System.out.println(" " + lhsAccess);
-		System.out.println("RHS1");
-		System.out.println(" " + rhs1Id);
-		System.out.print(" " + rhs1Access);
-		if(rhs1Access.equals("array")){
-			System.out.println(" [" + rhs1ArrayAccessId + "]");
-		}else{
-			System.out.println("");
-		}
-		if(twoSides){
-			System.out.println("RHS2");
-			System.out.println(" " + rhs2Id);
-			System.out.print(" " + rhs2Access);
-			if(rhs1Access.equals("array")){
-				System.out.println(" [" + rhs2ArrayAccessId + "]");
-			}else{
-				System.out.println("");
-			}
-		}*/
 		
+		
+		/**********************************
+					ERROR HANDLING
+		**********************************/
+		// LEFT HAND SIDE
 		boolean newVariable = false;
-		
-		// Check if the variables exist or not and then process further
-		if(!checkVariable(parentFunction, rhs1Id)){
+		if(!checkVariable(parentFunction,lhsId)){
 			newVariable = true;
-		}
-		//ERRO
-		if(!rhs1Access.equals("integer") && !checkVariable(parentFunction, rhs1Id)){
-			YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+			//ERROR: If the left hand side of a new variable is not a scalar type
+			if(!lhsAccess.equals("scalar")){
+				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Left hand side of assignement for new variable: " + lhsId + " must be of a scalar type" );
+			}
 		}else{
-			rhs1Type = getVariable(parentFunction,rhs1Id).getType();
-			if(rhs1Access.equals("array")){
-			}else if(rhs1Access.equals("scalar")){
-				//ERRO //TODO
-				if(rhs1Type.equals("array")){
-					YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
+			Variable v = getVariable(parentFunction, lhsId);
+			switch (lhsAccess) {
+				case "array":
+					//ERROR: If the variable on the left hand side is of array access but is not an array type
+					if(!v.getType().equals("array")){
+						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"The variable on the left hand side of assignement for variable: " + lhsId + " is not an array type" );
+					}else{
+						if(lhsArrayIndexId != null){
+							//ERROR: If the index of the left hand side of the assignment does not exist
+							if(!checkVariable(parentFunction,lhsArrayIndexId)){
+								YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + lhsArrayIndexId + " in the index from right hand side of assignement for variable: " + lhsId + " does not exist");
+							}else{
+								Variable index = getVariable(parentFunction, lhsArrayIndexId);
+								//ERROR: If the variable type used for the index is not a scalar
+								if(!index.getType().equals("scalar")){
+									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"The index used for the variable in the left hand for variable: " + lhsId + " is not a scalar");
+								}
+							}
+						}
+					}
+					break;
+				case "scalar":
+					//ERROR: If the left hand side variable is not a scalar variable
+					if(!v.getType().equals("scalar")){
+						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Left hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		
+		// FIRST RIGHT HAND SIDE
+		if(!rhs1Access.equals("integer")){
+			//ERROR: If the variable doesn't exist
+			if(!checkVariable(parentFunction, rhs1Id)){
+				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+			}else{
+				rhs1Type = getVariable(parentFunction,rhs1Id).getType();
+				if(rhs1Access.equals("array")){
+					//ERROR: If the variable used for the index doesn't exist
+					if(rhs1ArrayIndexId != null){
+						if(!checkVariable(parentFunction,rhs1ArrayIndexId)){
+							YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1ArrayIndexId + " from right hand side of assignement for variable: " + lhsId + " does not exist");
+						}else{
+							Variable v = getVariable(parentFunction, rhs1ArrayIndexId);
+							//ERROR: If the variable type used for the index is not a scalar
+							if(!v.getType().equals("scalar")){
+								YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"The index used for the variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar");
+							}
+						}
+					}
+				}else if(rhs1Access.equals("scalar")){
+					//ERROR: Check if the type is consistent with the type of access
+					if(rhs1Type.equals("array")){
+						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
+					}
 				}
 			}
 		}
+		// SECOND RIGHT HAND SIDE
 		if(twoSides){
-			//ERRO
-			if(!rhs2Access.equals("integer") && !checkVariable(parentFunction, rhs2Id)){
-				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
-			}else{
-				rhs2Type = getVariable(parentFunction,rhs2Id).getType();
-				System.out.println(rhs2Type);
+			if(!rhs2Access.equals("integer")){
+				//ERROR: If the variable doesn't exist
+				if(!checkVariable(parentFunction, rhs2Id)){
+					YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " does not exist" );
+				}else{
+					rhs2Type = getVariable(parentFunction,rhs2Id).getType();
+					if(rhs2Access.equals("array")){
+						//ERROR: If the variable used for the index doesn't exist
+						if(rhs2ArrayIndexId != null){
+							if(!checkVariable(parentFunction,rhs2ArrayIndexId)){
+								YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2ArrayIndexId + " from right hand side of assignement for variable: " + lhsId + " does not exist");
+							}else{
+								Variable v = getVariable(parentFunction, rhs2ArrayIndexId);
+								//ERROR: If the variable type used for the index is not a scalar
+								if(!v.getType().equals("scalar")){
+									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"The index used for the variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar");
+								}
+							}
+						}
+					}else if(rhs2Access.equals("scalar")){
+						//ERROR: Check if the type is consistent with the type of access
+						if(rhs2Type.equals("array")){
+							YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
+						}
+					}
+				}
 			}
 		}
 		
