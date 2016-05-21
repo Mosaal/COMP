@@ -384,6 +384,7 @@ class SimpleNode implements Node {
 		String rhs1Type = null;
 		String rhs1Access = null;
 		String rhs1ArrayIndexId = null;
+		String[] argumentTypes = null;
 		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 			if (rhsChild.ID != null) {
@@ -394,6 +395,7 @@ class SimpleNode implements Node {
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 					rhs1Access = "call";
 					rhs1Id = termChild.ID;
+					System.out.println(((SimpleNode)termChild.jjtGetChild(0)).ID);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					rhs1Access = "array";
 					rhs1Id = termChild.ID;
@@ -404,17 +406,17 @@ class SimpleNode implements Node {
 						rhs1ArrayIndexId = arrayIndex.ID;
 					}
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-					if(dot(lhs.ID)){
+					if(dot(termChild.ID)){
 						rhs1Access = "size";
 						rhs1Id = separateString(termChild.ID)[0];
 					}else{
 						rhs1Access = "scalar";
 						rhs1Id = termChild.ID;
 					}
-				}
+				} 
 			}
 		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-			//TODO System.out.println("sou um arraysize");
+			
 		}
 		
 		//RHS 2
@@ -438,7 +440,7 @@ class SimpleNode implements Node {
 						rhs2Id = termChild.ID;
 						rhs2ArrayIndexId = ((SimpleNode)termChild.jjtGetChild(0)).ID;
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-						if(dot(lhs.ID)){
+						if(dot(termChild.ID)){
 							rhs2Access = "size";
 							rhs2Id = separateString(termChild.ID)[0];
 						}else{
@@ -448,7 +450,7 @@ class SimpleNode implements Node {
 					}
 				}
 			} else if (rhs2Child.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-				// System.out.println("sou um arraysize");
+				
 			}
 		}
 		
@@ -476,7 +478,7 @@ class SimpleNode implements Node {
 						if(lhsArrayIndexId != null){
 							//ERROR: If the index of the left hand side of the assignment does not exist
 							if(!checkVariable(parentFunction,lhsArrayIndexId)){
-								YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + lhsArrayIndexId + " in the index from right hand side of assignement for variable: " + lhsId + " does not exist");
+								YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + lhsArrayIndexId + " in the index from left hand side of assignement for variable: " + lhsId + " does not exist");
 							}else{
 								Variable index = getVariable(parentFunction, lhsArrayIndexId);
 								//ERROR: If the variable type used for the index is not a scalar
@@ -523,9 +525,16 @@ class SimpleNode implements Node {
 					if(rhs1Type.equals("array")){
 						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
 					}
+				}else if(rhs1Access.equals("size")){
+					Variable v = getVariable(parentFunction,rhs1Id);
+					//ERROR: If the variable is not an array type
+					if(!v.getType().equals("array")){
+						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs1Id + " from right hand side of assignement for variable: " + lhsId + " is not an array variable" );
+					}
 				}
 			}
 		}
+		
 		// SECOND RIGHT HAND SIDE
 		if(twoSides){
 			if(!rhs2Access.equals("integer")){
@@ -551,6 +560,12 @@ class SimpleNode implements Node {
 						//ERROR: Check if the type is consistent with the type of access
 						if(rhs2Type.equals("array")){
 							YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " is not a scalar variable" );
+						}
+					}else if(rhs2Access.equals("size")){
+						Variable v = getVariable(parentFunction,rhs2Id);
+						//ERROR: If the variable is not an array type
+						if(!v.getType().equals("array")){
+							YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Variable " + rhs2Id + " from right hand side of assignement for variable: " + lhsId + " is not an array variable" );
 						}
 					}
 				}
