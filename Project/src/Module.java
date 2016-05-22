@@ -41,10 +41,7 @@ public class Module {
 	}
 	
 	public boolean checkGlobalVariable(String id) {
-		if (globalVariableMap.containsKey(id))
-			return true;
-		else
-			return false;
+		return globalVariableMap.containsKey(id);
 	}
 	
 	public Variable getGlobalVariable(String id){

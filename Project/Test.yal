@@ -1,22 +1,6 @@
 module while4 {
-	a;
-	b = -1;
-	c[] = [10];
-	d = [5];
-	b = 2;
-	c;
 
 	function f1(v[], N, x) {
-		/*a = x;
-		a.size = v[3];
-		a[b] = 3;*/
-		//1 RHS test
-		a = v;
-		/*a = b;
-		a = v[a];
-		a = b.size;*/
-		//a = [3]; //doubts
-		/*
 		if (i < N) {
 			s = 4;
 		} else {
@@ -26,8 +10,6 @@ module while4 {
 		while (f > j) {
 			g = h;
 		}
-
-		lel.f2(a, d, f);*/
 	}
 
 	/*function main() {
