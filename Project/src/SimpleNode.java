@@ -173,6 +173,95 @@ class SimpleNode implements Node {
 			}
 		}
 	}
+	
+
+	/**
+	 * Method used to process the attributes of a module
+	 */
+	public void getAttributes(String prefix) {
+		for (int i = 0; i < children.length; i++) {
+			SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+			if (node != null) {
+				if (node.id == YalToJvmTreeConstants.JJTFUNCTION) // Function found. No more module attributes, stop loop
+					break;
+				if (node.id == YalToJvmTreeConstants.JJTGLOBAL) { // Attribute found
+
+					int globalChildrenNum = node.jjtGetNumChildren();
+					SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
+					SimpleNode accessNode = (SimpleNode) lhs.jjtGetChild(0);
+					String varName = accessNode.ID;
+					Variable var = new Variable(varName);
+					
+					// DECLARATION --> LHS;
+					if (globalChildrenNum == 1) {
+						if (!YalToJvm.getModule().addGlobalVariable(var)) {
+							// ERROR: Repeated declaration
+							YalToJvm.semanticErrorMessages.add("Variable " + varName + "is already declared!"); 
+							}
+						
+					// ASSIGNMENT --> LHS = RHS;
+					} else if (globalChildrenNum == 2) {
+						SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
+						SimpleNode valueNode = (SimpleNode) rhs.jjtGetChild(0);
+						
+						// RHS = SCALAR
+						if (valueNode.id == YalToJvmTreeConstants.JJTSCALAR) {
+							if(YalToJvm.getModule().getGlobalVariable(varName).getType().equals("array"))
+								YalToJvm.semanticErrorMessages
+									.add("Attribute type mismatch! Attribute " + varName + "is an Array and cannot be assigned to a Scalar."); // ERROR: a[5]; a = 3;
+							else {
+								int value = Integer.parseInt(valueNode.ID);
+								var = new Scalar(varName, value);
+							}
+							
+						// RHS = ARRAY
+						} else if (valueNode.id == YalToJvmTreeConstants.JJTARRAY) {
+							if (YalToJvm.getModule().getGlobalVariable(varName).getType().equals("scalar"))
+								YalToJvm.semanticErrorMessages
+										.add("Attribute type mismatch! Attribute " + varName + "is a Scalar and cannot be assigned to an Array."); // ERROR: a = 2; a = [0,2,4];
+							else {
+								int size = Integer.parseInt(valueNode.ID);
+								var = new Array(varName, size);
+							}
+							
+						// RHS = ATTRIBUTE
+						} else {
+							String valueName = valueNode.ID;
+							Variable var2 = new Variable(valueName);
+							
+							if(YalToJvm.getModule().checkGlobalVariable(valueName) && (YalToJvm.getModule().getGlobalVariable(valueName).getType().equals("scalar") || YalToJvm.getModule().getGlobalVariable(valueName).getType().equals("array")))
+								 var2 = YalToJvm.getModule().getGlobalVariable(valueName);
+							else
+								YalToJvm.semanticErrorMessages.add("Attribute " + valueName + " is not assigned to a value!"); // ERROR: RHS NOT DECLARED/ASSIGNED
+							
+							// SCALAR ATTRIBUTE
+							if (valueNode.id == YalToJvmTreeConstants.JJTSCALARACCESS){
+								if(YalToJvm.getModule().getGlobalVariable(varName).getType().equals("array"))
+									YalToJvm.semanticErrorMessages.add("Attribute type mismatch! Attribute " + varName + " is an Array and attribute " + valueName + " is a Scalar.");
+								else{
+									int value = ((Scalar) var2).getValue();
+									var = new Scalar(varName, value);
+								}
+							
+							// ARRAY ATTRIBUTE
+							} else if (valueNode.id == YalToJvmTreeConstants.JJTARRAYACCESS){
+								if(YalToJvm.getModule().getGlobalVariable(varName).getType().equals("scalar"))
+									YalToJvm.semanticErrorMessages.add("Attribute type mismatch! Attribute " + varName + " is an Scalar and attribute " + valueName + " is a Array.");
+								else{
+									int size = ((Array) var2).getSize();
+									var = new Array(varName, size);
+								}
+							}
+						}
+						
+						if(!YalToJvm.getModule().addGlobalVariable(var)){
+							YalToJvm.getModule().replaceGlobalVariable(var);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		String lhsType, rhsType;
