@@ -33,6 +33,10 @@ public class Function {
 	public SimpleNode getBody(){
 		return body;
 	}
+	
+	public ArrayList<Variable> getParameters(){
+		return parameters;
+	}
 
 	@Override
 	public boolean equals(Object object) {
