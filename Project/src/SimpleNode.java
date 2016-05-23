@@ -173,20 +173,115 @@ class SimpleNode implements Node {
 			}
 		}
 	}
+	
+
+	/**
+	 * Method used to process the attributes of a module
+	 */
+	public void getAttributes(String prefix) {
+		for (int i = 0; i < children.length; i++) {
+			SimpleNode node = (SimpleNode) this.jjtGetChild(i);
+			if (node != null) {
+				if (node.id == YalToJvmTreeConstants.JJTFUNCTION) // Function found. No more module attributes, stop loop
+					break;
+				if (node.id == YalToJvmTreeConstants.JJTGLOBAL) { // Attribute found
+
+					int globalChildrenNum = node.jjtGetNumChildren();
+					SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
+					SimpleNode accessNode = (SimpleNode) lhs.jjtGetChild(0);
+					String varName = accessNode.ID;
+					Variable var = new Variable(varName);
+					
+					// DECLARATION --> LHS;
+					if (globalChildrenNum == 1) {
+						if (!YalToJvm.getModule().addGlobalVariable(var)) {
+							// ERROR: Repeated declaration
+							YalToJvm.semanticErrorMessages.add("Variable " + varName + "is already declared!"); 
+							}
+						
+					// ASSIGNMENT --> LHS = RHS;
+					} else if (globalChildrenNum == 2) {
+						SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
+						SimpleNode valueNode = (SimpleNode) rhs.jjtGetChild(0);
+						
+						// RHS = SCALAR
+						if (valueNode.id == YalToJvmTreeConstants.JJTSCALAR) {
+							if(YalToJvm.getModule().getGlobalVariable(varName).getType().equals("array"))
+								YalToJvm.semanticErrorMessages
+									.add("Attribute type mismatch! Attribute " + varName + "is an Array and cannot be assigned to a Scalar."); // ERROR: a[5]; a = 3;
+							else {
+								int value = Integer.parseInt(valueNode.ID);
+								var = new Scalar(varName, value);
+							}
+							
+						// RHS = ARRAY
+						} else if (valueNode.id == YalToJvmTreeConstants.JJTARRAY) {
+							if (YalToJvm.getModule().getGlobalVariable(varName).getType().equals("scalar"))
+								YalToJvm.semanticErrorMessages
+										.add("Attribute type mismatch! Attribute " + varName + "is a Scalar and cannot be assigned to an Array."); // ERROR: a = 2; a = [0,2,4];
+							else {
+								int size = Integer.parseInt(valueNode.ID);
+								var = new Array(varName, size);
+							}
+							
+						// RHS = ATTRIBUTE
+						} else {
+							String valueName = valueNode.ID;
+							Variable var2 = new Variable(valueName);
+							
+							if(YalToJvm.getModule().checkGlobalVariable(valueName) && (YalToJvm.getModule().getGlobalVariable(valueName).getType().equals("scalar") || YalToJvm.getModule().getGlobalVariable(valueName).getType().equals("array")))
+								 var2 = YalToJvm.getModule().getGlobalVariable(valueName);
+							else
+								YalToJvm.semanticErrorMessages.add("Attribute " + valueName + " is not assigned to a value!"); // ERROR: RHS NOT DECLARED/ASSIGNED
+							
+							// SCALAR ATTRIBUTE
+							if (valueNode.id == YalToJvmTreeConstants.JJTSCALARACCESS){
+								if(YalToJvm.getModule().getGlobalVariable(varName).getType().equals("array"))
+									YalToJvm.semanticErrorMessages.add("Attribute type mismatch! Attribute " + varName + " is an Array and attribute " + valueName + " is a Scalar.");
+								else{
+									int value = ((Scalar) var2).getValue();
+									var = new Scalar(varName, value);
+								}
+							
+							// ARRAY ATTRIBUTE
+							} else if (valueNode.id == YalToJvmTreeConstants.JJTARRAYACCESS){
+								if(YalToJvm.getModule().getGlobalVariable(varName).getType().equals("scalar"))
+									YalToJvm.semanticErrorMessages.add("Attribute type mismatch! Attribute " + varName + " is an Scalar and attribute " + valueName + " is a Array.");
+								else{
+									int size = ((Array) var2).getSize();
+									var = new Array(varName, size);
+								}
+							}
+						}
+						
+						if(!YalToJvm.getModule().addGlobalVariable(var)){
+							YalToJvm.getModule().replaceGlobalVariable(var);
+						}
+					}
+				}
+			}
+		}
+	}
 
 	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+		String lhsType, rhsType;
+		
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
+			lhsType = "scalar";
+			System.out.println("lhsA: " + lhs.ID);
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
+			lhsType = "scalar";
+			if (!YalToJvm.getModule().checkGlobalVariable(lhs.ID) || !parentFunction.checkParams(lhs.ID) || !parentFunction.checkLocalVariable(lhs.ID)) {
+				YalToJvm.semanticErrorMessages.add("The variable \"" + lhs.ID + "\" hasn't been declared yet!");
+			}
 		}
 
-		if (rhs.jjtGetNumChildren() == 1) {
+		// if (rhs.jjtGetNumChildren() == 1) {
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 				if (rhsChild.ID != null) {
-					System.out.println(rhsChild.ID);
+					System.out.println("rhs: " + rhsChild.ID);
 				} else {
 					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 
@@ -195,162 +290,47 @@ class SimpleNode implements Node {
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-						System.out.println(termChild.ID);
+						System.out.println("rhs: " + termChild.ID);
 					}
 				}
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-
+				System.out.println("Error: You can't compare variables with array sizes!");
 			}
-		} else if (rhs.jjtGetNumChildren() == 2) {
-			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
-			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
-
-			if (termLeft.ID != null) {
-
-			} else {
-				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
-
-				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-				}
-			}
-
-			if (termRight.ID != null) {
-
-			} else {
-				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
-
-				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-				}
-			}
-		}
-	}
-
-	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		Variable lhsVariable = new Variable(lhs.ID);
-		boolean valid = true;
-		String scope = null;
-		String lhsType = null;
-		/**
-		 * Check the type of the scope of the variable
-		 */
-		scope = getVariableScope(parentFunction, lhs.ID);
-		if(!scope.equals("new")){
-			lhsVariable = getVariableByScope(parentFunction,lhs.ID,scope);
-		}
-		/**
-		 * Check the type of the variable of the left hand side
-		 */
-		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-			if(scope.equals("new")){
-				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +  "The variable: " + lhs.ID + " on left hand side of the assignment does not exist");
-			}
-			lhsType = "arrayAccess";
-		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-			lhsType ="scalarAccess";
-		}
-		/**
-		 * This part of the function processes the right hand side of the assignment
-		 */
-		if (rhs.jjtGetNumChildren() == 1) {
-			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-				/**
-				 * If the right hand side of the assignement is a hardcoded integer;
-				 */
-				if (rhsChild.ID != null) {
-					if(scope.equals("new")){
-						lhsVariable = new Scalar(lhsVariable.getVariableID(),Integer.parseInt(rhsChild.ID));
-					}else{
-						((Scalar)lhsVariable).setValue(Integer.parseInt(rhsChild.ID));
-					}
-				} else {
-					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
-					String rhsScope = getVariableScope(parentFunction, termChild.ID);
-					Variable rhsVariable = getVariableByScope(parentFunction, termChild.ID, rhsScope);
-					if(rhsVariable == null){
-						valid = false;
-						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement for variable: " + lhsVariable.getVariableID() + " does not exist" );
-					}else{
-						if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-						} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-							
-						} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-							if(scope.equals("new")){
-								if(rhsVariable.is("Array")){
-									valid = false;
-									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement for variable: " + lhsVariable.getVariableID() + " cannot be an array");
-								}else{
-									lhsVariable = new Scalar(lhsVariable.getVariableID(),((Scalar)rhsVariable).getValue());
-								}
-							}else{
-								System.out.println(rhsVariable);
-								if(rhsVariable.is("Scalar")){
-									((Scalar)lhsVariable).setValue(((Scalar)rhsVariable).getValue());
-								}else if(rhsVariable.is("Array")){
-									valid = false;
-									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement for variable: " + lhsVariable.getVariableID() + " cannot be an array");
-								}else{
-									valid = false;
-									YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " +"Right hand side of assignement should be a scalar for variable: " + lhsVariable.getVariableID() );
-								}
-							}
-						}
-					}
-				}
-			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-				
-			}
-		} else if (rhs.jjtGetNumChildren() == 2) {
-			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
-			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
-			if (termLeft.ID != null) {
-
-			} else {
-				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
-				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-					
-				}else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-					
-				}else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-					
-				}
-			}
-			if (termRight.ID != null) {
-
-			} else {
-				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
-
-				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-
-				}
-			}
-		}
-		/**
-		 * Check if the assignment is a valid one
-		 */
-		if(valid){
-			if(scope.equals("new")){
-				parentFunction.addVariable(lhsVariable);
-			}
-		}
+//		} else if (rhs.jjtGetNumChildren() == 2) {
+//			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
+//			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
+//
+//			if (termLeft.ID != null) {
+//
+//			} else {
+//				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
+//
+//				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+//
+//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+//
+//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+//
+//				}
+//			}
+//
+//			if (termRight.ID != null) {
+//
+//			} else {
+//				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
+//
+//				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+//
+//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+//
+//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+//
+//				}
+//			}
+//		}
 	}
 	
-	public void processAssignement2(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		//VARS
 		boolean twoSides = false;
 		String lhsId = null;
@@ -646,7 +626,7 @@ class SimpleNode implements Node {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
-				processAssignement2(lhs, rhs, parentFunction);
+				// processAssignement(lhs, rhs, parentFunction);
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode)bodyChild.jjtGetChild(0);

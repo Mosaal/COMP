@@ -51,10 +51,7 @@ public class Function {
 	}
 	
 	public boolean checkLocalVariable(String id){
-		if(variableMap.containsKey(id))
-			return true;
-		else
-			return false;
+		return variableMap.containsKey(id);
 	}
 
 	public void setVariableValue(String variableID, int value) {
