@@ -202,8 +202,6 @@ public class SimpleNode implements Node {
 			if (node.id == YalToJvmTreeConstants.JJTFUNCTION) // Function found. No more module attributes, stop loop
 				break;
 			if (node.id == YalToJvmTreeConstants.JJTGLOBAL) { // Attribute found
-				
-				System.out.println("GLOBAL " + i);
 
 				int globalChildrenNum = node.jjtGetNumChildren();
 				SimpleNode lhs = (SimpleNode) node.jjtGetChild(0);
@@ -212,7 +210,6 @@ public class SimpleNode implements Node {
 
 				// DECLARATION --> LHS;
 				if (globalChildrenNum == 1) {
-					System.out.println("DEBUG: FILHOS = 1");
 					var = new Scalar(varName);
 					if (!YalToJvm.getModule().addGlobalVariable(var)) {
 						// ERROR: Repeated declaration
@@ -223,8 +220,6 @@ public class SimpleNode implements Node {
 				} else if (globalChildrenNum == 2) {
 					SimpleNode rhs = (SimpleNode) node.jjtGetChild(1);
 					int rhsChildrenNum = rhs.jjtGetNumChildren();
-					
-					System.out.println("RHS COM A CONSTANT: " + YalToJvmTreeConstants.jjtNodeName[rhs.getId()]);
 
 					// RHS = SCALAR
 					if(rhsChildrenNum == 0){
