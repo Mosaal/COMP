@@ -89,7 +89,6 @@ class SimpleNode implements Node {
 
 	/* Override this method if you want to customize how the node dumps
      out its children. */
-
 	public void dump(String prefix) {
 		switch (id) {
 		case YalToJvmTreeConstants.JJTMODULE:
@@ -174,97 +173,179 @@ class SimpleNode implements Node {
 		}
 	}
 
-	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		String lhsType, rhsType;
+	public void processArrayAccess(String arrayAccess, String index, Function parentFunction) {
+		if (YalToJvm.getModule().checkGlobalVariable(arrayAccess)) {
+			if (YalToJvm.getModule().getGlobalVariable(arrayAccess) instanceof Scalar)
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arrayAccess + "\" is not an array!");
+		} else if (parentFunction.checkLocalVariable(arrayAccess)) {
+			if (parentFunction.getVariable(arrayAccess) instanceof Scalar)
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arrayAccess + "\" is not an array!!");
+		} else if (parentFunction.checkParams(arrayAccess)) {
+			if (parentFunction.getParameter(arrayAccess) instanceof Scalar)
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arrayAccess + "\" is not an array!!");
+		} else if (parentFunction.checkReturnVariable(arrayAccess)) {
+			if (parentFunction.getReturnVar() instanceof Scalar)
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arrayAccess + "\" is not an array!!");
+		} else {
+			YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arrayAccess + "\" hasn't been declared!");
+		}
 		
-		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-			lhsType = "scalar";
-			System.out.println("lhsA: " + lhs.ID);
-		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-			lhsType = "scalar";
-			if (!YalToJvm.getModule().checkGlobalVariable(lhs.ID) || !parentFunction.checkParams(lhs.ID) || !parentFunction.checkLocalVariable(lhs.ID)) {
-				YalToJvm.semanticErrorMessages.add("The variable \"" + lhs.ID + "\" hasn't been declared yet!");
+		try {
+			Integer.parseInt(index);
+		} catch (NumberFormatException e) {
+			if (YalToJvm.getModule().checkGlobalVariable(index)) {
+				if (YalToJvm.getModule().getGlobalVariable(index) instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: To access the array \"" + arrayAccess + "\" you must use an integer or a scalar variable!");
+			} else if (parentFunction.checkLocalVariable(index)) {
+				if (parentFunction.getVariable(index) instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: To access the array \"" + arrayAccess + "\" you must use an integer or a scalar variable!");
+			} else if (parentFunction.checkParams(index)) {
+				if (parentFunction.getParameter(index) instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: To access the array \"" + arrayAccess + "\" you must use an integer or a scalar variable!");
+			} else if (parentFunction.checkReturnVariable(index)) {
+				if (parentFunction.getReturnVar() instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: To access the array \"" + arrayAccess + "\" you must use an integer or a scalar variable!");
+			} else {
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + index + "\" hasn't been declared!");
 			}
 		}
-
-		// if (rhs.jjtGetNumChildren() == 1) {
+	}
+	
+	public void processScalarAccess(String scalarAccess, Function parentFunction) {
+		String var;
+		
+		if (dot(scalarAccess)) {
+			var = separateString(scalarAccess)[0];
+			
+			if (YalToJvm.getModule().checkGlobalVariable(var)) {
+				if (YalToJvm.getModule().getGlobalVariable(var) instanceof Scalar)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The \"size\" property is not avaiable for the variable \"" + var + "\"!");
+			} else if (parentFunction.checkLocalVariable(var)) {
+				if (parentFunction.getVariable(var) instanceof Scalar)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The \"size\" property is not avaiable for the variable \"" + var + "\"!");
+			} else if (parentFunction.checkParams(var)) {
+				if (parentFunction.getParameter(var) instanceof Scalar)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The \"size\" property is not avaiable for the variable \"" + var + "\"!");
+			} else if (parentFunction.checkReturnVariable(var)) {
+				if (parentFunction.getReturnVar() instanceof Scalar)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The \"size\" property is not avaiable for the variable \"" + var + "\"!");
+			} else {
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + var + "\" hasn't been declared!");
+			}
+		} else {
+			if (YalToJvm.getModule().checkGlobalVariable(scalarAccess)) {
+				if (YalToJvm.getModule().getGlobalVariable(scalarAccess) instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: You can't use the array \"" + scalarAccess + "\" without indicating an index to access!");
+			} else if (parentFunction.checkLocalVariable(scalarAccess)) {
+				if (parentFunction.getVariable(scalarAccess) instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: You can't use the array \"" + scalarAccess + "\" without indicating an index to access!");
+			} else if (parentFunction.checkParams(scalarAccess)) {
+				if (parentFunction.getParameter(scalarAccess) instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: You can't use the array \"" + scalarAccess + "\" without indicating an index to access!");
+			} else if (parentFunction.checkReturnVariable(scalarAccess)) {
+				if (parentFunction.getReturnVar() instanceof Array)
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: You can't use the array \"" + scalarAccess + "\" without indicating an index to access!");
+			} else {
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + scalarAccess + "\" hasn't been declared!");
+			}
+		}
+	}
+	
+	public void processCall(String call) {
+		String lib, function;
+		
+		if (dot(call)) {
+			lib = separateString(call)[0];
+			function = separateString(call)[1];
+			System.out.println("Calling method \"" + function + "\" from \"" + lib + "\"");
+		} else {
+			System.out.println("Calling method \"" + call + "\"");
+		}
+	}
+	
+	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
+			processArrayAccess(lhs.ID, index.ID, parentFunction);
+		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+			processScalarAccess(lhs.ID, parentFunction);
+		}
+		
+		if (rhs.jjtGetNumChildren() == 1) {
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-				if (rhsChild.ID != null) {
-					System.out.println("rhs: " + rhsChild.ID);
-				} else {
+				if (rhsChild.ID == null) {
 					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 
 					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
+						processCall(termChild.ID);
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
+						SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
+						processArrayAccess(termChild.ID, index.ID, parentFunction);
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-						System.out.println("rhs: " + termChild.ID);
+						processScalarAccess(termChild.ID, parentFunction);
 					}
 				}
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-				System.out.println("Error: You can't compare variables with array sizes!");
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Invalid placement of TODO!");
 			}
-//		} else if (rhs.jjtGetNumChildren() == 2) {
-//			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
-//			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
-//
-//			if (termLeft.ID != null) {
-//
-//			} else {
-//				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
-//
-//				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-//
-//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-//
-//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-//
-//				}
-//			}
-//
-//			if (termRight.ID != null) {
-//
-//			} else {
-//				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
-//
-//				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-//
-//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-//
-//				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-//
-//				}
-//			}
-//		}
+		} else if (rhs.jjtGetNumChildren() == 2) {
+			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
+			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
+			
+			if (termLeft.ID == null) {
+				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
+
+				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					processCall(termChild.ID);
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+					SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
+					processArrayAccess(termChild.ID, index.ID, parentFunction);
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+					processScalarAccess(termChild.ID, parentFunction);
+				}
+			}
+			
+			if (termRight.ID == null) {
+				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
+
+				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					processCall(termChild.ID);
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
+					SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
+					processArrayAccess(termChild.ID, index.ID, parentFunction);
+				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+					processScalarAccess(termChild.ID, parentFunction);
+				}
+			}
+		}
 	}
 	
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		//VARS
 		boolean twoSides = false;
 		String lhsId = null;
-		String lhsType = null;
+		//String lhsType = null;
 		String lhsAccess = null;
 		String lhsArrayIndexId = null;
-		String lhsArrayAccess = null;
+		//String lhsArrayAccess = null;
 		
 		//LHS
 		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			lhsAccess = "array";
 			lhsId = lhs.ID;
 			SimpleNode arrayIndex = (SimpleNode)(lhs.jjtGetChild(0));
-			try{
-				  Integer.parseInt(arrayIndex.ID);
-				} catch (NumberFormatException e) {
-					lhsArrayIndexId  = arrayIndex.ID;
-				}
+			try {
+				Integer.parseInt(arrayIndex.ID);
+			} catch (NumberFormatException e) {
+				lhsArrayIndexId = arrayIndex.ID;
+			}
 		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			if(dot(lhs.ID)){
 				lhsAccess = "size";
 				lhsId = separateString(lhs.ID)[0];
-			}else{
+			} else {
 				lhsAccess = "scalar";
 				lhsId = lhs.ID;
 			}
@@ -275,7 +356,7 @@ class SimpleNode implements Node {
 		String rhs1Type = null;
 		String rhs1Access = null;
 		String rhs1ArrayIndexId = null;
-		String[] argumentTypes = null;
+		//String[] argumentTypes = null;
 		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 			if (rhsChild.ID != null) {
@@ -470,34 +551,34 @@ class SimpleNode implements Node {
 		
 	}
 	
-	private String getVariableScope(Function f, String id){
-		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
-			return "return";
-		}else if(f.checkParams(id)){
-			return "param";
-		}else if(YalToJvm.getModule().checkGlobalVariable(id)){
-			return "global";
-		}else if(f.checkLocalVariable(id)){
-			return "local";
-		}else{
-			return "new";
-		}
-	}
+//	private String getVariableScope(Function f, String id){
+//		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
+//			return "return";
+//		}else if(f.checkParams(id)){
+//			return "param";
+//		}else if(YalToJvm.getModule().checkGlobalVariable(id)){
+//			return "global";
+//		}else if(f.checkLocalVariable(id)){
+//			return "local";
+//		}else{
+//			return "new";
+//		}
+//	}
 	
-	private Variable getVariableByScope(Function f, String id, String scope){
-		switch(scope){
-			case "local":
-				return f.getVariable(id);
-			case "param":
-				return f.getParameter(id);
-			case "return":
-				return f.getReturnVar();
-			case "global":
-				return YalToJvm.getModule().getGlobalVariable(id);
-			default:
-				return null;
-		}
-	}
+//	private Variable getVariableByScope(Function f, String id, String scope){
+//		switch(scope){
+//			case "local":
+//				return f.getVariable(id);
+//			case "param":
+//				return f.getParameter(id);
+//			case "return":
+//				return f.getReturnVar();
+//			case "global":
+//				return YalToJvm.getModule().getGlobalVariable(id);
+//			default:
+//				return null;
+//		}
+//	}
 	
 	private Variable getVariable(Function f, String id){
 		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
@@ -537,7 +618,7 @@ class SimpleNode implements Node {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
-				// processAssignement(lhs, rhs, parentFunction);
+				processAssignement(lhs, rhs, parentFunction);
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode)bodyChild.jjtGetChild(0);

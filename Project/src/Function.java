@@ -69,14 +69,14 @@ public class Function {
 	
 	public Variable getParameter(String id){
 		for (int i = 0; i < parameters.size(); i++) {
-			if(parameters.get(i).getVariableID().equals(id)){
+			if (parameters.get(i).getVariableID().equals(id)){
 				return parameters.get(i);
 			}
 		}
 		return null;
 	}
 
-	public String toString(){
+	public String toString() {
 		String s = functionID;
 		s += "(";
 		for (int i = 0; i < parameters.size(); i++) {
@@ -96,11 +96,21 @@ public class Function {
 		return false;
 	}
 	
-	public boolean checkReturnVariable(String id){
-		if(returnVar.getVariableID().equals(id))
-			return true;
+	public boolean checkReturnVariable(String id) {
+		if (returnVar != null) {
+			if (returnVar.getVariableID().equals(id))
+				return true;
+		}
+		return false;
+	}
+	
+	public String checkReturnVariableType() {
+		if (returnVar instanceof Scalar)
+			return "scalar";
+		else if (returnVar instanceof Array)
+			return "array";
 		else
-			return false;
+			return null;
 	}
 	
 	public void printData(){
@@ -109,7 +119,7 @@ public class Function {
 			System.out.println("  " + parameters.get(i));
 		}
 		System.out.println("  LOCAL:");
-		for(String key : variableMap.keySet()) {
+		for (String key : variableMap.keySet()) {
 			Variable v = variableMap.get(key);
 			System.out.println("  " + v);
 	 	}

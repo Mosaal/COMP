@@ -7,7 +7,7 @@ public class Module {
 	private String moduleID;
 	private HashMap<String,Function> functionMap;
 	private HashMap<String,Variable> globalVariableMap;
-	private Variable ret;
+	// private Variable ret;
 	private SimpleNode root;
 
 	public Module(String id, SimpleNode r) {
@@ -75,7 +75,7 @@ public class Module {
 	}
 
 	public boolean functionExists(String functionID) {
-		return false;
+		return functionMap.containsKey(functionID);
 	}
 
 

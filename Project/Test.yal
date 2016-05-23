@@ -1,6 +1,7 @@
 module while4 {
-
 	function f1(v[], N, x) {
+		i = 0;
+
 		if (i < N) {
 			s = 4;
 		} else {
