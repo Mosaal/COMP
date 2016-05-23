@@ -39,6 +39,10 @@ public class Module {
 		} else
 			return false;
 	}
+
+	public void replaceGlobalVariable(Variable globalVariable) {
+		globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
+	}
 	
 	public boolean checkGlobalVariable(String id) {
 		return globalVariableMap.containsKey(id);
