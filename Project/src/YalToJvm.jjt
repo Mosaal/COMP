@@ -18,7 +18,7 @@ public class YalToJvm {
 		//TreeViewer tv = new TreeViewer();
 		YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
 		SimpleNode root = parser.Module();
-		// root.dump("");
+		root.dump("");
 
 		module = new Module(root.ID, root);
 		// module.getAttributes();
@@ -26,6 +26,11 @@ public class YalToJvm {
 		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
+
+		// If there are no erros
+		//if(semanticErrorMessages.size() == 0){
+			JasminGenerator.generate(root,module);
+		//}
 		//tv.run();
 		// module.printSymbolTables();
 		// printSemanticErrors();

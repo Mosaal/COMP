@@ -14,7 +14,7 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 //TreeViewer tv = new TreeViewer();
                 YalToJvm parser = new YalToJvm(new FileInputStream(args[0]));
                 SimpleNode root = parser.Module();
-                // root.dump("");
+                root.dump("");
 
                 module = new Module(root.ID, root);
                 // module.getAttributes();
@@ -22,6 +22,11 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 module.processFunctions();
                 module.printSymbolTables();
                 printSemanticErrors();
+
+                // If there are no erros
+                //if(semanticErrorMessages.size() == 0){
+                        JasminGenerator.generate(root,module);
+                //}
                 //tv.run();
                 // module.printSymbolTables();
                 // printSemanticErrors();
@@ -1207,14 +1212,6 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_3R_11()
- {
-    if (jj_3R_15()) return true;
-    if (jj_scan_token(ASSIGN)) return true;
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_35()
  {
     if (jj_scan_token(ID)) return true;
@@ -1486,6 +1483,14 @@ if (jjtc000) {
   static private boolean jj_3R_36()
  {
     if (jj_scan_token(INTEGER)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_11()
+ {
+    if (jj_3R_15()) return true;
+    if (jj_scan_token(ASSIGN)) return true;
+    if (jj_3R_16()) return true;
     return false;
   }
 

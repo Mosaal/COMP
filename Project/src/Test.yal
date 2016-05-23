@@ -1,10 +1,10 @@
 module while4 {
-	/*a;
+	a;
 	b = 1;
 	c = [10];
 	d = [5];
 	b = 2;
-	c;*/
+	c;
 
 	function f1(v[], N, x) {
 		i = 0;
