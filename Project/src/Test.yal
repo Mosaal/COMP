@@ -1,6 +1,5 @@
 module while4 {
 	a;
-	a;
 	b = 1;
 	c = [10];
 	d = [5];

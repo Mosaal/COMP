@@ -30,6 +30,11 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		module.processFunctions();
 		module.printSymbolTables();
 		printSemanticErrors();
+
+		// If there are no erros
+		//if(semanticErrorMessages.size() == 0){
+			JasminGenerator.generate(root,module);
+		//}
 		//tv.run();
 		// module.printSymbolTables();
 		// printSemanticErrors();

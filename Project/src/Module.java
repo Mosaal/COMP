@@ -15,7 +15,6 @@ public class Module {
 		functionMap = new HashMap<String,Function>();
 		globalVariableMap = new HashMap<String,Variable>();
 		root = r;
-		JasminGenerator.generate("teste",root);
 	}
 
 	public String getModuleID() {
@@ -31,6 +30,10 @@ public class Module {
 			YalToJvm.semanticErrorMessages.add("Function " + key + " already exists");
 			return false;
 		}
+	}
+	
+	public HashMap<String, Function> getFunctionMap(){
+		return functionMap;
 	}
 
 	public boolean addGlobalVariable(Variable globalVariable) {

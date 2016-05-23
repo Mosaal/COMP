@@ -902,6 +902,7 @@ public class SimpleNode implements Node {
 			switch (bodyChild.getId()) {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
 <<<<<<< HEAD
+<<<<<<< HEAD
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
 				processAssignement(lhs, rhs, parentFunction);
@@ -911,6 +912,11 @@ public class SimpleNode implements Node {
 																		// ScalarAccess
 				SimpleNode rhs = (SimpleNode) bodyChild.jjtGetChild(1); // Rhs
 				// processAssignement(lhs, rhs, parentFunction);
+>>>>>>> origin/master
+=======
+				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
+				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
+				processAssignement(lhs, rhs, parentFunction);
 >>>>>>> origin/master
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
