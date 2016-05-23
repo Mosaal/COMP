@@ -15,6 +15,7 @@ public class Module {
 		functionMap = new HashMap<String,Function>();
 		globalVariableMap = new HashMap<String,Variable>();
 		root = r;
+		JasminGenerator.generate("teste",root);
 	}
 
 	public String getModuleID() {
@@ -38,6 +39,10 @@ public class Module {
 			return true;
 		} else
 			return false;
+	}
+
+	public void replaceGlobalVariable(Variable globalVariable) {
+		globalVariableMap.put(globalVariable.getVariableID(),globalVariable);
 	}
 	
 	public boolean checkGlobalVariable(String id) {
