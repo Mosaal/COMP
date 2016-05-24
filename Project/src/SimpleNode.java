@@ -230,6 +230,9 @@ public class SimpleNode implements Node {
 					temp += "_a";
 					processArrayAccess(arg.ID, "0", parentFunction);
 				}
+			} else {
+				temp += "_" + arg.ID;
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arg.ID +"\" hasn't been declared!");
 			}
 		}
 		
@@ -314,7 +317,7 @@ public class SimpleNode implements Node {
 		}
 	}
 
-	public void processCall(String call, Node[] args, Function parentFunction) {
+	public void processCall(String call, Node[] args, boolean isCondition, Function parentFunction) {
 		if (dot(call)) {
 //			String lib = separateString(call)[0];
 //			String function = separateString(call)[1];
@@ -325,22 +328,26 @@ public class SimpleNode implements Node {
 				String fullName = call + "(" + getRealFunctionName(args, parentFunction) + ")";
 				
 				if (YalToJvm.getModule().functionExists(fullName)) {
-					if (YalToJvm.getModule().getReturnVarFunction(fullName) != null) {
-						if (YalToJvm.getModule().getReturnVarFunction(fullName) instanceof Array)
-							YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" returns an array! Invalid call of the method!");
-					} else
-						YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" has no return variable! Invalid call of the method!");
+					if (isCondition) {
+						if (YalToJvm.getModule().getReturnVarFunction(fullName) != null) {
+							if (YalToJvm.getModule().getReturnVarFunction(fullName) instanceof Array)
+								YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" returns an array! Invalid call of the method!");
+						} else
+							YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" has no return variable! Invalid call of the method!");
+					}
 				} else
 					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" hasn't been declared!");
 			} else {
 				String fullName = call + "()";
 				
 				if (YalToJvm.getModule().functionExists(fullName)) {
-					if (YalToJvm.getModule().getReturnVarFunction(fullName) != null) {
-						if (YalToJvm.getModule().getReturnVarFunction(fullName) instanceof Array)
-							YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" returns an array! Invalid call of the method!");
-					} else
-						YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" has no return variable! Invalid call of the method!");
+					if (isCondition) {
+						if (YalToJvm.getModule().getReturnVarFunction(fullName) != null) {
+							if (YalToJvm.getModule().getReturnVarFunction(fullName) instanceof Array)
+								YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" returns an array! Invalid call of the method!");
+						} else
+							YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" has no return variable! Invalid call of the method!");
+					}
 				} else
 					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" hasn't been declared!");
 			}
@@ -449,7 +456,7 @@ public class SimpleNode implements Node {
 					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 
 					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-						processCall(termChild.ID, termChild.jjtGetChildren(), parentFunction);
+						processCall(termChild.ID, termChild.jjtGetChildren(), true, parentFunction);
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 						SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
 						processArrayAccess(termChild.ID, index.ID, parentFunction);
@@ -468,7 +475,7 @@ public class SimpleNode implements Node {
 				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
 
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-					processCall(termChild.ID, termChild.jjtGetChildren(), parentFunction);
+					processCall(termChild.ID, termChild.jjtGetChildren(), true, parentFunction);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
 					processArrayAccess(termChild.ID, index.ID, parentFunction);
@@ -481,7 +488,7 @@ public class SimpleNode implements Node {
 				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
 
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-					processCall(termChild.ID, termChild.jjtGetChildren(), parentFunction);
+					processCall(termChild.ID, termChild.jjtGetChildren(), true, parentFunction);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
 					processArrayAccess(termChild.ID, index.ID, parentFunction);
@@ -823,7 +830,7 @@ public class SimpleNode implements Node {
 				}
 				break;
 			case YalToJvmTreeConstants.JJTCALL:
-				// process call
+				processCall(bodyChild.ID, bodyChild.jjtGetChildren(), false, parentFunction);
 				break;
 			}
 		}

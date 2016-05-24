@@ -3,9 +3,8 @@ module while4 {
 	b = 1;
 	c = [10];
 	d = [5];
-	b = 2;
 
-	function f(a, b, c[]) {
+	function i=f(a, b, c[]) {
 		i = 2;
 	}
 
@@ -19,6 +18,8 @@ module while4 {
 			v[i] = v[i] + x;
 			i = i + 1;
 		}
+
+		f(a, b, c);
 	}
 
 	/*function main() {
