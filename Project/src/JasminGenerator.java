@@ -16,6 +16,8 @@ public class JasminGenerator {
 	private static SimpleNode node;
 	private static Module module;
 	private static String moduleName;
+	private static int labelWhileCount = 0;
+	private static int labelIfCount = 0;
 	
 	public static void generate(SimpleNode n, Module m){
 		node = n;
@@ -113,6 +115,129 @@ public class JasminGenerator {
 		writer.println("\t.limit locals " + (f.getNumParameters()+1));
 	}
 	
+	private static void printMethodBody(SimpleNode bodyNode){
+		for (int i = 0; i < bodyNode.jjtGetNumChildren(); i++) {
+			SimpleNode n = (SimpleNode) bodyNode.jjtGetChild(i);
+			int id = n.getId();
+			
+			if (id == YalToJvmTreeConstants.JJTASSIGNEMENT){
+				//printAssignment(n);
+			} else if (id == YalToJvmTreeConstants.JJTWHILE){
+				labelWhileCount++;
+				printWhileBlock(n);
+			} else if (id == YalToJvmTreeConstants.JJTIF){
+				labelIfCount++;
+				printIfBlock(n);
+			}
+		}
+	}
+	
+	private static void printIfBlock(SimpleNode ifNode){
+		SimpleNode ifCondition = (SimpleNode) ifNode.jjtGetChild(0);
+		SimpleNode ifBody = (SimpleNode) ifNode.jjtGetChild(1);
+		
+		writer.println("If" + labelIfCount + ":"); // Start label
+		
+		String endlabel = "EndIf" + labelIfCount;
+		
+		printCondition(ifCondition, endlabel);
+		
+		writer.println("\tgoto If" + labelIfCount);
+		writer.println(endlabel+":");
+		
+	}
+	
+	private static void printWhileBlock(SimpleNode whileNode){
+		SimpleNode whileCondition = (SimpleNode) whileNode.jjtGetChild(0);
+		SimpleNode whileBody = (SimpleNode) whileNode.jjtGetChild(1);
+		
+		writer.println("While" + labelWhileCount + ":"); // Start label
+		
+		String endlabel = "EndWhile" + labelWhileCount;
+		
+		printCondition(whileCondition, endlabel);
+		
+		writer.println("\tgoto While" + labelWhileCount);
+		writer.println(endlabel+":");
+		
+	}
+	
+	private static void printCondition(SimpleNode condition, String jumpLabel){
+		SimpleNode condLhs = (SimpleNode) condition.jjtGetChild(0);
+		SimpleNode condRhs = (SimpleNode) condition.jjtGetChild(1);
+		
+		if(condLhs.getId() == YalToJvmTreeConstants.JJTSCALAR && Integer.parseInt(condLhs.ID) == 0){
+			switch(condition.ID){
+			case "<":
+				writer.println("\tifle " + jumpLabel); // jump if 0 >= rhs
+				break;
+			case ">":
+				writer.println("\tifge " + jumpLabel); // jump if 0 <= rhs
+				break;
+			case "<=":
+				writer.println("\tifgt " + jumpLabel); // jump if 0 > rhs
+				break;
+			case ">=":
+				writer.println("\tiflt " + jumpLabel); // jump if 0 < rhs
+				break;
+			case "==":
+				writer.println("\tifne " + jumpLabel); // jump if 0 != rhs
+				break;
+			case "!=":
+				writer.println("\tifeq " + jumpLabel); // jump if 0 == rhs
+				break;
+			default:
+				break;
+			}
+		}else if(condRhs.getId() == YalToJvmTreeConstants.JJTSCALAR && Integer.parseInt(condRhs.ID) == 0){
+			switch(condition.ID){
+			case "<":
+				writer.println("\tifge " + jumpLabel); // jump if lhs >= 0
+				break;
+			case ">":
+				writer.println("\tifle " + jumpLabel); // jump if lhs <= 0
+				break;
+			case "<=":
+				writer.println("\tifgt " + jumpLabel); // jump if lhs > 0
+				break;
+			case ">=":
+				writer.println("\tiflt " + jumpLabel); // jump if lhs < 0
+				break;
+			case "==":
+				writer.println("\tifne " + jumpLabel); // jump if lhs != 0
+				break;
+			case "!=":
+				writer.println("\tifeq " + jumpLabel); // jump if lhs == 0
+				break;
+			default:
+				break;
+			}
+		}else{
+			switch(condition.ID){
+			case "<":
+				writer.println("\tif_icmpge " + jumpLabel); // jump if lhs >= rhs
+				break;
+			case ">":
+				writer.println("\tif_icmple " + jumpLabel); // jump if lhs <= rhs
+				break;
+			case "<=":
+				writer.println("\tif_icmpgt " + jumpLabel); // jump if lhs > rhs
+				break;
+			case ">=":
+				writer.println("\tif_icmplt " + jumpLabel); // jump if lhs < rhs
+				break;
+			case "==":
+				writer.println("\tif_icmpne " + jumpLabel); // jump if lhs != rhs
+				break;
+			case "!=":
+				writer.println("\tif_icmpeq " + jumpLabel); // jump if lhs == rhs
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	
 	private static void printMethodFooter(){
 		//TODO: Temporary
 		writer.println("\treturn");
@@ -174,6 +299,7 @@ public class JasminGenerator {
 		HashMap<String, Function> map = module.getFunctionMap();
 		for (Function f : map.values()) {
 		    printMethodHeader(f);
+		    printMethodBody(f.getBody());
 		    printMethodFooter();
 		}
 	}
