@@ -7,7 +7,6 @@
 .field private c [I
 .field private d [I
 .field private b I = 2
-.field private c I
 
 .method public <init>()V
 	.limit stack 2
@@ -21,10 +20,6 @@
 	aload 0
 	ldc 2
 	putfield while4/b I
-
-	aload 0
-	ldc 0
-	putfield while4/c I
 
 	aload 0
 	ldc 10
@@ -49,5 +44,9 @@ While1:
 	if_icmpge EndWhile1
 	goto While1
 EndWhile1:
+	return
+.end method
+.method public f(II[I)V
+	.limit locals 4
 	return
 .end method

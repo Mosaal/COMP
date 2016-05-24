@@ -1,9 +1,4 @@
 module while4 {
-<<<<<<< HEAD
-	function f1(v[], N, x) {
-		i = 0;
-
-=======
 	b = 1;
 	a = 1000;
 	c;
@@ -14,7 +9,6 @@ module while4 {
 		i = 1;
 		
 		/*
->>>>>>> origin/master
 		if (i < N) {
 			s = 4;
 		} else {

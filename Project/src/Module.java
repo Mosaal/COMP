@@ -86,6 +86,9 @@ public class Module {
 		return functionMap.containsKey(functionID);
 	}
 
+	public Variable getReturnVarFunction(String functionID) {
+		return functionMap.get(functionID).getReturnVar();
+	}
 
 	public void getAttributes() {
 		int num = root.jjtGetNumChildren();

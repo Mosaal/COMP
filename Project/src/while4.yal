@@ -4,11 +4,14 @@ module while4 {
 	c = [10];
 	d = [5];
 	b = 2;
-	c;
+
+	function f(a, b, c[]) {
+		i = 2;
+	}
 
 	function f1(v[], N, x) {
 		i = 0;
-		if (i < i.size) {
+		if (i < f(a, b, c)) {
 			i = i + 1;
 		}
 		
