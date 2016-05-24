@@ -8,7 +8,7 @@ module while4 {
 
 	function f1(v[], N, x) {
 		i = 0;
-		if (i < f()) {
+		if (i < i.size) {
 			i = i + 1;
 		}
 		

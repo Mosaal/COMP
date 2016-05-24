@@ -1,5 +1,3 @@
-
-
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -8,10 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JasminGenerator {
+	
 	private static final String SCALARTYPE = "I";
 	private static final String ARRAYTYPE = "[I";
-	private static final HashMap<String, String> scalarFields = new HashMap<String,String>();
-	private static final HashMap<String, String> arrayFields = new HashMap<String,String>();
+	private static final HashMap<String,String> scalarFields = new HashMap<String,String>();
+	private static final HashMap<String,String> arrayFields = new HashMap<String,String>();
 	private static PrintWriter writer;
 	private static SimpleNode node;
 	private static Module module;
@@ -257,8 +256,7 @@ public class JasminGenerator {
 	
 	private static void printFields(){
 		int size = node.jjtGetNumChildren();
-		int i;
-		for (i = 0; i < size; i++) {
+		for (int i = 0; i < size; i++) {
 			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
 			if(n.getId() == YalToJvmTreeConstants.JJTGLOBAL){
 				String name = null;

@@ -66,7 +66,6 @@ public class SimpleNode implements Node {
 	 * output uses more than one line you should override toString(String),
 	 * otherwise overriding toString() is probably all you need to do.
 	 */
-
 	public String toString() {
 		return YalToJvmTreeConstants.jjtNodeName[id];
 	}
@@ -279,11 +278,9 @@ public class SimpleNode implements Node {
 		}
 	}
 	
-	//System.out.println("NODE COM A CONSTANT: " + YalToJvmTreeConstants.jjtNodeName[node.getId()]);
-	
-		/**
-		 * Method used to process the attributes of a module
-		 */
+	/**
+	 * Method used to process the attributes of a module
+	 */
 	public void getAttributes() {
 		for (int i = 0; i < children.length; i++) {
 			SimpleNode node = (SimpleNode) this.jjtGetChild(i);
@@ -302,7 +299,7 @@ public class SimpleNode implements Node {
 					var = new Scalar(varName);
 					if (!YalToJvm.getModule().addGlobalVariable(var)) {
 						// ERROR: Repeated declaration
-						YalToJvm.semanticErrorMessages.add("Attribute \"" + varName + "\" is already declared!");
+						YalToJvm.semanticErrorMessages.add("[ Module - " + YalToJvm.getModule().getModuleID() + " ]: Attribute \"" + varName + "\" is already declared!");
 					}
 					
 				// ASSIGNMENT --> LHS = RHS;
@@ -360,7 +357,7 @@ public class SimpleNode implements Node {
 						 */
 
 					if (!YalToJvm.getModule().addGlobalVariable(var)) {
-						YalToJvm.semanticErrorMessages.add("Attribute \"" + varName + "\" cannot be reassigned!");
+						YalToJvm.semanticErrorMessages.add("[ Module - " + YalToJvm.getModule().getModuleID() + " ]: Attribute \"" + varName + "\" cannot be reassigned!");
 					}
 				}
 			}
@@ -690,64 +687,6 @@ public class SimpleNode implements Node {
 			parentFunction.addVariable(new Scalar(lhsId));
 		}
 
-	}
-	
-//	private String getVariableScope(Function f, String id){
-//		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
-//			return "return";
-//		}else if(f.checkParams(id)){
-//			return "param";
-//		}else if(YalToJvm.getModule().checkGlobalVariable(id)){
-//			return "global";
-//		}else if(f.checkLocalVariable(id)){
-//			return "local";
-//		}else{
-//			return "new";
-//		}
-//	}
-	
-//	private Variable getVariableByScope(Function f, String id, String scope){
-//		switch(scope){
-//			case "local":
-//				return f.getVariable(id);
-//			case "param":
-//				return f.getParameter(id);
-//			case "return":
-//				return f.getReturnVar();
-//			case "global":
-//				return YalToJvm.getModule().getGlobalVariable(id);
-//			default:
-//				return null;
-//		}
-//	}
-	
-	private String getVariableScope(Function f, String id) {
-		if (f.getReturnVar() != null && f.checkReturnVariable(id)) {
-			return "return";
-		} else if (f.checkParams(id)) {
-			return "param";
-		} else if (YalToJvm.getModule().checkGlobalVariable(id)) {
-			return "global";
-		} else if (f.checkLocalVariable(id)) {
-			return "local";
-		} else {
-			return "new";
-		}
-	}
-
-	private Variable getVariableByScope(Function f, String id, String scope) {
-		switch (scope) {
-		case "local":
-			return f.getVariable(id);
-		case "param":
-			return f.getParameter(id);
-		case "return":
-			return f.getReturnVar();
-		case "global":
-			return YalToJvm.getModule().getGlobalVariable(id);
-		default:
-			return null;
-		}
 	}
 
 	private Variable getVariable(Function f, String id) {
