@@ -114,7 +114,7 @@ public class JasminGenerator {
 		writer.println("\t.limit locals " + (f.getNumParameters()+1));
 	}
 	
-	private static void printMethodBody(SimpleNode bodyNode){
+	private static void printBody(SimpleNode bodyNode){
 		for (int i = 0; i < bodyNode.jjtGetNumChildren(); i++) {
 			SimpleNode n = (SimpleNode) bodyNode.jjtGetChild(i);
 			int id = n.getId();
@@ -134,16 +134,22 @@ public class JasminGenerator {
 	private static void printIfBlock(SimpleNode ifNode){
 		SimpleNode ifCondition = (SimpleNode) ifNode.jjtGetChild(0);
 		SimpleNode ifBody = (SimpleNode) ifNode.jjtGetChild(1);
+		Boolean hasElseBody;
+		String jumplabel, endlabel = "EndIf" + labelIfCount;
 		
-		writer.println("If" + labelIfCount + ":"); // Start label
+		hasElseBody = (ifNode.jjtGetNumChildren() > 2) ? true : false;
+		jumplabel = hasElseBody ? "ElseBody" + labelIfCount : endlabel;
 		
-		String endlabel = "EndIf" + labelIfCount;
+		printCondition(ifCondition, jumplabel);
+		printBody(ifBody);
 		
-		printCondition(ifCondition, endlabel);
-		
-		writer.println("\tgoto If" + labelIfCount);
+		if(hasElseBody){
+			writer.println("\tgoto "+endlabel);
+			SimpleNode elseBody = (SimpleNode) ifNode.jjtGetChild(2);
+			writer.println(jumplabel+":");
+			printBody(elseBody);
+		}
 		writer.println(endlabel+":");
-		
 	}
 	
 	private static void printWhileBlock(SimpleNode whileNode){
@@ -297,7 +303,7 @@ public class JasminGenerator {
 		HashMap<String, Function> map = module.getFunctionMap();
 		for (Function f : map.values()) {
 		    printMethodHeader(f);
-		    printMethodBody(f.getBody());
+		    printBody(f.getBody());
 		    printMethodFooter();
 		}
 	}
