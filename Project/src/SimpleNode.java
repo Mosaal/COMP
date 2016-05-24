@@ -100,16 +100,10 @@ public class SimpleNode implements Node {
 		return callID.split("\\.");
 	}
 
-<<<<<<< HEAD
-	/* Override this method if you want to customize how the node dumps
-     out its children. */
-=======
 	/*
 	 * Override this method if you want to customize how the node dumps out its
 	 * children.
 	 */
-
->>>>>>> origin/master
 	public void dump(String prefix) {
 		switch (id) {
 		case YalToJvmTreeConstants.JJTMODULE:
@@ -195,7 +189,6 @@ public class SimpleNode implements Node {
 		}
 	}
 
-<<<<<<< HEAD
 	public void processArrayAccess(String arrayAccess, String index, Function parentFunction) {
 		if (YalToJvm.getModule().checkGlobalVariable(arrayAccess)) {
 			if (YalToJvm.getModule().getGlobalVariable(arrayAccess) instanceof Scalar)
@@ -285,10 +278,6 @@ public class SimpleNode implements Node {
 			System.out.println("Calling method \"" + call + "\"");
 		}
 	}
-	
-	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-=======
-	//System.out.println("NODE COM A CONSTANT: " + YalToJvmTreeConstants.jjtNodeName[node.getId()]);
 	
 	/**
 	 * Method used to process the attributes of a module
@@ -387,14 +376,10 @@ public class SimpleNode implements Node {
 	}
 
 	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		String lhsType, rhsType;
-
->>>>>>> origin/master
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 			processArrayAccess(lhs.ID, index.ID, parentFunction);
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-<<<<<<< HEAD
 			processScalarAccess(lhs.ID, parentFunction);
 		}
 		
@@ -447,157 +432,72 @@ public class SimpleNode implements Node {
 				}
 			}
 		}
-=======
-			lhsType = "scalar";
-			if (!YalToJvm.getModule().checkGlobalVariable(lhs.ID) || !parentFunction.checkParams(lhs.ID)
-					|| !parentFunction.checkLocalVariable(lhs.ID)) {
-				YalToJvm.semanticErrorMessages.add("The variable \"" + lhs.ID + "\" hasn't been declared yet!");
-			}
-		}
-
-		// if (rhs.jjtGetNumChildren() == 1) {
-		SimpleNode rhsChild = (SimpleNode) rhs.jjtGetChild(0);
-
-		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-			if (rhsChild.ID != null) {
-				System.out.println("rhs: " + rhsChild.ID);
-			} else {
-				SimpleNode termChild = (SimpleNode) rhsChild.jjtGetChild(0);
-
-				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-
-				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-					System.out.println("rhs: " + termChild.ID);
-				}
-			}
-		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-			System.out.println("Error: You can't compare variables with array sizes!");
-		}
-		// } else if (rhs.jjtGetNumChildren() == 2) {
-		// SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
-		// SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
-		//
-		// if (termLeft.ID != null) {
-		//
-		// } else {
-		// SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
-		//
-		// if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-		//
-		// } else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS)
-		// {
-		//
-		// } else if (termChild.getId() ==
-		// YalToJvmTreeConstants.JJTSCALARACCESS) {
-		//
-		// }
-		// }
-		//
-		// if (termRight.ID != null) {
-		//
-		// } else {
-		// SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
-		//
-		// if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-		//
-		// } else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS)
-		// {
-		//
-		// } else if (termChild.getId() ==
-		// YalToJvmTreeConstants.JJTSCALARACCESS) {
-		//
-		// }
-		// }
-		// }
->>>>>>> origin/master
 	}
 
 	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		// VARS
+		//VARS
 		boolean twoSides = false;
 		String lhsId = null;
-		//String lhsType = null;
+		String lhsType = null;
 		String lhsAccess = null;
 		String lhsArrayIndexId = null;
-<<<<<<< HEAD
-		//String lhsArrayAccess = null;
+		String lhsArrayAccess = null;
 		
 		//LHS
 		if(lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			lhsAccess = "array";
 			lhsId = lhs.ID;
 			SimpleNode arrayIndex = (SimpleNode)(lhs.jjtGetChild(0));
-=======
-		String lhsArrayAccess = null;
-
-		// LHS
-		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
-			lhsAccess = "array";
-			lhsId = lhs.ID;
-			SimpleNode arrayIndex = (SimpleNode) (lhs.jjtGetChild(0));
->>>>>>> origin/master
-			try {
+			try{
 				Integer.parseInt(arrayIndex.ID);
 			} catch (NumberFormatException e) {
-				lhsArrayIndexId = arrayIndex.ID;
+				lhsArrayIndexId  = arrayIndex.ID;
 			}
-<<<<<<< HEAD
 		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			if(dot(lhs.ID)){
-=======
-		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-			if (dot(lhs.ID)) {
->>>>>>> origin/master
 				lhsAccess = "size";
 				lhsId = separateString(lhs.ID)[0];
-			} else {
+			}else{
 				lhsAccess = "scalar";
 				lhsId = lhs.ID;
 			}
 		}
-
-		// RHS 1
+		
+		//RHS 1
 		String rhs1Id = null;
 		String rhs1Type = null;
 		String rhs1Access = null;
 		String rhs1ArrayIndexId = null;
-<<<<<<< HEAD
-		//String[] argumentTypes = null;
-		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-=======
 		String[] argumentTypes = null;
-		SimpleNode rhsChild = (SimpleNode) rhs.jjtGetChild(0);
->>>>>>> origin/master
+		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 			if (rhsChild.ID != null) {
 				rhs1Id = rhsChild.ID;
 				rhs1Access = "integer";
 			} else {
-				SimpleNode termChild = (SimpleNode) rhsChild.jjtGetChild(0);
+				SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 					rhs1Access = "call";
 					rhs1Id = termChild.ID;
-					System.out.println(((SimpleNode) termChild.jjtGetChild(0)).ID);
+					System.out.println(((SimpleNode)termChild.jjtGetChild(0)).ID);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					rhs1Access = "array";
 					rhs1Id = termChild.ID;
-					SimpleNode arrayIndex = (SimpleNode) (termChild.jjtGetChild(0));
-					try {
+					SimpleNode arrayIndex = (SimpleNode)(termChild.jjtGetChild(0));
+					try{
 						Integer.parseInt(arrayIndex.ID);
 					} catch (NumberFormatException e) {
 						rhs1ArrayIndexId = arrayIndex.ID;
 					}
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-					if (dot(termChild.ID)) {
+					if(dot(termChild.ID)){
 						rhs1Access = "size";
 						rhs1Id = separateString(termChild.ID)[0];
-					} else {
+					}else{
 						rhs1Access = "scalar";
 						rhs1Id = termChild.ID;
 					}
-				}
+				} 
 			}
 		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
 
@@ -799,7 +699,6 @@ public class SimpleNode implements Node {
 		}
 
 	}
-<<<<<<< HEAD
 	
 //	private String getVariableScope(Function f, String id){
 //		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
@@ -830,10 +729,6 @@ public class SimpleNode implements Node {
 //		}
 //	}
 	
-	private Variable getVariable(Function f, String id){
-		if(f.getReturnVar() != null && f.checkReturnVariable(id)){
-=======
-
 	private String getVariableScope(Function f, String id) {
 		if (f.getReturnVar() != null && f.checkReturnVariable(id)) {
 			return "return";
@@ -865,7 +760,6 @@ public class SimpleNode implements Node {
 
 	private Variable getVariable(Function f, String id) {
 		if (f.getReturnVar() != null && f.checkReturnVariable(id)) {
->>>>>>> origin/master
 			return f.getReturnVar();
 		} else if (f.checkParams(id)) {
 			return f.getParameter(id);
@@ -901,23 +795,9 @@ public class SimpleNode implements Node {
 			SimpleNode bodyChild = (SimpleNode) children[i];
 			switch (bodyChild.getId()) {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
-<<<<<<< HEAD
-<<<<<<< HEAD
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
 				processAssignement(lhs, rhs, parentFunction);
-=======
-				SimpleNode lhs = (SimpleNode) bodyChild.jjtGetChild(0); // ArrayAccess
-																		// or
-																		// ScalarAccess
-				SimpleNode rhs = (SimpleNode) bodyChild.jjtGetChild(1); // Rhs
-				// processAssignement(lhs, rhs, parentFunction);
->>>>>>> origin/master
-=======
-				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
-				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
-				processAssignement(lhs, rhs, parentFunction);
->>>>>>> origin/master
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode) bodyChild.jjtGetChild(0);
