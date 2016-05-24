@@ -36,9 +36,9 @@
 
 .method public f1([III)V
 	.limit locals 4
-If1:
-	if_icmpge EndIf1
-	goto If1
+	if_icmpge ElseBody1
+	goto EndIf1
+ElseBody1:
 EndIf1:
 While1:
 	if_icmpge EndWhile1
