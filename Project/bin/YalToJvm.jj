@@ -35,6 +35,11 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants/*@egen*/ 
 		//}
 	}
 
+	public static SimpleNode getAST(String name) throws ParseException, FileNotFoundException {
+		YalToJvm parser = new YalToJvm(new FileInputStream(name));
+		return parser.Module();
+	}
+
 	public static Module getModule(){
 		return module;
 	}

@@ -45,7 +45,3 @@ While1:
 EndWhile1:
 	return
 .end method
-.method public f(II[I)I
-	.limit locals 4
-	return
-.end method

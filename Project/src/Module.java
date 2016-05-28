@@ -7,7 +7,6 @@ public class Module {
 	private String moduleID;
 	private HashMap<String,Function> functionMap;
 	private HashMap<String,Variable> globalVariableMap;
-	// private Variable ret;
 	private SimpleNode root;
 
 	public Module(String id, SimpleNode r) {

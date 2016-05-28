@@ -1,5 +1,6 @@
 options {
 	LOOKAHEAD = 1;
+	STATIC = false;
 }
 
 PARSER_BEGIN(YalToJvm)
@@ -31,11 +32,16 @@ public class YalToJvm {
 		//}
 	}
 
-	public static Module getModule(){
+	public static SimpleNode getAST(String name) throws ParseException, FileNotFoundException {
+		YalToJvm parser = new YalToJvm(new FileInputStream(name));
+		return parser.Module();
+	}
+
+	public static Module getModule() {
 		return module;
 	}
 
-	public static void printSemanticErrors(){
+	public static void printSemanticErrors() {
 		System.out.println("---------------\nSEMANTIC ERRORS:");
 
 		if (semanticErrorMessages.size() == 0)
