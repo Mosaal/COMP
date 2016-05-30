@@ -1,6 +1,6 @@
 module test {
 	
-	function f(a, b, c[]) {
+	function i=f(a, b, c[]) {
 		a = 0;
 	}
 

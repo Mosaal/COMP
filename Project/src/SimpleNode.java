@@ -196,66 +196,71 @@ public class SimpleNode implements Node {
 
 	public String getRealFunctionName(Node[] args, Function parentFunction) {
 		String temp = "";
-		
+
 		if (args == null)
 			return temp;
-		
+
+		for (int i = 0; i < args.length; i++) {
+			SimpleNode arg = (SimpleNode)args[i];
+
+			try {
+				Integer.parseInt(arg.ID);
+				temp += "_s";
+			} catch (NumberFormatException e) {
+				if (YalToJvm.getModule().checkGlobalVariable(arg.ID)) {
+					if (YalToJvm.getModule().getGlobalVariable(arg.ID) instanceof Scalar) {
+						temp += "_s";
+						processScalarAccess(arg.ID, parentFunction);
+					} else {
+						temp += "_a";
+						processArrayAccess(arg.ID, "0", parentFunction);
+					}
+				} else if (parentFunction.checkLocalVariable(arg.ID)) {
+					if (parentFunction.getVariable(arg.ID) instanceof Scalar) {
+						temp += "_s";
+						processScalarAccess(arg.ID, parentFunction);
+					} else {
+						temp += "_a";
+						processArrayAccess(arg.ID, "0", parentFunction);
+					}
+				} else if (parentFunction.checkParams(arg.ID)) {
+					if (parentFunction.getParameter(arg.ID) instanceof Scalar) {
+						temp += "_s";
+						processScalarAccess(arg.ID, parentFunction);
+					} else {
+						temp += "_a";
+						processArrayAccess(arg.ID, "0", parentFunction);
+					}
+				} else if (parentFunction.checkReturnVariable(arg.ID)) {
+					if (parentFunction.getReturnVar() instanceof Scalar) {
+						temp += "_s";
+						processScalarAccess(arg.ID, parentFunction);
+					} else {
+						temp += "_a";
+						processArrayAccess(arg.ID, "0", parentFunction);
+					}
+				} else {
+					temp += "_" + arg.ID;
+					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arg.ID +"\" hasn't been declared!");
+				}
+			}
+		}
+
+		return temp;
+	}
+
+	public String getRealFunctionNameOtherModule(Node[] args, Function parentFunction) {
+		String temp = "";
+
+		if (args == null)
+			return temp;
+
 		for (int i = 0; i < args.length; i++) {
 			SimpleNode arg = (SimpleNode)args[i];
 
 			if (YalToJvm.getModule().checkGlobalVariable(arg.ID)) {
 				if (YalToJvm.getModule().getGlobalVariable(arg.ID) instanceof Scalar) {
 					temp += "_s";
-					processScalarAccess(arg.ID, parentFunction);
-				} else {
-					temp += "_a";
-					processArrayAccess(arg.ID, "0", parentFunction);
-				}
-			} else if (parentFunction.checkLocalVariable(arg.ID)) {
-				if (parentFunction.getVariable(arg.ID) instanceof Scalar) {
-					temp += "_s";
-					processScalarAccess(arg.ID, parentFunction);
-				} else {
-					temp += "_a";
-					processArrayAccess(arg.ID, "0", parentFunction);
-				}
-			} else if (parentFunction.checkParams(arg.ID)) {
-				if (parentFunction.getParameter(arg.ID) instanceof Scalar) {
-					temp += "_s";
-					processScalarAccess(arg.ID, parentFunction);
-				} else {
-					temp += "_a";
-					processArrayAccess(arg.ID, "0", parentFunction);
-				}
-			} else if (parentFunction.checkReturnVariable(arg.ID)) {
-				if (parentFunction.getReturnVar() instanceof Scalar) {
-					temp += "_s";
-					processScalarAccess(arg.ID, parentFunction);
-				} else {
-					temp += "_a";
-					processArrayAccess(arg.ID, "0", parentFunction);
-				}
-			} else {
-				temp += "_" + arg.ID;
-				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arg.ID +"\" hasn't been declared!");
-			}
-		}
-		
-		return temp;
-	}
-	
-	public String getRealFunctionNameOtherModule(Node[] args, Function parentFunction) {
-		String temp = "";
-		
-		if (args == null)
-			return temp;
-		
-		for (int i = 0; i < args.length; i++) {
-			SimpleNode arg = (SimpleNode)args[i];
-			
-			if (YalToJvm.getModule().checkGlobalVariable(arg.ID)) {
-				if (YalToJvm.getModule().getGlobalVariable(arg.ID) instanceof Scalar) {
-					temp += "_s";
 				} else {
 					temp += "_a";
 				}
@@ -282,10 +287,10 @@ public class SimpleNode implements Node {
 				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arg.ID +"\" hasn't been declared!");
 			}
 		}
-		
+
 		return temp;
 	}
-	
+
 	public void processArrayAccess(String arrayAccess, String index, Function parentFunction) {
 		if (YalToJvm.getModule().checkGlobalVariable(arrayAccess)) {
 			if (YalToJvm.getModule().getGlobalVariable(arrayAccess) instanceof Scalar)
@@ -365,30 +370,7 @@ public class SimpleNode implements Node {
 	}
 
 	public void processCall(String call, Node[] args, boolean isCondition, Function parentFunction) {
-		if (dot(call)) {
-			try {
-				SimpleNode newTree = YalToJvm.getAST(separateString(call)[0] + ".yal");
-				Module newModule = new Module(newTree.ID, newTree);
-				newModule.getFunctions();
-				
-				String fullName = separateString(call)[1] + "(" + getRealFunctionNameOtherModule(args, parentFunction) + ")";
-				
-				if (newModule.functionExists(fullName)) {
-					if (isCondition) {
-						if (newModule.getReturnVarFunction(fullName) != null) {
-							if (newModule.getReturnVarFunction(fullName) instanceof Array)
-								YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" from the module \"" + separateString(call)[0] + "\" returns an array! Invalid call of the method!");
-						} else
-							YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" from the module \"" + separateString(call)[0] + "\" has no return variable! Invalid call of the method!");
-					}
-				} else
-					YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" from the module \"" + separateString(call)[0] + "\" hasn't been declared!");
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		} else {
+		if (!dot(call)) {
 			String fullName = call + "(" + getRealFunctionName(args, parentFunction) + ")";
 
 			if (YalToJvm.getModule().functionExists(fullName)) {
@@ -549,7 +531,7 @@ public class SimpleNode implements Node {
 		}
 	}
 
-	public void processAssignement(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+	public void processAssignment(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		//VARS
 		boolean twoSides = false;
 		String lhsId = null;
@@ -848,13 +830,16 @@ public class SimpleNode implements Node {
 	 * if/else statement
 	 */
 	public void processBody(Function parentFunction) {
+		if (children == null)
+			return;
+		
 		for (int i = 0; i < children.length; i++) {
 			SimpleNode bodyChild = (SimpleNode) children[i];
 			switch (bodyChild.getId()) {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
-				processAssignement(lhs, rhs, parentFunction);
+				processAssignment(lhs, rhs, parentFunction);
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode) bodyChild.jjtGetChild(0);
