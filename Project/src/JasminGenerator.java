@@ -159,16 +159,15 @@ public class JasminGenerator {
 	private static void printIfBlock(Function function, SimpleNode ifNode) {
 		SimpleNode ifCondition = (SimpleNode) ifNode.jjtGetChild(0);
 		SimpleNode ifBody = (SimpleNode) ifNode.jjtGetChild(1);
-		Boolean hasElseBody;
+
 		String jumplabel, endlabel = "EndIf" + labelIfCount;
 		
-		hasElseBody = (ifNode.jjtGetNumChildren() > 2) ? true : false;
-		jumplabel = hasElseBody ? "ElseBody" + labelIfCount : endlabel;
+		jumplabel = (ifNode.jjtGetNumChildren() > 2) ? "ElseBody" + labelIfCount : endlabel;
 		
 		printCondition(ifCondition, jumplabel);
 		printBody(function, ifBody);
 		
-		if (hasElseBody){
+		if ((ifNode.jjtGetNumChildren() > 2)){
 			writer.println("\tgoto "+endlabel);
 			SimpleNode elseBody = (SimpleNode) ifNode.jjtGetChild(2);
 			writer.println(jumplabel+":");
