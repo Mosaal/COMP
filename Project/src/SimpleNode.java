@@ -490,6 +490,9 @@ public class SimpleNode implements Node {
 	}
 
 	public void processAssignment(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+		CFGNode cfgNode = new CFGNode();
+		cfgNode.type = "assignment";
+		
 		//VARS
 		boolean twoSides = false;
 		String lhsId = null;
@@ -524,6 +527,7 @@ public class SimpleNode implements Node {
 		String rhs1Access = null;
 		String rhs1ArrayIndexId = null;
 		String[] argumentTypes = null;
+		
 		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
 			if (rhsChild.ID != null) {
@@ -534,7 +538,6 @@ public class SimpleNode implements Node {
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 					rhs1Access = "call";
 					rhs1Id = termChild.ID;
-					System.out.println(((SimpleNode)termChild.jjtGetChild(0)).ID);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					rhs1Access = "array";
 					rhs1Id = termChild.ID;
@@ -557,7 +560,6 @@ public class SimpleNode implements Node {
 		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
 			rhs1Access = "arraysize";
 			rhs1Id = rhsChild.ID;
-			System.out.println(rhsChild.ID);
 		}
 
 		// RHS 2
@@ -757,6 +759,14 @@ public class SimpleNode implements Node {
 		if (newVariable) {
 			parentFunction.addVariable(new Scalar(lhsId));
 		}
+		
+		//Save in the cfgNode
+		//LHS
+		cfgNode.lhsId = lhsId;
+		cfgNode.lhsType = lhsType;
+		cfgNode.lhsAccess = lhsAccess;
+		cfgNode.lhsArrayIndexId = lhsArrayIndexId;
+		cfgNode.lhsArrayAccess = lhsArrayAccess;
 
 	}
 

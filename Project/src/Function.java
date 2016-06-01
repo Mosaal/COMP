@@ -9,6 +9,7 @@ public class Function {
 	private Variable returnVar;
 	private ArrayList<Variable> parameters;
 	private HashMap<String,Variable> variableMap;
+	public CFGNode cfgRoot;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
@@ -115,6 +116,20 @@ public class Function {
 			return "array";
 		else
 			return null;
+	}
+	
+	public Variable getVariableAllScopes(String id) {
+		if (getReturnVar() != null && checkReturnVariable(id)) {
+			return getReturnVar();
+		} else if (checkParams(id)) {
+			return getParameter(id);
+		} else if (checkLocalVariable(id)) {
+			return getVariable(id);
+		} else if (YalToJvm.getModule().checkGlobalVariable(id)) {
+			return YalToJvm.getModule().getGlobalVariable(id);
+		} else {
+			return null;
+		}
 	}
 	
 	public void printData(){

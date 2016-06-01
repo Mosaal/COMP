@@ -77,6 +77,7 @@ public class Module {
 	*/
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
+			functionMap.get(id).cfgRoot = new CFGNode();
 			functionMap.get(id).getBody().processBody(functionMap.get(id));
 		}
 	}
