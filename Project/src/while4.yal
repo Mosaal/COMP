@@ -4,7 +4,7 @@ module while4 {
 	c = [10];
 
 	function i=f(x, y, z[]) {
-		i = 2;
+		i=2;
 	}
 
 	function f1(v[], N, x) {

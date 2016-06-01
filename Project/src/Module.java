@@ -84,6 +84,10 @@ public class Module {
 	public boolean functionExists(String functionID) {
 		return functionMap.containsKey(functionID);
 	}
+	
+	public Function getFunctionByID(String functionID) {
+		return functionMap.get(functionID);
+	}
 
 	public Variable getReturnVarFunction(String functionID) {
 		return functionMap.get(functionID).getReturnVar();

@@ -29,11 +29,15 @@
 
 .method public f1([III)V
 	.limit locals 4
+
+	invokestatic while4/f(II[I)I
+
 	return
 .end method
 
 .method public f(II[I)I
 	.limit locals 4
+
 	return
 .end method
 

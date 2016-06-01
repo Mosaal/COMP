@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class JasminGenerator {
 	
+	private static final String VOID = "V";
 	private static final String SCALARTYPE = "I";
 	private static final String ARRAYTYPE = "[I";
 	private static final HashMap<String,String> scalarFields = new HashMap<String,String>();
@@ -128,13 +129,15 @@ public class JasminGenerator {
 				printAssignment(function, n);
 			} else if (id == YalToJvmTreeConstants.JJTWHILE) {
 				labelWhileCount++;
-				printWhileBlock(n);
+				printWhileBlock(function, n);
 			} else if (id == YalToJvmTreeConstants.JJTIF) {
 				labelIfCount++;
 				printIfBlock(function, n);
 			} else if (id == YalToJvmTreeConstants.JJTCALL) {
-				printCall(n);
+				printCall(function, n);
 			}
+			
+			printNewLine();
 		}
 	}
 	
@@ -142,7 +145,7 @@ public class JasminGenerator {
 		
 	}
 	
-	private static void printWhileBlock(SimpleNode whileNode) {
+	private static void printWhileBlock(Function function, SimpleNode whileNode) {
 		SimpleNode whileCondition = (SimpleNode) whileNode.jjtGetChild(0);
 		SimpleNode whileBody = (SimpleNode) whileNode.jjtGetChild(1);
 		
@@ -177,8 +180,36 @@ public class JasminGenerator {
 		writer.println(endlabel+":");
 	}
 	
-	private static void printCall(SimpleNode callNode) {
-		//TODO
+	private static String convertFunctionName(String actualName) {
+		String temp = "";
+		
+		if (actualName.equals(temp))
+			return temp;
+		
+		for (int i = 0; i < actualName.length(); i++) {
+			if (actualName.charAt(i) == 's')
+				temp += SCALARTYPE;
+			else if (actualName.charAt(i) == 'a')
+				temp += ARRAYTYPE;
+		}
+		
+		return "(" + temp + ")";
+	}
+	
+	private static void printCall(Function function, SimpleNode callNode) {
+		if (callNode.dot(callNode.ID)) {
+			writer.println("\tinvokestatic " + callNode.separateString(callNode.ID)[0] + "/" + callNode.separateString(callNode.ID)[1] + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + VOID);
+		} else {
+			String fullName = callNode.ID + "(" + callNode.getRealFunctionName(callNode.jjtGetChildren(), function) + ")";
+			
+			if (module.getFunctionByID(fullName).checkReturnVariableType() == null) {
+				writer.println("\tinvokestatic " + module.getModuleID() + "/" + callNode.ID + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + VOID);
+			} else if (module.getFunctionByID(fullName).checkReturnVariableType().equals("scalar")) {
+				writer.println("\tinvokestatic " + module.getModuleID() + "/" + callNode.ID + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + SCALARTYPE);
+			} else {
+				writer.println("\tinvokestatic " + module.getModuleID() + "/" + callNode.ID + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + ARRAYTYPE);
+			}
+		}
 	}
 	
 	private static void printCondition(SimpleNode condition, String jumpLabel){

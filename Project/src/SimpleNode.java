@@ -249,48 +249,6 @@ public class SimpleNode implements Node {
 		return temp;
 	}
 
-	public String getRealFunctionNameOtherModule(Node[] args, Function parentFunction) {
-		String temp = "";
-
-		if (args == null)
-			return temp;
-
-		for (int i = 0; i < args.length; i++) {
-			SimpleNode arg = (SimpleNode)args[i];
-
-			if (YalToJvm.getModule().checkGlobalVariable(arg.ID)) {
-				if (YalToJvm.getModule().getGlobalVariable(arg.ID) instanceof Scalar) {
-					temp += "_s";
-				} else {
-					temp += "_a";
-				}
-			} else if (parentFunction.checkLocalVariable(arg.ID)) {
-				if (parentFunction.getVariable(arg.ID) instanceof Scalar) {
-					temp += "_s";
-				} else {
-					temp += "_a";
-				}
-			} else if (parentFunction.checkParams(arg.ID)) {
-				if (parentFunction.getParameter(arg.ID) instanceof Scalar) {
-					temp += "_s";
-				} else {
-					temp += "_a";
-				}
-			} else if (parentFunction.checkReturnVariable(arg.ID)) {
-				if (parentFunction.getReturnVar() instanceof Scalar) {
-					temp += "_s";
-				} else {
-					temp += "_a";
-				}
-			} else {
-				temp += "_" + arg.ID;
-				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: The variable \"" + arg.ID +"\" hasn't been declared!");
-			}
-		}
-
-		return temp;
-	}
-
 	public void processArrayAccess(String arrayAccess, String index, Function parentFunction) {
 		if (YalToJvm.getModule().checkGlobalVariable(arrayAccess)) {
 			if (YalToJvm.getModule().getGlobalVariable(arrayAccess) instanceof Scalar)
