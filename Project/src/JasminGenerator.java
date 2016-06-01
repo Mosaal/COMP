@@ -86,12 +86,14 @@ public class JasminGenerator {
 		    writer.println("\tputfield " + moduleName + "/" + id + " [I");
 		    printNewLine();
 		}
+		
 		writer.println("\treturn");
 		writer.println(".end method");
 	}
 	
 	private static void printMethodHeader(Function f){
 		writer.print(".method public " + f.getFunctionID() + "(");
+		
 		ArrayList<Variable> params = f.getParameters();
 		for (int i = 0; i < params.size(); i++) {
 			if(params.get(i).getType().equals("scalar")){
@@ -100,7 +102,9 @@ public class JasminGenerator {
 				writer.print("[I");
 			}
 		}
+		
 		writer.print(")");
+		
 		Variable ret = f.getReturnVar();
 		if(ret != null){
 			if(f.getReturnVar().getType().equals("scalar")){
@@ -111,48 +115,34 @@ public class JasminGenerator {
 		}else{
 			writer.println("V");
 		}
+		
 		writer.println("\t.limit locals " + (f.getNumParameters()+1));
 	}
 	
-	private static void printBody(SimpleNode bodyNode){
+	private static void printBody(Function function, SimpleNode bodyNode){
 		for (int i = 0; i < bodyNode.jjtGetNumChildren(); i++) {
 			SimpleNode n = (SimpleNode) bodyNode.jjtGetChild(i);
 			int id = n.getId();
 			
-			if (id == YalToJvmTreeConstants.JJTASSIGNEMENT){
-				//printAssignment(n);
-			} else if (id == YalToJvmTreeConstants.JJTWHILE){
+			if (id == YalToJvmTreeConstants.JJTASSIGNEMENT) {
+				printAssignment(function, n);
+			} else if (id == YalToJvmTreeConstants.JJTWHILE) {
 				labelWhileCount++;
 				printWhileBlock(n);
-			} else if (id == YalToJvmTreeConstants.JJTIF){
+			} else if (id == YalToJvmTreeConstants.JJTIF) {
 				labelIfCount++;
-				printIfBlock(n);
+				printIfBlock(function, n);
+			} else if (id == YalToJvmTreeConstants.JJTCALL) {
+				printCall(n);
 			}
 		}
 	}
 	
-	private static void printIfBlock(SimpleNode ifNode){
-		SimpleNode ifCondition = (SimpleNode) ifNode.jjtGetChild(0);
-		SimpleNode ifBody = (SimpleNode) ifNode.jjtGetChild(1);
-		Boolean hasElseBody;
-		String jumplabel, endlabel = "EndIf" + labelIfCount;
+	private static void printAssignment(Function function, SimpleNode assignNode) {
 		
-		hasElseBody = (ifNode.jjtGetNumChildren() > 2) ? true : false;
-		jumplabel = hasElseBody ? "ElseBody" + labelIfCount : endlabel;
-		
-		printCondition(ifCondition, jumplabel);
-		printBody(ifBody);
-		
-		if(hasElseBody){
-			writer.println("\tgoto "+endlabel);
-			SimpleNode elseBody = (SimpleNode) ifNode.jjtGetChild(2);
-			writer.println(jumplabel+":");
-			printBody(elseBody);
-		}
-		writer.println(endlabel+":");
 	}
 	
-	private static void printWhileBlock(SimpleNode whileNode){
+	private static void printWhileBlock(SimpleNode whileNode) {
 		SimpleNode whileCondition = (SimpleNode) whileNode.jjtGetChild(0);
 		SimpleNode whileBody = (SimpleNode) whileNode.jjtGetChild(1);
 		
@@ -164,14 +154,38 @@ public class JasminGenerator {
 		
 		writer.println("\tgoto While" + labelWhileCount);
 		writer.println(endlabel+":");
+	}
+	
+	private static void printIfBlock(Function function, SimpleNode ifNode) {
+		SimpleNode ifCondition = (SimpleNode) ifNode.jjtGetChild(0);
+		SimpleNode ifBody = (SimpleNode) ifNode.jjtGetChild(1);
+
+		String jumplabel, endlabel = "EndIf" + labelIfCount;
 		
+		jumplabel = (ifNode.jjtGetNumChildren() > 2) ? "ElseBody" + labelIfCount : endlabel;
+		
+		printCondition(ifCondition, jumplabel);
+		printBody(function, ifBody);
+		
+		if ((ifNode.jjtGetNumChildren() > 2)){
+			writer.println("\tgoto "+endlabel);
+			SimpleNode elseBody = (SimpleNode) ifNode.jjtGetChild(2);
+			writer.println(jumplabel+":");
+			printBody(function, elseBody);
+		}
+		
+		writer.println(endlabel+":");
+	}
+	
+	private static void printCall(SimpleNode callNode) {
+		//TODO
 	}
 	
 	private static void printCondition(SimpleNode condition, String jumpLabel){
 		SimpleNode condLhs = (SimpleNode) condition.jjtGetChild(0);
 		SimpleNode condRhs = (SimpleNode) condition.jjtGetChild(1);
 		
-		if(condLhs.getId() == YalToJvmTreeConstants.JJTSCALAR && Integer.parseInt(condLhs.ID) == 0){
+		if (condLhs.getId() == YalToJvmTreeConstants.JJTSCALAR && Integer.parseInt(condLhs.ID) == 0){
 			switch(condition.ID){
 			case "<":
 				writer.println("\tifle " + jumpLabel); // jump if 0 >= rhs
@@ -194,7 +208,7 @@ public class JasminGenerator {
 			default:
 				break;
 			}
-		}else if(condRhs.getId() == YalToJvmTreeConstants.JJTSCALAR && Integer.parseInt(condRhs.ID) == 0){
+		} else if (condRhs.getId() == YalToJvmTreeConstants.JJTSCALAR && Integer.parseInt(condRhs.ID) == 0){
 			switch(condition.ID){
 			case "<":
 				writer.println("\tifge " + jumpLabel); // jump if lhs >= 0
@@ -217,7 +231,7 @@ public class JasminGenerator {
 			default:
 				break;
 			}
-		}else{
+		} else {
 			switch(condition.ID){
 			case "<":
 				writer.println("\tif_icmpge " + jumpLabel); // jump if lhs >= rhs
@@ -254,46 +268,54 @@ public class JasminGenerator {
 		String statement = ".field private ";
 		statement += name + " ";
 		statement += type;
-		if(value != null && !type.equals(ARRAYTYPE)){
+		
+		if (value != null && !type.equals(ARRAYTYPE)){
 			statement += " = " + value;
 		}
+		
 		writer.println(statement);
 	}
 	
 	private static void printFields(){
 		int size = node.jjtGetNumChildren();
+		
 		for (int i = 0; i < size; i++) {
 			SimpleNode n = (SimpleNode)node.jjtGetChild(i);
-			if(n.getId() == YalToJvmTreeConstants.JJTGLOBAL){
+			if (n.getId() == YalToJvmTreeConstants.JJTGLOBAL){
 				String name = null;
 				String type = null;
 				String value = null;
 				SimpleNode lhs = (SimpleNode)n.jjtGetChild(0);
 				name = lhs.ID;
-				if(n.jjtGetNumChildren() == 2){
+				
+				if (n.jjtGetNumChildren() == 2) {
 					SimpleNode rhs = (SimpleNode)n.jjtGetChild(1);
-					if(rhs.ID == null){
+					
+					if (rhs.ID == null) {
 						type = ARRAYTYPE;
 						SimpleNode arraySize = ((SimpleNode)rhs.jjtGetChild(0));
-						if(arraySize.ID == null){
+						
+						if (arraySize.ID == null) {
 							value = ((SimpleNode)arraySize.jjtGetChild(0)).ID;
-						}else{
+						} else {
 							value = arraySize.ID;
 						}
-					}else{
+					} else {
 						value = rhs.ID;
 						type = SCALARTYPE;
 					}
-				}else{
+				} else {
 					type = SCALARTYPE;
 				}
-				if(type.equals(SCALARTYPE)){
+				
+				if (type.equals(SCALARTYPE)) {
 					scalarFields.put(name, value);
-				}else {
+				} else {
 					arrayFields.put(name,value);
 				}
+				
 				printField(type,name,value);
-			}else{
+			} else {
 				i = size;
 			}
 		}
@@ -303,8 +325,9 @@ public class JasminGenerator {
 		HashMap<String, Function> map = module.getFunctionMap();
 		for (Function f : map.values()) {
 		    printMethodHeader(f);
-		    printBody(f.getBody());
+		    printBody(f, f.getBody());
 		    printMethodFooter();
+		    printNewLine();
 		}
 	}
 	
