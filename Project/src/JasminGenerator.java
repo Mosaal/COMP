@@ -116,7 +116,7 @@ public class JasminGenerator {
 			writer.println("V");
 		}
 		
-		writer.println("\t.limit locals " + (f.getNumParameters()+1));
+		writer.println("\t.limit locals " + (1+f.getNumParameters()+f.getNumVariable()));
 	}
 	
 	private static void printBody(Function function, SimpleNode bodyNode){
@@ -138,8 +138,26 @@ public class JasminGenerator {
 		}
 	}
 	
-	private static void printAssignment(Function function, SimpleNode assignNode) {
+	private static void printAssignment(Function f, SimpleNode assignNode) {
+		String lhsID = ((SimpleNode)assignNode.jjtGetChild(0)).ID;
+		Variable lhsVariable = f.getVariableAllScopes(lhsID);
+		String lhsType = lhsVariable.getType();
 		
+		SimpleNode rhsNode = ((SimpleNode)assignNode.jjtGetChild(1));
+		String rhs1ID = ((SimpleNode)rhsNode.jjtGetChild(0)).ID;
+		System.out.println(rhs1ID);
+		
+		/**
+		 * All types of assignments
+		 * - scalar = scalar;
+		 * - scalar = integer
+		 * - scalar = array[index]
+		 * - scalar = call
+		 * - scalar = array.size
+		 */
+		if(true){
+			
+		}
 	}
 	
 	private static void printWhileBlock(SimpleNode whileNode) {

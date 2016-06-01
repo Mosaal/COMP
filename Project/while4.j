@@ -3,7 +3,7 @@
 .super java/lang/Object
 
 .field private b I = 1
-.field private a I = 1000
+.field private a I
 .field private c I
 .field private d [I
 
@@ -13,7 +13,7 @@
 	invokenonvirtual java/lang/Object/<init>()V
 
 	aload 0
-	ldc 1000
+	ldc 0
 	putfield while4/a I
 
 	aload 0
@@ -33,6 +33,7 @@
 .end method
 
 .method public f1([III)V
-	.limit locals 4
+	.limit locals 6
 	return
 .end method
+
