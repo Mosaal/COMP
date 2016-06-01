@@ -615,7 +615,9 @@ public class SimpleNode implements Node {
 				} 
 			}
 		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-
+			rhs1Access = "arraysize";
+			rhs1Id = rhsChild.ID;
+			System.out.println(rhsChild.ID);
 		}
 
 		// RHS 2
@@ -712,7 +714,10 @@ public class SimpleNode implements Node {
 		}
 
 		// FIRST RIGHT HAND SIDE
-		if (!rhs1Access.equals("integer")) {
+		if(rhs1Access.equals("arraysize")){
+			//TODO
+			System.out.println("arraysize!");
+		}else if (!rhs1Access.equals("integer")) {
 			// ERROR: If the variable doesn't exist
 			if (!checkVariable(parentFunction, rhs1Id)) {
 				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " + "Variable " + rhs1Id
