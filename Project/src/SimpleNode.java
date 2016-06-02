@@ -430,7 +430,7 @@ public class SimpleNode implements Node {
 		}
 	}
 
-	public void processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+	public CFGNode processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 			processArrayAccess(lhs.ID, index.ID, parentFunction);
@@ -487,12 +487,11 @@ public class SimpleNode implements Node {
 				}
 			}
 		}
+		CFGNode cfgNode = new CFGNode("condition");
+		return cfgNode;
 	}
 
-	public void processAssignment(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
-		CFGNode cfgNode = new CFGNode();
-		cfgNode.type = "assignment";
-		
+	public CFGNode processAssignment(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
 		//VARS
 		boolean twoSides = false;
 		String lhsId = null;
@@ -760,13 +759,17 @@ public class SimpleNode implements Node {
 			parentFunction.addVariable(new Scalar(lhsId));
 		}
 		
-		//Save in the cfgNode
-		//LHS
+		//CFG
+		CFGNode cfgNode = new CFGNode("Assignment");
 		cfgNode.lhsId = lhsId;
 		cfgNode.lhsType = lhsType;
 		cfgNode.lhsAccess = lhsAccess;
 		cfgNode.lhsArrayIndexId = lhsArrayIndexId;
 		cfgNode.lhsArrayAccess = lhsArrayAccess;
+		cfgNode.twoSides = twoSides;
+		cfgNode.newVar = newVariable;
+		
+		return cfgNode;
 
 	}
 
@@ -802,9 +805,12 @@ public class SimpleNode implements Node {
 	 * Method used to process the body of a function, a while loop and an
 	 * if/else statement
 	 */
-	public void processBody(Function parentFunction) {
-		if (children == null)
-			return;
+	public CFGNode processBody(Function parentFunction, CFGNode parentCFGNode) {
+		if (children == null){
+			return parentCFGNode;
+		}
+		
+		CFGNode currentNode = parentCFGNode;
 		
 		for (int i = 0; i < children.length; i++) {
 			SimpleNode bodyChild = (SimpleNode) children[i];
@@ -812,16 +818,25 @@ public class SimpleNode implements Node {
 			case YalToJvmTreeConstants.JJTASSIGNEMENT:
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
-				processAssignment(lhs, rhs, parentFunction);
+				CFGNode assignmentNode = processAssignment(lhs, rhs, parentFunction);
+				//CFG Link the nodes
+				currentNode.outs.add(assignmentNode);
+				assignmentNode.ins.add(currentNode);
+				currentNode = assignmentNode;
 				break;
 			case YalToJvmTreeConstants.JJTWHILE:
 				SimpleNode whileCondition = (SimpleNode) bodyChild.jjtGetChild(0);
 				SimpleNode whileLhs = (SimpleNode) whileCondition.jjtGetChild(0);
 				SimpleNode whileRhs = (SimpleNode) whileCondition.jjtGetChild(1);
-				processCondition(whileLhs, whileRhs, parentFunction);
-
+				CFGNode conditionNode = processCondition(whileLhs, whileRhs, parentFunction);
+				currentNode.outs.add(conditionNode);
+				conditionNode.ins.add(currentNode);
+				currentNode = conditionNode;
+				
 				SimpleNode whileBody = (SimpleNode) bodyChild.jjtGetChild(1);
-				whileBody.processBody(parentFunction);
+				CFGNode lastNode = whileBody.processBody(parentFunction,conditionNode);
+				currentNode.ins.add(lastNode);
+				lastNode.outs.add(currentNode);
 				break;
 			case YalToJvmTreeConstants.JJTIF:
 				SimpleNode ifCondition = (SimpleNode) bodyChild.jjtGetChild(0);
@@ -830,11 +845,11 @@ public class SimpleNode implements Node {
 				processCondition(ifLhs, ifRhs, parentFunction);
 
 				SimpleNode ifBody = (SimpleNode) bodyChild.jjtGetChild(1);
-				ifBody.processBody(parentFunction);
+				ifBody.processBody(parentFunction,parentCFGNode);
 
 				if (bodyChild.jjtGetNumChildren() == 3) {
 					SimpleNode elseBody = (SimpleNode) bodyChild.jjtGetChild(2);
-					elseBody.processBody(parentFunction);
+					elseBody.processBody(parentFunction,parentCFGNode);
 				}
 				break;
 			case YalToJvmTreeConstants.JJTCALL:
@@ -842,6 +857,9 @@ public class SimpleNode implements Node {
 				break;
 			}
 		}
+		
+		//CFG
+		return currentNode;
 	}
 
 	public int getId() {
