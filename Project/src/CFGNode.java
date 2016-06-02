@@ -1,6 +1,7 @@
 
 public class CFGNode {
 	public String type;
+	public int num;
 	public CFGNode[] outs;
 	public CFGNode[] ins;
 	public boolean twoSides;

@@ -28,7 +28,7 @@
 .end method
 
 .method public f1([III)V
-	.limit locals 4
+	.limit locals 5
 
 	invokestatic while4/f(II[I)I
 

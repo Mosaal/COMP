@@ -1,6 +1,5 @@
 options {
 	LOOKAHEAD = 1;
-	STATIC = false;
 }
 
 PARSER_BEGIN(YalToJvm)

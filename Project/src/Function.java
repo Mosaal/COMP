@@ -118,6 +118,18 @@ public class Function {
 			return null;
 	}
 	
+	public String getVariableScope(String id) {
+		if (checkParams(id)) {
+			return "parameter";
+		} else if (checkLocalVariable(id)) {
+			return "localVar";
+		} else if (YalToJvm.getModule().checkGlobalVariable(id)) {
+			return "globalVar";
+		} else {
+			return null;
+		}
+	}
+	
 	public Variable getVariableAllScopes(String id) {
 		if (getReturnVar() != null && checkReturnVariable(id)) {
 			return getReturnVar();

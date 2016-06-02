@@ -106,6 +106,8 @@ public class JasminGenerator {
 		
 		writer.print(")");
 		
+		livenessAnalysis(f.cfgRoot);
+		
 		Variable ret = f.getReturnVar();
 		if(ret != null){
 			if(f.getReturnVar().getType().equals("scalar")){
@@ -172,6 +174,8 @@ public class JasminGenerator {
 		String endlabel = "EndWhile" + labelWhileCount;
 		
 		printCondition(whileCondition, endlabel);
+		
+		printBody(function, whileBody);
 		
 		writer.println("\tgoto While" + labelWhileCount);
 		writer.println(endlabel+":");
@@ -377,6 +381,18 @@ public class JasminGenerator {
 		    printBody(f, f.getBody());
 		    printMethodFooter();
 		    printNewLine();
+		}
+	}
+	
+	private static void livenessAnalysis(CFGNode root){
+		CFGNode currentNode = root;
+		ArrayList<ArrayList<String>> in = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> out = new ArrayList<ArrayList<String>>();
+		
+		while(currentNode.type != "end"){
+			for(int i = 0; i < root.outs.length; i++){
+				currentNode = root.outs[i];
+			}
 		}
 	}
 	
