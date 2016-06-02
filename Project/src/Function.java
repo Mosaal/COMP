@@ -9,7 +9,8 @@ public class Function {
 	private Variable returnVar;
 	private ArrayList<Variable> parameters;
 	private HashMap<String,Variable> variableMap;
-	public CFGNode cfgRoot;
+	public CFGNode cfgStartNode;
+	public CFGNode cfgEndNode;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
@@ -155,4 +156,31 @@ public class Function {
 			System.out.println("  " + v);
 	 	}
 	}
+	
+	public void printCFG(CFGNode cfgNode){
+		String print = cfgNode.number + "-" + cfgNode.type + "\n\tOuts -> (";
+		for (int i = 0; i < cfgNode.outs.size(); i++) {
+			print += cfgNode.outs.get(i).number + "-" + cfgNode.outs.get(i).type;
+			if(i+1 != cfgNode.outs.size()){
+				print += ", ";
+			}
+		}
+		print += ")\n";
+		print += "\tIns -> (";
+		for (int i = 0; i < cfgNode.ins.size(); i++) {
+			print += cfgNode.ins.get(i).number + "-" + cfgNode.ins.get(i).type;
+			if(i+1 != cfgNode.ins.size()){
+				print += ", ";
+			}
+		}
+		print += ")";
+		System.out.println(print);
+		cfgNode.visited = true;
+		for (int i = 0; i < cfgNode.outs.size(); i++) {
+			if(!cfgNode.outs.get(i).visited){
+				printCFG(cfgNode.outs.get(i));
+			}
+		}
+	}
+	
 }
