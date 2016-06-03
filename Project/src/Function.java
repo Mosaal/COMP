@@ -9,6 +9,7 @@ public class Function {
 	private Variable returnVar;
 	private ArrayList<Variable> parameters;
 	private HashMap<String,Variable> variableMap;
+	public List<CFGNode> cfgNodes;
 	public CFGNode cfgStartNode;
 	public CFGNode cfgEndNode;
 
@@ -18,6 +19,7 @@ public class Function {
 		parameters = p;
 		body = n;
 		variableMap = new HashMap<String,Variable>();
+		cfgNodes = new ArrayList<CFGNode>();
 	}
 
 	public int getNumVariable() {
