@@ -24,12 +24,17 @@ public class CFGNode {
 	
 	
 	
-	public CFGNode (String t) {
+	public CFGNode (String t, Function f) {
 		type = t;
 		outs = new ArrayList<CFGNode>();
 		ins = new ArrayList<CFGNode>();
-		cfgNodeCount++;
-		number = cfgNodeCount;
+		if(!t.equals("endif")){
+			number = cfgNodeCount;
+			cfgNodeCount++;
+			f.cfgNodes.add(this);
+		}else{
+			number = -1;
+		}
 	}
 	
 }
