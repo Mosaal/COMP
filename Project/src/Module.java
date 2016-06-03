@@ -77,9 +77,9 @@ public class Module {
 	*/
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
-			functionMap.get(id).cfgStartNode = new CFGNode("start");
+			functionMap.get(id).cfgStartNode = new CFGNode("start",functionMap.get(id));
 			CFGNode lastNode = functionMap.get(id).getBody().processBody(functionMap.get(id),functionMap.get(id).cfgStartNode);
-			CFGNode endNode = new CFGNode("end");
+			CFGNode endNode = new CFGNode("end",functionMap.get(id));
 			lastNode.outs.add(endNode);
 			endNode.ins.add(lastNode);
 			System.out.println("CFG:");
