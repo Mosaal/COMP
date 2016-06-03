@@ -4,10 +4,9 @@ import java.util.List;
 
 public class CFGNode {
 	/* Meta data */
-	public String type;
+	public String type; //assignment, while, if, endif, call, start, end
 	public List<CFGNode> outs;
 	public List<CFGNode> ins;
-	public static int cfgNodeCount;
 	public int number;
 	
 	/* Assignement or declaration */
@@ -46,13 +45,9 @@ public class CFGNode {
 		type = t;
 		outs = new ArrayList<CFGNode>();
 		ins = new ArrayList<CFGNode>();
-		if(!t.equals("endif")){
-			number = cfgNodeCount;
-			cfgNodeCount++;
-			f.cfgNodes.add(this);
-		}else{
-			number = -1;
-		}
+		number = f.cfgNodeCount;
+		f.cfgNodeCount++;
+		f.cfgNodes.add(this);
 	}
 	
 }

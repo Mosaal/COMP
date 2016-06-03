@@ -145,7 +145,7 @@ public class JasminGenerator {
 		
 		SimpleNode rhsNode = ((SimpleNode)assignNode.jjtGetChild(1));
 		String rhs1ID = ((SimpleNode)rhsNode.jjtGetChild(0)).ID;
-		System.out.println(rhs1ID);
+		//System.out.println(rhs1ID);
 		
 		/**
 		 * All types of assignments
@@ -344,8 +344,51 @@ public class JasminGenerator {
 		for (Function f : map.values()) {
 		    printMethodHeader(f);
 		    printBody(f, f.getBody());
+		    printCFG(f, f.cfgStartNode);
 		    printMethodFooter();
 		    printNewLine();
+		}
+	}
+	
+	/**
+	 * Analyses the CFG and prints the corresponding
+	 * JVM instruction codes
+	 * @param f The function of the body
+	 * @param node The current node visiting
+	 */
+	private static void printCFG(Function f, CFGNode node){
+		switch (node.type) {
+		case "start":
+			System.out.println("\t" + node.number + "-" + node.type);
+			break;
+		case "assignment":
+			System.out.println("\t" + node.number + "-" + node.type);
+			break;
+		case "while":
+			System.out.println("label" + node.number + ": " + node.number + "-" + node.type);
+			System.out.println("\tif cond label" + node.outs.get(1).number);
+			break;
+		case "if":
+			System.out.println("\t" + node.number + "-" + node.type);
+			break;
+		case "endif":
+			break;
+		case "end":
+			System.out.println("\t" + node.number + "-" + node.type);
+			break;
+		default:
+			break;
+		}
+		node.visited = true;
+		for (int i = 0; i < node.outs.size(); i++) {
+			if(node.outs.get(i).type.equals("while")){
+				if(node.number >= node.outs.get(i).number){
+					System.out.println("\tGOTO label" + node.outs.get(i).number);
+				}
+			}
+			if(!node.outs.get(i).visited){
+				printCFG(f, node.outs.get(i));
+			}
 		}
 	}
 	
