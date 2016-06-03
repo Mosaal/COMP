@@ -487,7 +487,8 @@ public class SimpleNode implements Node {
 				}
 			}
 		}
-		CFGNode cfgNode = new CFGNode("condition");
+		//TODO: Fill node
+		CFGNode cfgNode = new CFGNode("condition",parentFunction);
 		return cfgNode;
 	}
 
@@ -760,7 +761,8 @@ public class SimpleNode implements Node {
 		}
 		
 		//CFG
-		CFGNode cfgNode = new CFGNode("Assignment");
+		//TODO: Continue filling node
+		CFGNode cfgNode = new CFGNode("Assignment",parentFunction);
 		cfgNode.lhsId = lhsId;
 		cfgNode.lhsType = lhsType;
 		cfgNode.lhsAccess = lhsAccess;
@@ -819,7 +821,7 @@ public class SimpleNode implements Node {
 				SimpleNode lhs = (SimpleNode)bodyChild.jjtGetChild(0); //ArrayAccess or ScalarAccess
 				SimpleNode rhs = (SimpleNode)bodyChild.jjtGetChild(1); //Rhs
 				CFGNode assignmentNode = processAssignment(lhs, rhs, parentFunction);
-				//CFG Link the nodes
+				//CFG
 				currentNode.outs.add(assignmentNode);
 				assignmentNode.ins.add(currentNode);
 				currentNode = assignmentNode;
@@ -828,37 +830,69 @@ public class SimpleNode implements Node {
 				SimpleNode whileCondition = (SimpleNode) bodyChild.jjtGetChild(0);
 				SimpleNode whileLhs = (SimpleNode) whileCondition.jjtGetChild(0);
 				SimpleNode whileRhs = (SimpleNode) whileCondition.jjtGetChild(1);
-				CFGNode conditionNode = processCondition(whileLhs, whileRhs, parentFunction);
-				currentNode.outs.add(conditionNode);
-				conditionNode.ins.add(currentNode);
-				currentNode = conditionNode;
+				CFGNode conditionNodeWhile = processCondition(whileLhs, whileRhs, parentFunction);
+				//CFG
+				currentNode.outs.add(conditionNodeWhile);
+				conditionNodeWhile.ins.add(currentNode);
+				currentNode = conditionNodeWhile;
 				
 				SimpleNode whileBody = (SimpleNode) bodyChild.jjtGetChild(1);
-				CFGNode lastNode = whileBody.processBody(parentFunction,conditionNode);
-				currentNode.ins.add(lastNode);
-				lastNode.outs.add(currentNode);
+				CFGNode lastNodeWhile = whileBody.processBody(parentFunction,conditionNodeWhile);
+				//CFG
+				currentNode.ins.add(lastNodeWhile);
+				lastNodeWhile.outs.add(currentNode);
 				break;
 			case YalToJvmTreeConstants.JJTIF:
 				SimpleNode ifCondition = (SimpleNode) bodyChild.jjtGetChild(0);
 				SimpleNode ifLhs = (SimpleNode) ifCondition.jjtGetChild(0);
 				SimpleNode ifRhs = (SimpleNode) ifCondition.jjtGetChild(1);
-				processCondition(ifLhs, ifRhs, parentFunction);
+				CFGNode conditionNodeIf = processCondition(ifLhs, ifRhs, parentFunction);
+				//CFG
+				currentNode.outs.add(conditionNodeIf);
+				conditionNodeIf.ins.add(currentNode);
 
 				SimpleNode ifBody = (SimpleNode) bodyChild.jjtGetChild(1);
-				ifBody.processBody(parentFunction,parentCFGNode);
-
+				CFGNode lastNodeIf = ifBody.processBody(parentFunction,conditionNodeIf);
+				CFGNode endIfNode = new CFGNode("endif", parentFunction);
+				
 				if (bodyChild.jjtGetNumChildren() == 3) {
 					SimpleNode elseBody = (SimpleNode) bodyChild.jjtGetChild(2);
-					elseBody.processBody(parentFunction,parentCFGNode);
+					CFGNode lastNodeElse = elseBody.processBody(parentFunction,conditionNodeIf);
+					if(lastNodeIf != conditionNodeIf && conditionNodeIf == lastNodeElse){
+						endIfNode.ins.add(lastNodeIf);
+						lastNodeIf.outs.add(endIfNode);
+						endIfNode.ins.add(conditionNodeIf);
+						conditionNodeIf.outs.add(endIfNode);
+					}else if(conditionNodeIf != lastNodeElse && lastNodeIf == conditionNodeIf){
+						endIfNode.ins.add(lastNodeElse);
+						lastNodeElse.outs.add(endIfNode);
+						endIfNode.ins.add(conditionNodeIf);
+						conditionNodeIf.outs.add(endIfNode);
+					}else if(conditionNodeIf != lastNodeElse && lastNodeIf != conditionNodeIf){
+						endIfNode.ins.add(lastNodeIf);
+						lastNodeIf.outs.add(endIfNode);
+						endIfNode.ins.add(lastNodeElse);
+						lastNodeElse.outs.add(endIfNode);
+					}else{
+						endIfNode.ins.add(conditionNodeIf);
+						conditionNodeIf.outs.add(endIfNode);
+					}
+				}else{
+					if(lastNodeIf != conditionNodeIf){
+						endIfNode.ins.add(lastNodeIf);
+						lastNodeIf.outs.add(endIfNode);
+					}
+					endIfNode.ins.add(conditionNodeIf);
+					conditionNodeIf.outs.add(endIfNode);
 				}
+				
+				currentNode = endIfNode;
 				break;
 			case YalToJvmTreeConstants.JJTCALL:
 				processCall(bodyChild.ID, bodyChild.jjtGetChildren(), false, parentFunction);
 				break;
 			}
 		}
-		
-		//CFG
 		return currentNode;
 	}
 
