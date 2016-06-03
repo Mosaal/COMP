@@ -7,6 +7,8 @@ public class CFGNode {
 	public String type;
 	public List<CFGNode> outs;
 	public List<CFGNode> ins;
+	public List<Variable> uses;
+	public List<Variable> defs;
 	public List<Variable> laIns;
 	public List<Variable> laOuts;
 	public static int cfgNodeCount;

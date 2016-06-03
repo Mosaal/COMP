@@ -386,51 +386,65 @@ public class JasminGenerator {
 		}
 	}
 	
-	// Assumindo que: StartNode.number = 1 e EndNode.number = Num de nos do CFG
-	
-	/*private static void livenessAnalysis(Function f){
-		boolean[] visited = new boolean[f.cfgEndNode.number];
-		visited[1] = true;
-		
-		CFGNode[] cfgList = new CFGNode[f.cfgEndNode.number];
-		CFGNode currentNode = f.cfgStartNode.outs.get(0);
-		
-			
-		while(!currentNode.equals(f.cfgEndNode)){
-			cfgList[currentNode.number] = currentNode;
-			visited[currentNode.number] = true;
-			
-			if(visited[currentNode.outs.get(0).number] && currentNode.outs.size() > 1){
-				unvisitedSonSearch:
-					for(int i = 0; i < currentNode.outs.size(); i++){
-						if(!visited[currentNode.outs.get(i).number]){
-							currentNode = currentNode.outs.get(i);
-							break unvisitedSonSearch;
-						}
-					}
-			} else if(!visited[currentNode.outs.get(0).number])
-				currentNode = currentNode.outs.get(0);
-		 }
-	}*/
-	
 	private static void livenessAnalysis (Function f){
+		
+		setUsesAndDefs(f);
 		do{
+			for(int i = 0; i < f.cfgNodes.size(); i++){
+				f.cfgNodesIns.set(i, f.cfgNodes.get(i).laIns);
+				f.cfgNodesOuts.set(i, f.cfgNodes.get(i).laOuts);
+			}
+			
+			for(int i = f.cfgNodes.size() - 1; i > -1; i--){
+				nodeAnalysis(f.cfgNodes.get(i));
+			}
 			
 		}while(compareIterations(f));
 	}
 	
-	private static boolean compareIterations(Function f){
-		for(int i = 0; i < f.cfgNodesIns.size(); i++){
-			if(f.cfgNodesIns.get(i).size() != f.cfg.get(i).laIns.size()){
-				return true;
+	private static void setUsesAndDefs (Function f){
+		for(int i = 0; i < f.cfgNodes.size(); i++){
+			if(!f.cfgNodes.get(i).type.equals("endif")){
+				
 			}
 		}
-		for(int i = 0; i < f.cfgNodesOuts.size(); i++){
-			if(f.cfgNodesOuts.get(i).size() != f.cfg.get(i).laOuts.size()){
+	}
+	
+	private static boolean compareIterations (Function f){
+		for(int i = 0; i < f.cfgNodes.size(); i++){
+			if(f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
+				return true;
+			}
+			if(f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
 				return true;
 			}
 		}
 		return false;
+	}
+	
+	private static void nodeAnalysis(CFGNode node){
+		
+		/* node 'OUT' SET */
+		// For each successor of node
+		for(int i = 0; i < node.outs.size(); i++){
+			
+			// For each variable in the 'IN' set of the successor
+			for(int j = 0; j < node.outs.get(i).laIns.size(); j++){
+				
+				if(!node.laOuts.contains(node.outs.get(i).laIns.get(j)))
+					node.laOuts.add(node.outs.get(i).laIns.get(j));
+			}
+		}
+		
+		/* node 'IN' SET */
+		for(int i = 0; i < node.uses.size(); i++){
+			if(!node.laIns.contains(node.uses.get(i)))
+				node.laIns.add(node.uses.get(i));
+		}
+		for(int i = 0; i < node.laOuts.size(); i++){
+			if(!node.laIns.contains(node.laOuts.get(i)) && !node.defs.contains(node.laOuts.get(i)))
+				node.laIns.add(node.laOuts.get(i));
+		}
 	}
 	
 }
