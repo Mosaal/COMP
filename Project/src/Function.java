@@ -11,6 +11,8 @@ public class Function {
 	private HashMap<String,Variable> variableMap;
 	public CFGNode cfgStartNode;
 	public CFGNode cfgEndNode;
+	public List<ArrayList<Variable>> cfgNodesIns;
+	public List<ArrayList<Variable>> cfgNodesOuts;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;

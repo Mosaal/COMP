@@ -7,6 +7,8 @@ public class CFGNode {
 	public String type;
 	public List<CFGNode> outs;
 	public List<CFGNode> ins;
+	public List<Variable> laIns;
+	public List<Variable> laOuts;
 	public static int cfgNodeCount;
 	public int number;
 	
@@ -32,4 +34,11 @@ public class CFGNode {
 		number = cfgNodeCount;
 	}
 	
+	@Override
+    public boolean equals(Object obj) {
+		if (!(obj instanceof CFGNode))
+			return false;
+		else
+			return ((CFGNode)obj).number == this.number;
+	}	
 }

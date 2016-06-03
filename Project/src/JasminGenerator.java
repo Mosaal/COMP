@@ -2,7 +2,9 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JasminGenerator {
@@ -106,7 +108,7 @@ public class JasminGenerator {
 		
 		writer.print(")");
 		
-		livenessAnalysis(f.cfgRoot);
+		livenessAnalysis(f);
 		
 		Variable ret = f.getReturnVar();
 		if(ret != null){
@@ -384,16 +386,51 @@ public class JasminGenerator {
 		}
 	}
 	
-	private static void livenessAnalysis(CFGNode root){
-		CFGNode currentNode = root;
-		ArrayList<ArrayList<String>> in = new ArrayList<ArrayList<String>>();
-		ArrayList<ArrayList<String>> out = new ArrayList<ArrayList<String>>();
+	// Assumindo que: StartNode.number = 1 e EndNode.number = Num de nos do CFG
+	
+	/*private static void livenessAnalysis(Function f){
+		boolean[] visited = new boolean[f.cfgEndNode.number];
+		visited[1] = true;
 		
-		while(currentNode.type != "end"){
-			for(int i = 0; i < root.outs.length; i++){
-				currentNode = root.outs[i];
+		CFGNode[] cfgList = new CFGNode[f.cfgEndNode.number];
+		CFGNode currentNode = f.cfgStartNode.outs.get(0);
+		
+			
+		while(!currentNode.equals(f.cfgEndNode)){
+			cfgList[currentNode.number] = currentNode;
+			visited[currentNode.number] = true;
+			
+			if(visited[currentNode.outs.get(0).number] && currentNode.outs.size() > 1){
+				unvisitedSonSearch:
+					for(int i = 0; i < currentNode.outs.size(); i++){
+						if(!visited[currentNode.outs.get(i).number]){
+							currentNode = currentNode.outs.get(i);
+							break unvisitedSonSearch;
+						}
+					}
+			} else if(!visited[currentNode.outs.get(0).number])
+				currentNode = currentNode.outs.get(0);
+		 }
+	}*/
+	
+	private static void livenessAnalysis (Function f){
+		do{
+			
+		}while(compareIterations(f));
+	}
+	
+	private static boolean compareIterations(Function f){
+		for(int i = 0; i < f.cfgNodesIns.size(); i++){
+			if(f.cfgNodesIns.get(i).size() != f.cfg.get(i).laIns.size()){
+				return true;
 			}
 		}
+		for(int i = 0; i < f.cfgNodesOuts.size(); i++){
+			if(f.cfgNodesOuts.get(i).size() != f.cfg.get(i).laOuts.size()){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }
