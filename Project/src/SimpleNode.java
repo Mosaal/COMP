@@ -531,12 +531,14 @@ public class SimpleNode implements Node {
 		}
 
 		// RHS 2
+		String op = null;
 		String rhs2Id = null;
 		String rhs2Type = null;
 		String rhs2Access = null;
 		String rhs2ArrayIndexId = null;
 		String rhs2ArrayAccess = null;
 		if (rhs.jjtGetNumChildren() == 2) {
+			op = rhs.ID;
 			twoSides = true;
 			SimpleNode rhs2Child = (SimpleNode) rhs.jjtGetChild(1);
 			if (rhs2Child.getId() == YalToJvmTreeConstants.JJTTERM) {
@@ -733,6 +735,7 @@ public class SimpleNode implements Node {
 		CFGNode cfgNode = new CFGNode("assignment",parentFunction);		
 		//META
 		cfgNode.twoSides = twoSides;
+		cfgNode.assignementOp = op;
 		//LHS
 		cfgNode.lhsId = lhsId;
 		cfgNode.lhsScope = parentFunction.getVariableScope(lhsId);

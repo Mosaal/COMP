@@ -139,7 +139,11 @@ public class JasminGenerator {
 			writer.println("V");
 		}
 		
-		writer.println("\t.limit locals " + (1+f.getNumParameters()+f.getNumVariable()));
+		int numLocal = 1+f.getNumParameters()+f.getNumVariable();
+		if(f.getReturnVar() != null){
+			numLocal++;
+		}
+		writer.println("\t.limit locals " + numLocal);
 		writer.println("\t.limit stack " + 2);
 		writer.println();
 	}
@@ -332,9 +336,29 @@ public class JasminGenerator {
 		}
 	}
 	
-	private static void printMethodFooter(){
+	private static void printMethodFooter(Function f){
 		//TODO: Temporary
-		writer.println("\treturn");
+		Variable ret = f.getReturnVar();
+		if(ret != null){
+			int localNum = f.localVariables.indexOf(ret.variableID);
+			if(ret.getType().equals("scalar")){
+				if(localNum <= 3){
+					writer.println("\tiload_" + localNum);
+				}else{
+					writer.println("\tiload " + localNum);
+				}
+				writer.println("\tireturn ");
+			}else if(ret.getType().equals("array")){
+				if(localNum <= 3){
+					writer.println("\taload_" + localNum);
+				}else{
+					writer.println("\t");
+				}
+				writer.println("\tareturn ");
+			}
+		}else{
+			writer.println("\treturn");
+		}
 		writer.println(".end method");
 	}
 	
@@ -402,7 +426,7 @@ public class JasminGenerator {
 		    printMethodHeader(f);
 		    //printBody(f, f.getBody());
 		    printCFG(f, f.cfgStartNode);
-		    printMethodFooter();
+		    printMethodFooter(f);
 		    printNewLine();
 		}
 	}
@@ -511,35 +535,71 @@ public class JasminGenerator {
 		node.printAssignmentNode();
 		
 		//Push rhs1 variable value to stack
-		
-		//Assign values in stack to lhs variable
-		if(node.twoSides){
+		if(node.rhs1Access.equals("integer")){
+			int rhsValue = Integer.parseInt(node.rhs1Id);
+			if(rhsValue <= 127 && rhsValue >= -128){
+				writer.println("\tbipush " + rhsValue);
+			}else{
+				writer.println("\tsipush " + rhsValue);
+			}
+		}else if(node.rhs1Access.equals("scalar")){
+			if(node.lhsScope.equals("global")){
+				int rhsValue;
+				//TODO:
+			}else{
+				
+			}
+		}else if(node.rhs1Access.equals("array")){
 			
-		}else{
+		}else if(node.rhs1Access.equals("call")){
+			
+		}
+		
+		if(node.twoSides){
+			//Push rhs2 variable value to stack
 			if(node.rhs1Access.equals("integer")){
-				int rhsValue = Integer.parseInt(node.rhs1Id);
-				if(rhsValue <= 127 && rhsValue >= -128){
-					writer.println("\tbipush " + rhsValue);
+				int rhs2Value = Integer.parseInt(node.rhs2Id);
+				if(rhs2Value <= 127 && rhs2Value >= -128){
+					writer.println("\tbipush " + rhs2Value);
 				}else{
-					writer.println("\tsipush " + rhsValue);
+					writer.println("\tsipush " + rhs2Value);
 				}
+			}else if(node.rhs1Access.equals("scalar")){
 				if(node.lhsScope.equals("global")){
-					if(node.lhsAccess.equals("scalar")){
-						writer.println("\tputstatic " + moduleName + "/" + node.lhsId + " I");
-					}else if(node.lhsAccess.equals("array")){
-						//TODO:
-					}
+					
+				}else{
+					
 				}
+			}else if(node.rhs1Access.equals("array")){
+				
+			}else if(node.rhs1Access.equals("call")){
+				
 			}
 			
+			//Make operation
+			printOperation(node.assignementOp);
+			
+		}
+		
+		//Assign values in stack to lhs variable
+		if(node.lhsScope.equals("global")){
+			if(node.lhsAccess.equals("scalar")){
+				writer.println("\tputstatic " + moduleName + "/" + node.lhsId + " I");
+			}else if(node.lhsAccess.equals("array")){
+				//TODO:
+			}
+		}else{
 			if(node.lhsAccess.equals("scalar")){
 				if(numLhs <= 3){
-					
+					writer.println("\tistore_" + numLhs);
+				}else{
+					writer.println("\tistore " + numLhs);
 				}
 			}else if(node.lhsAccess.equals("array")){
 				
 			}
 		}
+		
 		printNewLine();
 	}
 
@@ -648,6 +708,43 @@ public class JasminGenerator {
 		for(int i = 0; i < node.laOuts.size(); i++){
 			if(!node.laIns.contains(node.laOuts.get(i)) && !node.defs.contains(node.laOuts.get(i)))
 				node.laIns.add(node.laOuts.get(i));
+		}
+	}
+	
+	private static void printOperation(String op){
+		switch (op) {
+		case "+":
+			writer.println("\tiadd");
+			break;
+		case "-":
+			writer.println("\tisub");
+			break;
+		case "*":
+			writer.println("\timul");
+			break;
+		case "/":
+			writer.println("\tidiv");
+			break;
+		case ">>":
+			writer.println("\tishr");
+			break;
+		case "<<":
+			writer.println("\tishl");
+		break;
+		case ">>>":
+			writer.println("\tiushr");
+			break;
+		case "&":
+			writer.println("\tiand");
+			break;
+		case "|":
+			writer.println("\tior");
+			break;
+		case "^":
+			writer.println("\tixor");
+			break;
+		default:
+			break;
 		}
 	}
 	
