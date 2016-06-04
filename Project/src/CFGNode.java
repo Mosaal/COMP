@@ -16,6 +16,7 @@ public class CFGNode {
 	
 	/* Assignement or declaration */
 	public boolean twoSides;
+	public String assignementOp;
 	
 	public String lhsId;
 	public String lhsScope;
