@@ -2,42 +2,58 @@
 .class public while4
 .super java/lang/Object
 
-.field private a I = 0
-.field private b I = 1
-.field private c [I
+.field static a I = 0
+.field static b I = 1
+.field static c [I
 
-.method public <init>()V
+;
+; CONSTRUCTORS
+;
+.method static <clinit>()V
 	.limit stack 2
-	aload 0
-	invokenonvirtual java/lang/Object/<init>()V
+	.limit locals 0
 
-	aload 0
-	ldc 0
-	putfield while4/a I
-
-	aload 0
-	ldc 1
-	putfield while4/b I
-
-	aload 0
-	ldc 10
+	bipush 10
 	newarray int
-	putfield while4/c [I
+	putstatic while4/c [I
 
 	return
 .end method
 
+.method public <init>()V
+	.limit stack 2
+
+	aload 0
+	invokenonvirtual java/lang/Object/<init>()V
+
+	return
+.end method
+
+
+
+;
+; FUNCTIONS
+;
 .method public f1([III)V
 	.limit locals 5
+	.limit stack 2
 
-	invokestatic while4/f(II[I)I
+	; ASSIGNMENT
+	bipush 0
+	istore 4
 
 	return
 .end method
 
 .method public f(II[I)I
-	.limit locals 4
+	.limit locals 5
+	.limit stack 2
 
-	return
+	; ASSIGNMENT
+	bipush 2
+	istore_1
+
+	iload_1
+	ireturn 
 .end method
 

@@ -606,26 +606,38 @@ public class JasminGenerator {
 	private static void livenessAnalysis (Function f){
 		
 		setUsesAndDefs(f);
+		
+		f.cfgNodesIns = new ArrayList<ArrayList<Variable>>();
+		f.cfgNodesOuts = new ArrayList<ArrayList<Variable>>();
+		
+		// Empty aux Ins and Outs sets
+		for(int i = 0; i < f.cfgNodes.size(); i++){
+			f.cfgNodesIns.add(new ArrayList<Variable>());
+			f.cfgNodesOuts.add(new ArrayList<Variable>());
+		}
+		
 		do{
 			for(int i = 0; i < f.cfgNodes.size(); i++){
-				f.cfgNodesIns.set(i, f.cfgNodes.get(i).laIns);
-				f.cfgNodesOuts.set(i, f.cfgNodes.get(i).laOuts);
+				if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
+					f.cfgNodesIns.set(i, f.cfgNodes.get(i).laIns);
+					f.cfgNodesOuts.set(i, f.cfgNodes.get(i).laOuts);
+				}
 			}
 			
 			for(int i = f.cfgNodes.size() - 1; i > -1; i--){
-				nodeAnalysis(f.cfgNodes.get(i));
+				if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if"))
+					nodeAnalysis(f.cfgNodes.get(i));
 			}
 			
 		}while(compareIterations(f));
 		
-		//System.out.println("INS: " + f.cfgNodesIns);
-		//System.out.println("OUTS: " + f.cfgNodesOuts);
+		System.out.println("INS: " + f.cfgNodesIns);
+		System.out.println("OUTS: " + f.cfgNodesOuts);
 	}
 	
 	private static void setUsesAndDefs (Function f){
 		for (int i = 0; i < f.cfgNodes.size(); i++){
 			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
-				
 				
 				// Assignment => DEFS
 				if (f.cfgNodes.get(i).type.equals("assignment") && f.checkLocalVariable(f.cfgNodes.get(i).lhsId)
@@ -677,11 +689,13 @@ public class JasminGenerator {
 	
 	private static boolean compareIterations (Function f){
 		for (int i = 0; i < f.cfgNodes.size(); i++){
-			if (f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
+			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
+				if (f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
+					return true;
+				}
+				if (f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
 				return true;
-			}
-			if (f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
-				return true;
+				}
 			}
 		}
 		return false;

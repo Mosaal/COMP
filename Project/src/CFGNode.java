@@ -5,12 +5,12 @@ import java.util.List;
 public class CFGNode {
 	/* Meta data */
 	public String type; //assignment, while, if, endif, call, start, end
-	public List<CFGNode> outs;
-	public List<CFGNode> ins;
-	public List<Variable> uses;
-	public List<Variable> defs;
-	public List<Variable> laIns;
-	public List<Variable> laOuts;
+	public ArrayList<CFGNode> outs = new ArrayList<CFGNode>();
+	public ArrayList<CFGNode> ins = new ArrayList<CFGNode>();
+	public ArrayList<Variable> uses = new ArrayList<Variable>();
+	public ArrayList<Variable> defs = new ArrayList<Variable>();
+	public ArrayList<Variable> laIns = new ArrayList<Variable>();
+	public ArrayList<Variable> laOuts = new ArrayList<Variable>();
 	public static int cfgNodeCount;
 	public int number;
 	
