@@ -1,11 +1,14 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.print.attribute.standard.PrinterState;
 
 public class JasminGenerator {
 	
@@ -44,14 +47,31 @@ public class JasminGenerator {
 		printFields();
 		printNewLine();
 		
-		printConstructor();
-		
+		printLargeComment("CONSTRUCTORS");
+		printStaticConstructor();
 		printNewLine();
+		
+		printConstructor();
+		printNewLine();
+		printNewLine();
+		printNewLine();
+		printLargeComment("FUNCTIONS");
+		
 		printFunctions();
 	}
 	
 	private static void printNewLine(){
 		writer.println("");
+	}
+	
+	private static void printComment(String comment){
+		writer.println("\t; " + comment);
+	}
+	
+	private static void printLargeComment(String comment){
+		writer.println(";");
+		writer.println("; " + comment);
+		writer.println(";");
 	}
 	
 	private static void printClassHeader(){
@@ -60,36 +80,33 @@ public class JasminGenerator {
 		writer.println(".super java/lang/Object");
 	}
 	
-	private static void printConstructor(){
-		writer.println(".method public <init>()V");
+	private static void printStaticConstructor(){
+		writer.println(".method static <clinit>()V");
 		writer.println("\t.limit stack 2");
-		writer.println("\taload 0");
-		writer.println("\tinvokenonvirtual java/lang/Object/<init>()V");
+		writer.println("\t.limit locals 0");
 		printNewLine();
-		
-		//SCALAR TYPES
-		for (Map.Entry<String, String> entry : scalarFields.entrySet() ) {
-		    String id = entry.getKey();
-		    String value = entry.getValue();
-		    if(value == null){
-		   	 value = "0";
-		    }
-		    writer.println("\taload 0");
-		    writer.println("\tldc " + value);
-		    writer.println("\tputfield " + moduleName + "/" + id + " I");
-		    printNewLine();
-		}
 		
 		//ARRAY TYPES
 		for (Map.Entry<String, String> entry : arrayFields.entrySet() ) {
 		    String id = entry.getKey();
 		    String size = entry.getValue();
-		    writer.println("\taload 0");
-		    writer.println("\tldc " + size);
+		    writer.println("\tbipush " + size);
 		    writer.println("\tnewarray int");
-		    writer.println("\tputfield " + moduleName + "/" + id + " [I");
+		    writer.println("\tputstatic " + moduleName + "/" + id + " [I");
 		    printNewLine();
 		}
+		
+		writer.println("\treturn");
+		writer.println(".end method");
+	}
+	
+	private static void printConstructor(){
+		writer.println(".method public <init>()V");
+		writer.println("\t.limit stack 2");
+		writer.println();
+		writer.println("\taload 0");
+		writer.println("\tinvokenonvirtual java/lang/Object/<init>()V");
+		printNewLine();
 		
 		writer.println("\treturn");
 		writer.println(".end method");
@@ -109,7 +126,7 @@ public class JasminGenerator {
 		
 		writer.print(")");
 		
-		livenessAnalysis(f);
+		//livenessAnalysis(f);
 		
 		Variable ret = f.getReturnVar();
 		if(ret != null){
@@ -123,6 +140,8 @@ public class JasminGenerator {
 		}
 		
 		writer.println("\t.limit locals " + (1+f.getNumParameters()+f.getNumVariable()));
+		writer.println("\t.limit stack " + 2);
+		writer.println();
 	}
 	
 	private static void printBody(Function function, SimpleNode bodyNode){
@@ -321,7 +340,7 @@ public class JasminGenerator {
 	
 	// .field <access-spec> <field-name> <descriptor> [ = <value> ] <- value doesn't work idkw
 	private static void printField(String type, String name, String value){
-		String statement = ".field private ";
+		String statement = ".field static ";
 		statement += name + " ";
 		statement += type;
 		
@@ -381,7 +400,7 @@ public class JasminGenerator {
 		HashMap<String, Function> map = module.getFunctionMap();
 		for (Function f : map.values()) {
 		    printMethodHeader(f);
-		    printBody(f, f.getBody());
+		    //printBody(f, f.getBody());
 		    printCFG(f, f.cfgStartNode);
 		    printMethodFooter();
 		    printNewLine();
@@ -459,6 +478,13 @@ public class JasminGenerator {
 			}
 			break;
 		default:
+			switch (node.type) {
+			case "assignment":
+				printAssignment(f, node);
+				break;
+			default:
+				break;
+			}
 			System.out.println("\t" + node.number + "-" + node.type);
 			node.visited = true;
 			for (int i = 0; i < node.outs.size(); i++) {
@@ -472,6 +498,49 @@ public class JasminGenerator {
 			}
 			break;
 		}
+	}
+
+	//TODO: Optimize
+	private static void printAssignment (Function f, CFGNode node) {
+		printComment("ASSIGNMENT");
+		
+		int numLhs, numRhs1, numRhs2;
+		numLhs = f.localVariables.indexOf(node.lhsId);
+		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
+		
+		node.printAssignmentNode();
+		
+		//Push rhs1 variable value to stack
+		
+		//Assign values in stack to lhs variable
+		if(node.twoSides){
+			
+		}else{
+			if(node.rhs1Access.equals("integer")){
+				int rhsValue = Integer.parseInt(node.rhs1Id);
+				if(rhsValue <= 127 && rhsValue >= -128){
+					writer.println("\tbipush " + rhsValue);
+				}else{
+					writer.println("\tsipush " + rhsValue);
+				}
+				if(node.lhsScope.equals("global")){
+					if(node.lhsAccess.equals("scalar")){
+						writer.println("\tputstatic " + moduleName + "/" + node.lhsId + " I");
+					}else if(node.lhsAccess.equals("array")){
+						//TODO:
+					}
+				}
+			}
+			
+			if(node.lhsAccess.equals("scalar")){
+				if(numLhs <= 3){
+					
+				}
+			}else if(node.lhsAccess.equals("array")){
+				
+			}
+		}
+		printNewLine();
 	}
 
 	private static void livenessAnalysis (Function f){

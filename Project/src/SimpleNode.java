@@ -529,6 +529,7 @@ public class SimpleNode implements Node {
 		String rhs1Type = null;
 		String rhs1Access = null;
 		String rhs1ArrayIndexId = null;
+		String rhs1ArrayAccess = null;
 		String[] argumentTypes = null;
 		
 		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
@@ -570,6 +571,7 @@ public class SimpleNode implements Node {
 		String rhs2Type = null;
 		String rhs2Access = null;
 		String rhs2ArrayIndexId = null;
+		String rhs2ArrayAccess = null;
 		if (rhs.jjtGetNumChildren() == 2) {
 			twoSides = true;
 			SimpleNode rhs2Child = (SimpleNode) rhs.jjtGetChild(1);
@@ -764,15 +766,30 @@ public class SimpleNode implements Node {
 		}
 		
 		//CFG
-		//TODO: Continue filling node
-		CFGNode cfgNode = new CFGNode("assignment",parentFunction);
+		CFGNode cfgNode = new CFGNode("assignment",parentFunction);		
+		//META
+		cfgNode.twoSides = twoSides;
+		//LHS
 		cfgNode.lhsId = lhsId;
+		cfgNode.lhsScope = parentFunction.getVariableScope(lhsId);
 		cfgNode.lhsType = lhsType;
 		cfgNode.lhsAccess = lhsAccess;
 		cfgNode.lhsArrayIndexId = lhsArrayIndexId;
 		cfgNode.lhsArrayAccess = lhsArrayAccess;
-		cfgNode.twoSides = twoSides;
-		cfgNode.newVar = newVariable;
+		//RHS1
+		cfgNode.rhs1Id = rhs1Id;
+		cfgNode.rhs1Scope = parentFunction.getVariableScope(rhs1Id);
+		cfgNode.rhs1Type = rhs1Type;
+		cfgNode.rhs1Access = rhs1Access;
+		cfgNode.rhs1ArrayIndexId = rhs1ArrayIndexId;
+		cfgNode.rhs1ArrayAccess = rhs1ArrayAccess;
+		//RHS2
+		cfgNode.rhs2Id = rhs2Id;
+		cfgNode.rhs2Scope = parentFunction.getVariableScope(rhs2Id);
+		cfgNode.rhs2Type = rhs2Type;
+		cfgNode.rhs2Access = rhs2Access;
+		cfgNode.rhs2ArrayIndexId = rhs2ArrayIndexId;
+		cfgNode.rhs2ArrayAccess = rhs2ArrayAccess;
 		
 		return cfgNode;
 	}

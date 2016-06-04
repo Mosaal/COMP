@@ -16,6 +16,7 @@ public class Function {
 	public int labelCount;
 	public List<List<Variable>> cfgNodesIns;
 	public List<List<Variable>> cfgNodesOuts;
+	public List<String> localVariables;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
@@ -26,6 +27,7 @@ public class Function {
 		cfgNodes = new ArrayList<CFGNode>();
 		cfgNodeCount = 0;
 		labelCount = 0;
+		localVariables = new ArrayList<String>();
 	}
 
 	public int getNumVariable() {
@@ -128,14 +130,16 @@ public class Function {
 	}
 	
 	public String getVariableScope(String id) {
-		if (checkParams(id)) {
+		if(returnVar != null && returnVar.variableID.equals(id)){
+			return "return";
+		}else if (checkParams(id)) {
 			return "parameter";
 		} else if (checkLocalVariable(id)) {
-			return "localVar";
+			return "local";
 		} else if (YalToJvm.getModule().checkGlobalVariable(id)) {
-			return "globalVar";
+			return "global";
 		} else {
-			return null;
+			return "new";
 		}
 	}
 	
@@ -188,6 +192,25 @@ public class Function {
 			if(!cfgNode.outs.get(i).visited){
 				printCFG(cfgNode.outs.get(i));
 			}
+		}
+	}
+
+	/**
+	 * Fills a String array mapping local variables
+	 * to numbers from 0 to N(number of local variables).
+	 * Local variable number 0 is reserved for the "this"
+	 * object reference if the method is not static.
+	 */
+	public void fillLocalVariables () {
+		localVariables.add("[this]");
+		if(returnVar != null){
+			localVariables.add(returnVar.variableID);
+		}
+		for (int i = 0; i < parameters.size(); i++) {
+			localVariables.add(parameters.get(i).variableID);
+		}
+		for (String key : variableMap.keySet()) {
+			localVariables.add(variableMap.get(key).variableID);
 		}
 	}
 	
