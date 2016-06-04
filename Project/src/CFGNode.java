@@ -7,6 +7,11 @@ public class CFGNode {
 	public String type; //assignment, while, if, endif, call, start, end
 	public List<CFGNode> outs;
 	public List<CFGNode> ins;
+	public List<Variable> uses;
+	public List<Variable> defs;
+	public List<Variable> laIns;
+	public List<Variable> laOuts;
+	public static int cfgNodeCount;
 	public int number;
 	
 	/* Assignement or declaration */
@@ -50,4 +55,11 @@ public class CFGNode {
 		f.cfgNodes.add(this);
 	}
 	
+	@Override
+    public boolean equals(Object obj) {
+		if (!(obj instanceof CFGNode))
+			return false;
+		else
+			return ((CFGNode)obj).number == this.number;
+	}	
 }

@@ -14,6 +14,8 @@ public class Function {
 	public CFGNode cfgStartNode;
 	public CFGNode cfgEndNode;
 	public int labelCount;
+	public List<List<Variable>> cfgNodesIns;
+	public List<List<Variable>> cfgNodesOuts;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
@@ -123,6 +125,18 @@ public class Function {
 			return "array";
 		else
 			return null;
+	}
+	
+	public String getVariableScope(String id) {
+		if (checkParams(id)) {
+			return "parameter";
+		} else if (checkLocalVariable(id)) {
+			return "localVar";
+		} else if (YalToJvm.getModule().checkGlobalVariable(id)) {
+			return "globalVar";
+		} else {
+			return null;
+		}
 	}
 	
 	public Variable getVariableAllScopes(String id) {

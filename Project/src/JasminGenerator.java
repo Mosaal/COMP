@@ -2,11 +2,14 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class JasminGenerator {
 	
+	private static final String VOID = "V";
 	private static final String SCALARTYPE = "I";
 	private static final String ARRAYTYPE = "[I";
 	private static final HashMap<String,String> scalarFields = new HashMap<String,String>();
@@ -106,6 +109,8 @@ public class JasminGenerator {
 		
 		writer.print(")");
 		
+		livenessAnalysis(f);
+		
 		Variable ret = f.getReturnVar();
 		if(ret != null){
 			if(f.getReturnVar().getType().equals("scalar")){
@@ -129,13 +134,15 @@ public class JasminGenerator {
 				printAssignment(function, n);
 			} else if (id == YalToJvmTreeConstants.JJTWHILE) {
 				labelWhileCount++;
-				printWhileBlock(n);
+				printWhileBlock(function, n);
 			} else if (id == YalToJvmTreeConstants.JJTIF) {
 				labelIfCount++;
 				printIfBlock(function, n);
 			} else if (id == YalToJvmTreeConstants.JJTCALL) {
-				printCall(n);
+				printCall(function, n);
 			}
+			
+			printNewLine();
 		}
 	}
 	
@@ -161,7 +168,7 @@ public class JasminGenerator {
 		}
 	}
 	
-	private static void printWhileBlock(SimpleNode whileNode) {
+	private static void printWhileBlock(Function function, SimpleNode whileNode) {
 		SimpleNode whileCondition = (SimpleNode) whileNode.jjtGetChild(0);
 		SimpleNode whileBody = (SimpleNode) whileNode.jjtGetChild(1);
 		
@@ -170,6 +177,8 @@ public class JasminGenerator {
 		String endlabel = "EndWhile" + labelWhileCount;
 		
 		printCondition(whileCondition, endlabel);
+		
+		printBody(function, whileBody);
 		
 		writer.println("\tgoto While" + labelWhileCount);
 		writer.println(endlabel+":");
@@ -196,8 +205,36 @@ public class JasminGenerator {
 		writer.println(endlabel+":");
 	}
 	
-	private static void printCall(SimpleNode callNode) {
-		//TODO
+	private static String convertFunctionName(String actualName) {
+		String temp = "";
+		
+		if (actualName.equals(temp))
+			return temp;
+		
+		for (int i = 0; i < actualName.length(); i++) {
+			if (actualName.charAt(i) == 's')
+				temp += SCALARTYPE;
+			else if (actualName.charAt(i) == 'a')
+				temp += ARRAYTYPE;
+		}
+		
+		return "(" + temp + ")";
+	}
+	
+	private static void printCall(Function function, SimpleNode callNode) {
+		if (callNode.dot(callNode.ID)) {
+			writer.println("\tinvokestatic " + callNode.separateString(callNode.ID)[0] + "/" + callNode.separateString(callNode.ID)[1] + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + VOID);
+		} else {
+			String fullName = callNode.ID + "(" + callNode.getRealFunctionName(callNode.jjtGetChildren(), function) + ")";
+			
+			if (module.getFunctionByID(fullName).checkReturnVariableType() == null) {
+				writer.println("\tinvokestatic " + module.getModuleID() + "/" + callNode.ID + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + VOID);
+			} else if (module.getFunctionByID(fullName).checkReturnVariableType().equals("scalar")) {
+				writer.println("\tinvokestatic " + module.getModuleID() + "/" + callNode.ID + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + SCALARTYPE);
+			} else {
+				writer.println("\tinvokestatic " + module.getModuleID() + "/" + callNode.ID + convertFunctionName(callNode.getRealFunctionName(callNode.jjtGetChildren(), function)) + ARRAYTYPE);
+			}
+		}
 	}
 	
 	private static void printCondition(SimpleNode condition, String jumpLabel){
@@ -351,6 +388,7 @@ public class JasminGenerator {
 		}
 	}
 	
+
 	/**
 	 * Analyses the CFG and prints the corresponding
 	 * JVM instruction codes
@@ -433,6 +471,67 @@ public class JasminGenerator {
 				}
 			}
 			break;
+		}
+	}
+
+	private static void livenessAnalysis (Function f){
+		
+		setUsesAndDefs(f);
+		do{
+			for(int i = 0; i < f.cfgNodes.size(); i++){
+				f.cfgNodesIns.set(i, f.cfgNodes.get(i).laIns);
+				f.cfgNodesOuts.set(i, f.cfgNodes.get(i).laOuts);
+			}
+			
+			for(int i = f.cfgNodes.size() - 1; i > -1; i--){
+				nodeAnalysis(f.cfgNodes.get(i));
+			}
+			
+		}while(compareIterations(f));
+	}
+	
+	private static void setUsesAndDefs (Function f){
+		for(int i = 0; i < f.cfgNodes.size(); i++){
+			if(!f.cfgNodes.get(i).type.equals("endif")){
+				
+			}
+		}
+	}
+	
+	private static boolean compareIterations (Function f){
+		for(int i = 0; i < f.cfgNodes.size(); i++){
+			if(f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
+				return true;
+			}
+			if(f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private static void nodeAnalysis(CFGNode node){
+		
+		/* node 'OUT' SET */
+		// For each successor of node
+		for(int i = 0; i < node.outs.size(); i++){
+			
+			// For each variable in the 'IN' set of the successor
+			for(int j = 0; j < node.outs.get(i).laIns.size(); j++){
+				
+				if(!node.laOuts.contains(node.outs.get(i).laIns.get(j)))
+					node.laOuts.add(node.outs.get(i).laIns.get(j));
+			}
+		}
+		
+		/* node 'IN' SET */
+		for(int i = 0; i < node.uses.size(); i++){
+			if(!node.laIns.contains(node.uses.get(i)))
+				node.laIns.add(node.uses.get(i));
+		}
+		for(int i = 0; i < node.laOuts.size(); i++){
+			if(!node.laIns.contains(node.laOuts.get(i)) && !node.defs.contains(node.laOuts.get(i)))
+				node.laIns.add(node.laOuts.get(i));
 		}
 	}
 	
