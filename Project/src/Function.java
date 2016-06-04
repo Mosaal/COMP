@@ -10,8 +10,10 @@ public class Function {
 	private ArrayList<Variable> parameters;
 	private HashMap<String,Variable> variableMap;
 	public List<CFGNode> cfgNodes;
+	public int cfgNodeCount;
 	public CFGNode cfgStartNode;
 	public CFGNode cfgEndNode;
+	public int labelCount;
 	public List<List<Variable>> cfgNodesIns;
 	public List<List<Variable>> cfgNodesOuts;
 
@@ -22,6 +24,8 @@ public class Function {
 		body = n;
 		variableMap = new HashMap<String,Variable>();
 		cfgNodes = new ArrayList<CFGNode>();
+		cfgNodeCount = 0;
+		labelCount = 0;
 	}
 
 	public int getNumVariable() {

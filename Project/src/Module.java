@@ -82,8 +82,8 @@ public class Module {
 			CFGNode endNode = new CFGNode("end",functionMap.get(id));
 			lastNode.outs.add(endNode);
 			endNode.ins.add(lastNode);
-			System.out.println("CFG:");
-			functionMap.get(id).printCFG(functionMap.get(id).cfgStartNode);
+			//System.out.println("CFG:");
+			//functionMap.get(id).printCFG(functionMap.get(id).cfgStartNode);
 		}
 	}
 

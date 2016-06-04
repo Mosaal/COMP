@@ -327,7 +327,7 @@ public class SimpleNode implements Node {
 		}
 	}
 
-	public void processCall(String call, Node[] args, boolean isCondition, Function parentFunction) {
+	public CFGNode processCall(String call, Node[] args, boolean isCondition, Function parentFunction) {
 		if (!dot(call)) {
 			String fullName = call + "(" + getRealFunctionName(args, parentFunction) + ")";
 
@@ -342,6 +342,9 @@ public class SimpleNode implements Node {
 			} else
 				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Function \"" + fullName + "\" hasn't been declared!");
 		}
+		//CFG
+		CFGNode cfgNode = new CFGNode("call",parentFunction);
+		return cfgNode;
 	}
 
 	/**
@@ -430,7 +433,7 @@ public class SimpleNode implements Node {
 		}
 	}
 
-	public CFGNode processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction) {
+	public CFGNode processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction, String type) {
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
 			processArrayAccess(lhs.ID, index.ID, parentFunction);
@@ -488,7 +491,7 @@ public class SimpleNode implements Node {
 			}
 		}
 		//TODO: Fill node
-		CFGNode cfgNode = new CFGNode("condition",parentFunction);
+		CFGNode cfgNode = new CFGNode(type,parentFunction);
 		return cfgNode;
 	}
 
@@ -762,7 +765,7 @@ public class SimpleNode implements Node {
 		
 		//CFG
 		//TODO: Continue filling node
-		CFGNode cfgNode = new CFGNode("Assignment",parentFunction);
+		CFGNode cfgNode = new CFGNode("assignment",parentFunction);
 		cfgNode.lhsId = lhsId;
 		cfgNode.lhsType = lhsType;
 		cfgNode.lhsAccess = lhsAccess;
@@ -772,7 +775,6 @@ public class SimpleNode implements Node {
 		cfgNode.newVar = newVariable;
 		
 		return cfgNode;
-
 	}
 
 	private Variable getVariable(Function f, String id) {
@@ -805,7 +807,7 @@ public class SimpleNode implements Node {
 
 	/**
 	 * Method used to process the body of a function, a while loop and an
-	 * if/else statement
+	 * if/else statement. Also builds the CFG.
 	 */
 	public CFGNode processBody(Function parentFunction, CFGNode parentCFGNode) {
 		if (children == null){
@@ -830,7 +832,7 @@ public class SimpleNode implements Node {
 				SimpleNode whileCondition = (SimpleNode) bodyChild.jjtGetChild(0);
 				SimpleNode whileLhs = (SimpleNode) whileCondition.jjtGetChild(0);
 				SimpleNode whileRhs = (SimpleNode) whileCondition.jjtGetChild(1);
-				CFGNode conditionNodeWhile = processCondition(whileLhs, whileRhs, parentFunction);
+				CFGNode conditionNodeWhile = processCondition(whileLhs, whileRhs, parentFunction,"while");
 				//CFG
 				currentNode.outs.add(conditionNodeWhile);
 				conditionNodeWhile.ins.add(currentNode);
@@ -846,7 +848,7 @@ public class SimpleNode implements Node {
 				SimpleNode ifCondition = (SimpleNode) bodyChild.jjtGetChild(0);
 				SimpleNode ifLhs = (SimpleNode) ifCondition.jjtGetChild(0);
 				SimpleNode ifRhs = (SimpleNode) ifCondition.jjtGetChild(1);
-				CFGNode conditionNodeIf = processCondition(ifLhs, ifRhs, parentFunction);
+				CFGNode conditionNodeIf = processCondition(ifLhs, ifRhs, parentFunction,"if");
 				//CFG
 				currentNode.outs.add(conditionNodeIf);
 				conditionNodeIf.ins.add(currentNode);
@@ -858,6 +860,7 @@ public class SimpleNode implements Node {
 				if (bodyChild.jjtGetNumChildren() == 3) {
 					SimpleNode elseBody = (SimpleNode) bodyChild.jjtGetChild(2);
 					CFGNode lastNodeElse = elseBody.processBody(parentFunction,conditionNodeIf);
+					//CFG
 					if(lastNodeIf != conditionNodeIf && conditionNodeIf == lastNodeElse){
 						endIfNode.ins.add(lastNodeIf);
 						lastNodeIf.outs.add(endIfNode);
@@ -889,7 +892,10 @@ public class SimpleNode implements Node {
 				currentNode = endIfNode;
 				break;
 			case YalToJvmTreeConstants.JJTCALL:
-				processCall(bodyChild.ID, bodyChild.jjtGetChildren(), false, parentFunction);
+				CFGNode callNode = processCall(bodyChild.ID, bodyChild.jjtGetChildren(), false, parentFunction);
+				callNode.ins.add(currentNode);
+				currentNode.outs.add(callNode);
+				currentNode = callNode;
 				break;
 			}
 		}
