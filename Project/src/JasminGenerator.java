@@ -557,22 +557,69 @@ public class JasminGenerator {
 			}
 			
 		}while(compareIterations(f));
+		
+
 	}
 	
 	private static void setUsesAndDefs (Function f){
-		for(int i = 0; i < f.cfgNodes.size(); i++){
-			if(!f.cfgNodes.get(i).type.equals("endif")){
+		for (int i = 0; i < f.cfgNodes.size(); i++){
+			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
 				
+				
+				// Assignment => DEFS
+				if (f.cfgNodes.get(i).type.equals("assignment") && f.checkLocalVariable(f.cfgNodes.get(i).lhsId)
+						&& !f.cfgNodes.get(i).defs.contains(f.getVariable(f.cfgNodes.get(i).lhsId))){
+					f.cfgNodes.get(i).defs.add(f.getVariable(f.cfgNodes.get(i).lhsId));
+				} // Condition => USES
+				else if (f.checkLocalVariable(f.cfgNodes.get(i).lhsId) && !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).lhsId))){
+					f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).lhsId));
+				}
+				
+				/* USES */
+				
+				// Local variable as LHS array index
+				if (f.cfgNodes.get(i).lhsArrayIndexId != null && f.checkLocalVariable(f.cfgNodes.get(i).lhsArrayIndexId)
+						&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).lhsArrayIndexId))){
+					f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).lhsArrayIndexId));
+				}
+				
+				//RHS 1
+				if(f.cfgNodes.get(i).rhs1Id != null && !f.cfgNodes.get(i).rhs1Access.equals("integer")){
+					if(f.checkLocalVariable(f.cfgNodes.get(i).rhs1Id)
+					&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs1Id))){
+						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs1Id));
+					}
+					
+					// Local variable as RHS1 array index
+					if (f.cfgNodes.get(i).rhs1ArrayIndexId != null && f.checkLocalVariable(f.cfgNodes.get(i).rhs1ArrayIndexId)
+							&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs1ArrayIndexId))){
+						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs1ArrayIndexId));
+					}
+				}
+				
+				//RHS 2
+				if(f.cfgNodes.get(i).twoSides && f.cfgNodes.get(i).rhs2Id != null && !f.cfgNodes.get(i).rhs2Access.equals("integer")){
+					if(f.checkLocalVariable(f.cfgNodes.get(i).rhs2Id)
+					&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs2Id))){
+						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs2Id));
+					}
+					
+					// Local variable as RHS2 array index
+					if (f.cfgNodes.get(i).rhs2ArrayIndexId != null && f.checkLocalVariable(f.cfgNodes.get(i).rhs2ArrayIndexId)
+							&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs2ArrayIndexId))){
+						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs2ArrayIndexId));
+					}
+				}
 			}
 		}
 	}
 	
 	private static boolean compareIterations (Function f){
-		for(int i = 0; i < f.cfgNodes.size(); i++){
-			if(f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
+		for (int i = 0; i < f.cfgNodes.size(); i++){
+			if (f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
 				return true;
 			}
-			if(f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
+			if (f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
 				return true;
 			}
 		}

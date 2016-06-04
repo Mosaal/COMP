@@ -387,43 +387,7 @@ public class SimpleNode implements Node {
 						int size = Integer.parseInt(arraySize.ID);
 						var = new Array(varName, size);
 					}
-
-					/*
-					 * RHS = ATTRIBUTE else { String valueName = valueNode.ID;
-					 * Variable var2 = new Variable(valueName);
-					 * 
-					 * if(YalToJvm.getModule().checkGlobalVariable(valueName) &&
-					 * ((YalToJvm.getModule().getGlobalVariable(valueName).
-					 * getType().equals("scalar") && ((Scalar)
-					 * YalToJvm.getModule().getGlobalVariable(valueName)).
-					 * getValue() != null) ||
-					 * YalToJvm.getModule().getGlobalVariable(valueName).getType
-					 * ().equals("array"))) var2 =
-					 * YalToJvm.getModule().getGlobalVariable(valueName); else
-					 * YalToJvm.semanticErrorMessages.add("Attribute " +
-					 * valueName + " is not assigned to a value!"); // ERROR:
-					 * RHS NOT DECLARED/ASSIGNED
-					 * 
-					 * // SCALAR ATTRIBUTE if (valueNode.id ==
-					 * YalToJvmTreeConstants.JJTSCALARACCESS){
-					 * if(YalToJvm.getModule().getGlobalVariable(varName).
-					 * getType().equals("array"))
-					 * YalToJvm.semanticErrorMessages.add(
-					 * "Attribute type mismatch! Attribute " + varName +
-					 * " is an Array and attribute " + valueName +
-					 * " is a Scalar."); else{ int value = ((Scalar)
-					 * var2).getValue(); var = new Scalar(varName, value); }
-					 * 
-					 * // ARRAY ATTRIBUTE } else if (valueNode.id ==
-					 * YalToJvmTreeConstants.JJTARRAYACCESS){
-					 * if(YalToJvm.getModule().getGlobalVariable(varName).
-					 * getType().equals("scalar"))
-					 * YalToJvm.semanticErrorMessages.add(
-					 * "Attribute type mismatch! Attribute " + varName +
-					 * " is an Scalar and attribute " + valueName +
-					 * " is a Array."); else{ int size = ((Array)
-					 * var2).getSize(); var = new Array(varName, size); } } }
-					 */
+					
 
 					if (!YalToJvm.getModule().addGlobalVariable(var)) {
 						YalToJvm.semanticErrorMessages.add("[ Module - " + YalToJvm.getModule().getModuleID() + " ]: Attribute \"" + varName + "\" cannot be reassigned!");
