@@ -126,7 +126,7 @@ public class JasminGenerator {
 		
 		writer.print(")");
 		
-		//livenessAnalysis(f);
+		livenessAnalysis(f);
 		
 		Variable ret = f.getReturnVar();
 		if(ret != null){
@@ -618,7 +618,8 @@ public class JasminGenerator {
 			
 		}while(compareIterations(f));
 		
-
+		//System.out.println("INS: " + f.cfgNodesIns);
+		//System.out.println("OUTS: " + f.cfgNodesOuts);
 	}
 	
 	private static void setUsesAndDefs (Function f){
