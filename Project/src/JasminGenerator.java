@@ -17,6 +17,7 @@ public class JasminGenerator {
 	private static String moduleName;
 	private static int labelWhileCount = 0;
 	private static int labelIfCount = 0;
+	private static CFGNode endIfNode;
 	
 	public static void generate(SimpleNode n, Module m){
 		node = n;
@@ -358,37 +359,80 @@ public class JasminGenerator {
 	 */
 	private static void printCFG(Function f, CFGNode node){
 		switch (node.type) {
-		case "start":
-			System.out.println("\t" + node.number + "-" + node.type);
-			break;
-		case "assignment":
-			System.out.println("\t" + node.number + "-" + node.type);
-			break;
 		case "while":
-			System.out.println("label" + node.number + ": " + node.number + "-" + node.type);
-			System.out.println("\tif cond label" + node.outs.get(1).number);
-			break;
-		case "if":
-			System.out.println("\t" + node.number + "-" + node.type);
-			break;
-		case "endif":
-			break;
-		case "end":
-			System.out.println("\t" + node.number + "-" + node.type);
-			break;
-		default:
-			break;
-		}
-		node.visited = true;
-		for (int i = 0; i < node.outs.size(); i++) {
-			if(node.outs.get(i).type.equals("while")){
-				if(node.number >= node.outs.get(i).number){
-					System.out.println("\tGOTO label" + node.outs.get(i).number);
+			if(!node.visited){
+				node.visited = true;
+				f.labelCount++;
+				int whileLabel = f.labelCount;
+				System.out.println("label" + whileLabel + ":");
+				f.labelCount++;
+				int whileLabel2 = f.labelCount;
+				System.out.print("\t" + node.number + "-WHILE");
+				System.out.println(" label" + whileLabel2);
+				
+				printCFG(f, node.outs.get(0));
+				
+				System.out.println("\tgoto label" + whileLabel);
+				System.out.println("label" + whileLabel2 + ":");
+				
+				if(!node.outs.get(1).type.equals("endif")){
+					printCFG(f, node.outs.get(1));
 				}
 			}
-			if(!node.outs.get(i).visited){
-				printCFG(f, node.outs.get(i));
+			break;
+		case "if":
+			if(node.outs.size() == 2){
+				//If has both inner nodes
+				if(!node.outs.get(0).type.equals("endif") && !node.outs.get(1).type.equals("endif")){
+					f.labelCount++;
+					int iflabel = f.labelCount;
+					System.out.println("\tIF label" + iflabel);
+					f.labelCount++;
+					int iflabel2 = f.labelCount;
+					printCFG(f, node.outs.get(0));
+					System.out.println("\tgoto label" + iflabel2);
+					System.out.println("label" + iflabel + ":");
+					printCFG(f, node.outs.get(1));
+					System.out.println("label" + iflabel2 + ":");
+					printCFG(f, endIfNode);
+				}else{
+					//If "if" side doesn't exist
+					if(node.outs.get(0).type.equals("endif")){
+						f.labelCount++;
+						int iflabel = f.labelCount;
+						System.out.println("\tIF label" + iflabel);
+						printCFG(f, node.outs.get(1));
+						System.out.println("label" + iflabel + ":");
+						printCFG(f, node.outs.get(0));
+					}else if(node.outs.get(1).type.equals("endif")){
+						//TODO: CHANGE SIGN!
+						//If "else" side doesn't exist
+						f.labelCount++;
+						int iflabel = f.labelCount;
+						System.out.println("\tIF label" + iflabel);
+						printCFG(f, node.outs.get(0));
+						System.out.println("label" + iflabel + ":");
+						printCFG(f, node.outs.get(1));
+					}
+				}
+			}else{
+				//If has no inner nodes
+				printCFG(f, node.outs.get(0));
 			}
+			break;
+		default:
+			System.out.println("\t" + node.number + "-" + node.type);
+			node.visited = true;
+			for (int i = 0; i < node.outs.size(); i++) {
+				if(!node.outs.get(i).visited){
+					if(!node.outs.get(i).type.equals("endif")){
+						printCFG(f, node.outs.get(i));
+					}else{
+						endIfNode = node.outs.get(i);
+					}
+				}
+			}
+			break;
 		}
 	}
 	

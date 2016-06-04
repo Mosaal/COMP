@@ -13,6 +13,7 @@ public class Function {
 	public int cfgNodeCount;
 	public CFGNode cfgStartNode;
 	public CFGNode cfgEndNode;
+	public int labelCount;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
@@ -22,6 +23,7 @@ public class Function {
 		variableMap = new HashMap<String,Variable>();
 		cfgNodes = new ArrayList<CFGNode>();
 		cfgNodeCount = 0;
+		labelCount = 0;
 	}
 
 	public int getNumVariable() {
