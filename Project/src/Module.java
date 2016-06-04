@@ -77,13 +77,17 @@ public class Module {
 	*/
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
-			functionMap.get(id).cfgStartNode = new CFGNode("start",functionMap.get(id));
-			CFGNode lastNode = functionMap.get(id).getBody().processBody(functionMap.get(id),functionMap.get(id).cfgStartNode);
-			CFGNode endNode = new CFGNode("end",functionMap.get(id));
+			Function f = functionMap.get(id);
+			//Semantic analysis and CFG building
+			f.cfgStartNode = new CFGNode("start",f);
+			CFGNode lastNode = functionMap.get(id).getBody().processBody(f,f.cfgStartNode);
+			CFGNode endNode = new CFGNode("end",f);
 			lastNode.outs.add(endNode);
 			endNode.ins.add(lastNode);
+			//Printing jasmin instructions
+			f.fillLocalVariables();
 			//System.out.println("CFG:");
-			//functionMap.get(id).printCFG(functionMap.get(id).cfgStartNode);
+			//f.printCFG(f.cfgStartNode);
 		}
 	}
 
