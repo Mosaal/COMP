@@ -532,7 +532,7 @@ public class JasminGenerator {
 		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
 		numRhs2 = f.localVariables.indexOf(node.rhs2Id);
 		
-		node.printAssignmentNode();
+		//node.printAssignmentNode();
 		
 		//Push rhs1 variable value to stack
 		if(node.rhs1Access.equals("integer")){ //INTEGER
@@ -555,8 +555,12 @@ public class JasminGenerator {
 			
 		}else if(node.rhs1Access.equals("call")){ //CALL
 			
+		}else if(node.rhs1Access.equals("size")){
+			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			writer.println("\tarraylength");
 		}
 		
+		//Push rhs2 variable value to stack
 		if(node.twoSides){
 			if(node.rhs2Access.equals("integer")){ //INTEGER
 				pushInt(node.rhs2Id);
@@ -578,6 +582,9 @@ public class JasminGenerator {
 				
 			}else if(node.rhs2Access.equals("call")){ //CALL
 				
+			}else if(node.rhs2Access.equals("size")){
+				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				writer.println("\tarraylength");
 			}
 			
 			//Make operation

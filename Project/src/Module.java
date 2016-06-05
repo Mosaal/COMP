@@ -78,12 +78,14 @@ public class Module {
 	public void processFunctions(){
 		for (String id : functionMap.keySet()) {
 			Function f = functionMap.get(id);
+			
 			//Semantic analysis and CFG building
 			f.cfgStartNode = new CFGNode("start",f);
 			CFGNode lastNode = functionMap.get(id).getBody().processBody(f,f.cfgStartNode);
 			CFGNode endNode = new CFGNode("end",f);
 			lastNode.outs.add(endNode);
 			endNode.ins.add(lastNode);
+			
 			//Printing jasmin instructions
 			f.fillLocalVariables();
 			//System.out.println("CFG:");
@@ -93,6 +95,56 @@ public class Module {
 
 	public boolean functionExists(String functionID) {
 		return functionMap.containsKey(functionID);
+	}
+	
+	public boolean functionExistsOnlyName(String functionName){
+		for (String key : functionMap.keySet()) {
+			if(getFunctionName(key).equals(functionName)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private String getFunctionName(String functionID){
+		String name = "";
+		for (int i = 0; i < functionID.length(); i++) {
+			if(functionID.charAt(i) == '('){
+				break;
+			}else{
+				name += functionID.charAt(i);
+			}
+		}
+		return name;
+	}
+	
+	private void processFunctions(String id, List<String> args){
+		boolean passed = false;
+		for (String key : functionMap.keySet()) {
+			if(getFunctionName(key).equals(id)){
+				Function f = functionMap.get(key);
+				if(f.getNumParameters() == args.size()){
+					for (int i = 0; i < args.size(); i++) {
+						//Check if variable exist and get its type
+						String varId = args.get(i);
+					}
+				}
+			}
+		}
+	}
+	
+	private boolean checkVariable(Function f, String id) {
+		if (f.getReturnVar() != null && f.checkReturnVariable(id)) {
+			return true;
+		} else if (f.checkParams(id)) {
+			return true;
+		} else if (f.checkLocalVariable(id)) {
+			return true;
+		} else if (checkGlobalVariable(id)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public Function getFunctionByID(String functionID) {
