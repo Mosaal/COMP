@@ -536,6 +536,8 @@ public class SimpleNode implements Node {
 		String rhs1ArrayIndexId = null;
 		String rhs1ArrayAccess = null;
 		List<String> rhs1Args = new ArrayList<String>();
+		Function rhs1Function = null;
+		boolean rhs1OtherModule = false;
 		
 		SimpleNode rhs1Child = (SimpleNode)rhs.jjtGetChild(0);
 		if (rhs1Child.getId() == YalToJvmTreeConstants.JJTTERM) {
@@ -585,6 +587,8 @@ public class SimpleNode implements Node {
 		String rhs2ArrayIndexId = null;
 		String rhs2ArrayAccess = null;
 		List<String> rhs2Args = new ArrayList<String>();
+		Function rhs2Function = null;
+		boolean rhs2OtherModule = false;
 		
 		if (rhs.jjtGetNumChildren() == 2) {
 			op = rhs.ID;
@@ -745,12 +749,17 @@ public class SimpleNode implements Node {
 						+ " does not exist in this module");
 				}else{
 					String functionID = buildFunctionId(parentFunction, rhs1Id, rhs1Args,lhsId);
+					System.out.println(functionID);
 					if(!YalToJvm.getModule().functionExists(functionID)){
 						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " + "Arguments of function " + rhs1Id
 							+ " from right hand side of assignement for variable: " + lhsId
 							+ " do not match patterns of the same name function in this module");
+					}else{
+						rhs1Function = YalToJvm.getModule().getFunctionByID(functionID);
 					}
 				}
+			}else{
+				rhs1OtherModule = true;
 			}
 		}
 
@@ -814,9 +823,13 @@ public class SimpleNode implements Node {
 							YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " + "Arguments of function " + rhs2Id
 								+ " from right hand side of assignement for variable: " + lhsId
 								+ " do not match patterns of the same name function in this module");
+						}else{
+							rhs2Function = YalToJvm.getModule().getFunctionByID(functionID);
 						}
 					}
 				}
+			}else{
+				rhs2OtherModule = true;
 			}
 		}
 
@@ -844,6 +857,9 @@ public class SimpleNode implements Node {
 		cfgNode.rhs1Access = rhs1Access;
 		cfgNode.rhs1ArrayIndexId = rhs1ArrayIndexId;
 		cfgNode.rhs1ArrayAccess = rhs1ArrayAccess;
+		cfgNode.rhs1Args = rhs1Args;
+		cfgNode.rhs1Call = rhs1Function;
+		cfgNode.rhs1OtherModule = rhs1OtherModule;
 		//RHS2
 		cfgNode.rhs2Id = rhs2Id;
 		cfgNode.rhs2Scope = parentFunction.getVariableScope(rhs2Id);
@@ -851,6 +867,9 @@ public class SimpleNode implements Node {
 		cfgNode.rhs2Access = rhs2Access;
 		cfgNode.rhs2ArrayIndexId = rhs2ArrayIndexId;
 		cfgNode.rhs2ArrayAccess = rhs2ArrayAccess;
+		cfgNode.rhs2Args = rhs2Args;
+		cfgNode.rhs2Call = rhs2Function;
+		cfgNode.rhs2OtherModule = rhs2OtherModule;
 		
 		return cfgNode;
 	}
