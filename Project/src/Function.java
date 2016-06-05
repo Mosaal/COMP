@@ -202,12 +202,11 @@ public class Function {
 	 * object reference if the method is not static.
 	 */
 	public void fillLocalVariables () {
-		localVariables.add("[this]");
-		if(returnVar != null){
-			localVariables.add(returnVar.variableID);
-		}
 		for (int i = 0; i < parameters.size(); i++) {
 			localVariables.add(parameters.get(i).variableID);
+		}
+		if(returnVar != null){
+			localVariables.add(returnVar.variableID);
 		}
 		for (String key : variableMap.keySet()) {
 			localVariables.add(variableMap.get(key).variableID);

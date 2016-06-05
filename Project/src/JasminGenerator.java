@@ -113,7 +113,7 @@ public class JasminGenerator {
 	}
 	
 	private static void printMethodHeader(Function f){
-		writer.print(".method public " + f.getFunctionID() + "(");
+		writer.print(".method public static " + f.getFunctionID() + "(");
 		
 		ArrayList<Variable> params = f.getParameters();
 		for (int i = 0; i < params.size(); i++) {
@@ -139,7 +139,7 @@ public class JasminGenerator {
 			writer.println("V");
 		}
 		
-		int numLocal = 1+f.getNumParameters()+f.getNumVariable();
+		int numLocal = f.getNumParameters() + f.getNumVariable();
 		if(f.getReturnVar() != null){
 			numLocal++;
 		}
@@ -554,8 +554,7 @@ public class JasminGenerator {
 			writer.println("\tiaload");
 			
 		}else if(node.rhs1Access.equals("call")){ //CALL
-			System.out.println("CAAAALLLL!");
-			String moduleName = getFunctionModule(node.rhs1Id);
+			String otherModuleName = getFunctionModule(node.rhs1Id);
 			String functionName = getFunctionName(node.rhs1Id);
 			String fullName;
 			if(node.rhs1OtherModule){
@@ -563,7 +562,7 @@ public class JasminGenerator {
 			}else{
 				fullName = getFunctionFullName(node.rhs1Id,node.rhs1Call);
 			}
-			System.out.println(fullName);
+			
 			//Push arguments to stack
 			for (int i = 0; i < node.rhs1Args.size(); i++) {
 				try {
@@ -581,8 +580,8 @@ public class JasminGenerator {
 				}
 			}
 			//Invoke call
-			if(moduleName != null){
-				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
+			if(otherModuleName != null){
+				writer.println("\tinvokestatic " + otherModuleName + "/" + fullName);
 			}else{
 				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 			}
@@ -613,7 +612,37 @@ public class JasminGenerator {
 				writer.println("\tiaload");
 				
 			}else if(node.rhs2Access.equals("call")){ //CALL
-				System.out.println("CAAAALLLL!");
+				String otherModuleName = getFunctionModule(node.rhs2Id);
+				String functionName = getFunctionName(node.rhs2Id);
+				String fullName;
+				if(node.rhs2OtherModule){
+					fullName = getFunctionFullNameOtherModule(f,functionName, node.rhs2Args);
+				}else{
+					fullName = getFunctionFullName(node.rhs2Id,node.rhs2Call);
+				}
+				
+				//Push arguments to stack
+				for (int i = 0; i < node.rhs2Args.size(); i++) {
+					try {
+						Integer.parseInt(node.rhs2Args.get(i));
+						pushInt(node.rhs2Args.get(i));
+					} catch (NumberFormatException e) {
+						Variable var = YalToJvm.getModule().getVariable(f, node.rhs2Args.get(i));
+						String scope = f.getVariableScope(node.rhs2Args.get(i));
+						int varNum = f.localVariables.indexOf(node.rhs2Args.get(i));
+						if(var.getType().equals("scalar")){
+							loadVarScalar(node.rhs2Args.get(i), varNum, scope);
+						}else if(var.getType().equals("array")){
+							loadVarArray(node.rhs2Args.get(i), varNum, scope);
+						}
+					}
+				}
+				//Invoke call
+				if(otherModuleName != null){
+					writer.println("\tinvokestatic " + otherModuleName + "/" + fullName);
+				}else{
+					writer.println("\tinvokestatic " + moduleName + "/" + fullName);
+				}
 				
 			}else if(node.rhs2Access.equals("size")){
 				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
