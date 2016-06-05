@@ -605,12 +605,6 @@ public class SimpleNode implements Node {
 		boolean newVariable = false;
 		if (!checkVariable(parentFunction, lhsId)) {
 			newVariable = true;
-			// ERROR: If the left hand side of a new variable is not a scalar
-			// type
-			if (!lhsAccess.equals("scalar")) {
-				YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] "
-						+ "Left hand side of assignement for new variable: " + lhsId + " must be of a scalar type");
-			}
 		} else {
 			Variable v = getVariable(parentFunction, lhsId);
 			switch (lhsAccess) {
@@ -644,12 +638,14 @@ public class SimpleNode implements Node {
 				}
 				break;
 			case "scalar":
-				// ERROR: If the left hand side variable is not a scalar
-				// variable
-				if (!v.getType().equals("scalar")) {
-					YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] "
-							+ "Left hand side of assignement for variable: " + lhsId + " is not a scalar variable");
-				}
+				if(!rhs1Access.equals("arraysize")){
+					Variable var = YalToJvm.getModule().getVariable(parentFunction, lhsId);
+					if(var.getType().equals("array")){
+						YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] "
+							+ "The variable: "  + lhsId + " in the left hand side for variable: " + lhsId
+							+ " is not a scalar type");
+					}
+				}else
 				break;
 			default:
 				break;
@@ -658,8 +654,13 @@ public class SimpleNode implements Node {
 
 		// FIRST RIGHT HAND SIDE
 		if(rhs1Access.equals("arraysize")){
-			//TODO
-			System.out.println("arraysize!");
+			if(!newVariable){
+				Variable lhsVar = YalToJvm.getModule().getVariable(parentFunction, lhsId);
+				if(!lhsVar.getType().equals("array")){
+					YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " + "Variable " + lhsId
+						+ " from left hand side of assignement for variable: " + lhsId + " is not an array type");
+				}
+			}
 		}else if (!rhs1Access.equals("integer") && !rhs1Access.equals("call")) {
 			// ERROR: If the variable doesn't exist
 			if (!checkVariable(parentFunction, rhs1Id)) {
@@ -799,12 +800,18 @@ public class SimpleNode implements Node {
 
 		// Add a new local variable
 		if (newVariable) {
-			parentFunction.addVariable(new Scalar(lhsId));
+			if(rhs1Access.equals("arraysize")){
+				Variable var = new Array(lhsId, Integer.parseInt(rhs1Id));
+				parentFunction.addVariable(var);
+			}else{
+				parentFunction.addVariable(new Scalar(lhsId));
+			}
 		}
 		
 		//CFG
 		CFGNode cfgNode = new CFGNode("assignment",parentFunction);		
 		//META
+		cfgNode.newVar = newVariable;
 		cfgNode.twoSides = twoSides;
 		cfgNode.assignementOp = op;
 		//LHS
