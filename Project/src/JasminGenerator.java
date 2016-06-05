@@ -467,37 +467,41 @@ public class JasminGenerator {
 				if(!node.outs.get(0).type.equals("endif") && !node.outs.get(1).type.equals("endif")){
 					f.labelCount++;
 					int iflabel = f.labelCount;
-					System.out.println("\tIF label" + iflabel);
+					writer.println("\tIF label" + iflabel);
 					f.labelCount++;
 					int iflabel2 = f.labelCount;
 					printCFG(f, node.outs.get(0));
-					System.out.println("\tgoto label" + iflabel2);
-					System.out.println("label" + iflabel + ":");
+					writer.println("\tgoto label" + iflabel2);
+					writer.println("label" + iflabel + ":");
 					printCFG(f, node.outs.get(1));
-					System.out.println("label" + iflabel2 + ":");
+					writer.println("label" + iflabel2 + ":");
 					printCFG(f, endIfNode);
 				}else{
 					//If "if" side doesn't exist
 					if(node.outs.get(0).type.equals("endif")){
 						f.labelCount++;
 						int iflabel = f.labelCount;
-						System.out.println("\tIF label" + iflabel);
+						writer.println("\tIF label" + iflabel);
 						printCFG(f, node.outs.get(1));
-						System.out.println("label" + iflabel + ":");
+						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(0));
 					}else if(node.outs.get(1).type.equals("endif")){
 						//TODO: CHANGE SIGN!
 						//If "else" side doesn't exist
 						f.labelCount++;
 						int iflabel = f.labelCount;
-						System.out.println("\tIF label" + iflabel);
+						writer.println("\tIF label" + iflabel);
 						printCFG(f, node.outs.get(0));
-						System.out.println("label" + iflabel + ":");
+						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(1));
 					}
 				}
 			}else{
 				//If has no inner nodes
+				f.labelCount++;
+				int iflabel = f.labelCount;
+				writer.println("\t" + printCondition(f, node) + " label " + iflabel);
+				writer.println("label" + iflabel + ":");
 				printCFG(f, node.outs.get(0));
 			}
 			break;
@@ -520,6 +524,22 @@ public class JasminGenerator {
 					}
 				}
 			}
+			break;
+		}
+	}
+	
+	private static String printCondition(Function f, CFGNode node){
+		String condJump = "";
+		return condJump;
+	}
+	
+	private static void printConditionJump(String op, boolean invert){
+		switch (op) {
+		case "<":
+			
+			break;
+
+		default:
 			break;
 		}
 	}
