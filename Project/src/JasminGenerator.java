@@ -606,9 +606,11 @@ public class JasminGenerator {
 				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 			}
 			
-		}else if(node.rhs1Access.equals("size")){
+		}else if(node.rhs1Access.equals("size")){ //SIZE
 			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
 			writer.println("\tarraylength");
+		}else if(node.rhs1Access.equals("arraysize")){ //ARRAYSIZE(Only in rhs1!)
+			pushInt(node.rhs1Id);
 		}
 		
 		//Push rhs2 variable value to stack
@@ -664,7 +666,7 @@ public class JasminGenerator {
 					writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 				}
 				
-			}else if(node.rhs2Access.equals("size")){
+			}else if(node.rhs2Access.equals("size")){ //SIZE
 				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
 				writer.println("\tarraylength");
 			}
@@ -676,7 +678,12 @@ public class JasminGenerator {
 		
 		//Assign values in stack to lhs variable
 		if(node.lhsAccess.equals("scalar")){
-			storeVarScalar(node.lhsId, numLhs, node.lhsScope);
+			if(node.rhs1Access.equals("arraysize")){ //new local array
+				writer.println("\tnewarray int");
+				storeVarArray(node.lhsId, numLhs, node.lhsScope);
+			}else{
+				storeVarScalar(node.lhsId, numLhs, node.lhsScope);
+			}
 		}else if(node.lhsAccess.equals("array")){
 			loadVarArray(node.lhsId, numLhs, node.lhsScope);
 			writer.println("\tswap");
@@ -833,6 +840,18 @@ public class JasminGenerator {
 				writer.println("\tistore_" + varNum);
 			}else{
 				writer.println("\tistore " + varNum);
+			}
+		}
+	}
+	
+	private static void storeVarArray(String id, int varNum, String scope){
+		if(scope.equals("global")){
+			writer.println("\tputstatic " + moduleName + "/" + id + " [I");
+		}else{
+			if(varNum <= 3){
+				writer.println("\tastore_" + varNum);
+			}else{
+				writer.println("\tastore " + varNum);
 			}
 		}
 	}

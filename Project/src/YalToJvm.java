@@ -18,13 +18,11 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 root.getAttributes();
                 module.getFunctions();
                 module.processFunctions();
-                module.printSymbolTables();
+                //module.printSymbolTables();
                 printSemanticErrors();
-
-                // If there are no erros
-                //if(semanticErrorMessages.size() == 0){
+                if(semanticErrorMessages.size() == 0){
                         JasminGenerator.generate(root, module);
-                //}
+                }
         }
 
         public static SimpleNode getAST(String name) throws ParseException, FileNotFoundException {
