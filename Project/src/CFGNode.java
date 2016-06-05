@@ -39,6 +39,10 @@ public class CFGNode {
 	public String rhs2ArrayIndexId;
 	public String rhs2ArrayAccess;
 	
+	public String callModule;
+	public String callFuntion;
+	public String[] callParams; 
+	
 	public boolean newVar;
 	
 	/* Conditions */
