@@ -144,7 +144,7 @@ public class JasminGenerator {
 			numLocal++;
 		}
 		writer.println("\t.limit locals " + numLocal);
-		writer.println("\t.limit stack " + 2);
+		writer.println("\t.limit stack " + 3);
 		writer.println();
 	}
 	
@@ -524,55 +524,59 @@ public class JasminGenerator {
 		}
 	}
 
-	//TODO: Optimize
 	private static void printAssignment (Function f, CFGNode node) {
 		printComment("ASSIGNMENT");
 		
 		int numLhs, numRhs1, numRhs2;
 		numLhs = f.localVariables.indexOf(node.lhsId);
 		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
+		numRhs2 = f.localVariables.indexOf(node.rhs2Id);
 		
 		node.printAssignmentNode();
 		
 		//Push rhs1 variable value to stack
-		if(node.rhs1Access.equals("integer")){
-			int rhsValue = Integer.parseInt(node.rhs1Id);
-			if(rhsValue <= 127 && rhsValue >= -128){
-				writer.println("\tbipush " + rhsValue);
-			}else{
-				writer.println("\tsipush " + rhsValue);
-			}
-		}else if(node.rhs1Access.equals("scalar")){
-			if(node.lhsScope.equals("global")){
-				int rhsValue;
-				//TODO:
-			}else{
-				
-			}
-		}else if(node.rhs1Access.equals("array")){
+		if(node.rhs1Access.equals("integer")){ //INTEGER
+			pushInt(node.rhs1Id);
 			
-		}else if(node.rhs1Access.equals("call")){
+		}else if(node.rhs1Access.equals("scalar")){ //SCALAR
+			loadVarScalar(node.rhs1Id, numRhs1, node.rhs1Scope);
+			
+		}else if(node.rhs1Access.equals("array")){ //ARRAY
+			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			String rhs1ArrayIndexId = node.rhs1ArrayIndexId;
+			int rhs1ArrayIndexNum = f.localVariables.indexOf(rhs1ArrayIndexId);
+			String rhs1ArrayIndexScope = f.getVariableScope(rhs1ArrayIndexId);
+			if(node.rhs1ArrayAccess.equals("integer")){
+				pushInt(rhs1ArrayIndexId);
+			}else if(node.rhs1ArrayAccess.equals("scalar")){
+				loadVarScalar(rhs1ArrayIndexId, rhs1ArrayIndexNum, rhs1ArrayIndexScope);
+			}
+			writer.println("\tiaload");
+			
+		}else if(node.rhs1Access.equals("call")){ //CALL
 			
 		}
 		
 		if(node.twoSides){
-			//Push rhs2 variable value to stack
-			if(node.rhs1Access.equals("integer")){
-				int rhs2Value = Integer.parseInt(node.rhs2Id);
-				if(rhs2Value <= 127 && rhs2Value >= -128){
-					writer.println("\tbipush " + rhs2Value);
-				}else{
-					writer.println("\tsipush " + rhs2Value);
-				}
-			}else if(node.rhs1Access.equals("scalar")){
-				if(node.lhsScope.equals("global")){
-					
-				}else{
-					
-				}
-			}else if(node.rhs1Access.equals("array")){
+			if(node.rhs2Access.equals("integer")){ //INTEGER
+				pushInt(node.rhs2Id);
 				
-			}else if(node.rhs1Access.equals("call")){
+			}else if(node.rhs2Access.equals("scalar")){ //SCALAR
+				loadVarScalar(node.rhs2Id, numRhs2, node.rhs2Scope);
+				
+			}else if(node.rhs2Access.equals("array")){ //ARRAY
+				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				String rhs2ArrayIndexId = node.rhs2ArrayIndexId;
+				int rhs2ArrayIndexNum = f.localVariables.indexOf(rhs2ArrayIndexId);
+				String rhs2ArrayIndexScope = f.getVariableScope(rhs2ArrayIndexId);
+				if(node.rhs2ArrayAccess.equals("integer")){
+					pushInt(rhs2ArrayIndexId);
+				}else if(node.rhs2ArrayAccess.equals("scalar")){
+					loadVarScalar(rhs2ArrayIndexId, rhs2ArrayIndexNum, rhs2ArrayIndexScope);
+				}
+				writer.println("\tiaload");
+				
+			}else if(node.rhs2Access.equals("call")){ //CALL
 				
 			}
 			
@@ -582,22 +586,20 @@ public class JasminGenerator {
 		}
 		
 		//Assign values in stack to lhs variable
-		if(node.lhsScope.equals("global")){
-			if(node.lhsAccess.equals("scalar")){
-				writer.println("\tputstatic " + moduleName + "/" + node.lhsId + " I");
-			}else if(node.lhsAccess.equals("array")){
-				//TODO:
+		if(node.lhsAccess.equals("scalar")){
+			storeVarScalar(node.lhsId, numLhs, node.lhsScope);
+		}else if(node.lhsAccess.equals("array")){
+			loadVarArray(node.lhsId, numLhs, node.lhsScope);
+			writer.println("\tswap");
+			int lhsArrayIndexNum = f.localVariables.indexOf(node.lhsArrayIndexId);
+			String lhsArrayIndexScope = f.getVariableScope(node.lhsArrayIndexId);
+			if(node.lhsArrayAccess.equals("integer")){
+				pushInt(node.lhsArrayIndexId);
+			}else if(node.lhsArrayAccess.equals("scalar")){
+				loadVarScalar(node.lhsArrayIndexId, lhsArrayIndexNum, lhsArrayIndexScope);
 			}
-		}else{
-			if(node.lhsAccess.equals("scalar")){
-				if(numLhs <= 3){
-					writer.println("\tistore_" + numLhs);
-				}else{
-					writer.println("\tistore " + numLhs);
-				}
-			}else if(node.lhsAccess.equals("array")){
-				
-			}
+			writer.println("\tswap");
+			writer.println("\tiastore");
 		}
 		
 		printNewLine();
@@ -760,6 +762,51 @@ public class JasminGenerator {
 			break;
 		default:
 			break;
+		}
+	}
+	
+	public static void pushInt(String n){
+		int rhs1Value = Integer.parseInt(n);
+		if(rhs1Value <= 127 && rhs1Value >= -128){
+			writer.println("\tbipush " + rhs1Value);
+		}else{
+			writer.println("\tsipush " + rhs1Value);
+		}
+	}
+	
+	public static void loadVarScalar(String id, int varNum, String scope){
+		if(scope.equals("global")){
+			writer.println("\tgetstatic " + moduleName + "/" + id + " I");
+		}else{
+			if(varNum <= 3){
+				writer.println("\tiload_" + varNum);
+			}else{
+				writer.println("\tiload " + varNum);
+			}
+		}
+	}
+	
+	public static void loadVarArray(String id, int varNum, String scope){
+		if(scope.equals("global")){
+			writer.println("\tgetstatic " + moduleName + "/" + id + " [I");
+		}else{
+			if(varNum <= 3){
+				writer.println("\taload_" + varNum);
+			}else{
+				writer.println("\taload " + varNum);
+			}
+		}
+	}
+	
+	public static void storeVarScalar(String id, int varNum, String scope){
+		if(scope.equals("global")){
+			writer.println("\tputstatic " + moduleName + "/" + id + " I");
+		}else{
+			if(varNum <= 3){
+				writer.println("\tistore_" + varNum);
+			}else{
+				writer.println("\tistore " + varNum);
+			}
 		}
 	}
 	

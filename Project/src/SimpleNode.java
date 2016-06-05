@@ -475,8 +475,11 @@ public class SimpleNode implements Node {
 			SimpleNode arrayIndex = (SimpleNode)(lhs.jjtGetChild(0));
 			try{
 				Integer.parseInt(arrayIndex.ID);
+				lhsArrayIndexId = arrayIndex.ID;
+				lhsArrayAccess = "integer";
 			} catch (NumberFormatException e) {
 				lhsArrayIndexId  = arrayIndex.ID;
+				lhsArrayAccess = "scalar";
 			}
 		} else if(lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			if(dot(lhs.ID)){
@@ -496,13 +499,13 @@ public class SimpleNode implements Node {
 		String rhs1ArrayAccess = null;
 		String[] argumentTypes = null;
 		
-		SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
-		if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
-			if (rhsChild.ID != null) {
-				rhs1Id = rhsChild.ID;
+		SimpleNode rhs1Child = (SimpleNode)rhs.jjtGetChild(0);
+		if (rhs1Child.getId() == YalToJvmTreeConstants.JJTTERM) {
+			if (rhs1Child.ID != null) {
+				rhs1Id = rhs1Child.ID;
 				rhs1Access = "integer";
 			} else {
-				SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
+				SimpleNode termChild = (SimpleNode)rhs1Child.jjtGetChild(0);
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
 					rhs1Access = "call";
 					rhs1Id = termChild.ID;
@@ -512,8 +515,11 @@ public class SimpleNode implements Node {
 					SimpleNode arrayIndex = (SimpleNode)(termChild.jjtGetChild(0));
 					try{
 						Integer.parseInt(arrayIndex.ID);
+						rhs1ArrayIndexId = arrayIndex.ID;
+						rhs1ArrayAccess = "integer";
 					} catch (NumberFormatException e) {
 						rhs1ArrayIndexId = arrayIndex.ID;
+						rhs1ArrayAccess = "scalar";
 					}
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 					if(dot(termChild.ID)){
@@ -525,9 +531,9 @@ public class SimpleNode implements Node {
 					}
 				} 
 			}
-		} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
+		} else if (rhs1Child.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
 			rhs1Access = "arraysize";
-			rhs1Id = rhsChild.ID;
+			rhs1Id = rhs1Child.ID;
 		}
 
 		// RHS 2
@@ -540,31 +546,41 @@ public class SimpleNode implements Node {
 		if (rhs.jjtGetNumChildren() == 2) {
 			op = rhs.ID;
 			twoSides = true;
-			SimpleNode rhs2Child = (SimpleNode) rhs.jjtGetChild(1);
+			SimpleNode rhs2Child = (SimpleNode)rhs.jjtGetChild(1);
 			if (rhs2Child.getId() == YalToJvmTreeConstants.JJTTERM) {
 				if (rhs2Child.ID != null) {
 					rhs2Id = rhs2Child.ID;
 					rhs2Access = "integer";
 				} else {
-					SimpleNode termChild = (SimpleNode) rhs2Child.jjtGetChild(0);
+					SimpleNode termChild = (SimpleNode)rhs2Child.jjtGetChild(0);
 					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
-
+						rhs2Access = "call";
+						rhs2Id = termChild.ID;
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 						rhs2Access = "array";
 						rhs2Id = termChild.ID;
-						rhs2ArrayIndexId = ((SimpleNode) termChild.jjtGetChild(0)).ID;
+						SimpleNode arrayIndex = (SimpleNode)(termChild.jjtGetChild(0));
+						try{
+							Integer.parseInt(arrayIndex.ID);
+							rhs2ArrayIndexId = arrayIndex.ID;
+							rhs2ArrayAccess = "integer";
+						} catch (NumberFormatException e) {
+							rhs2ArrayIndexId = arrayIndex.ID;
+							rhs2ArrayAccess = "scalar";
+						}
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
-						if (dot(termChild.ID)) {
+						if(dot(termChild.ID)){
 							rhs2Access = "size";
 							rhs2Id = separateString(termChild.ID)[0];
-						} else {
+						}else{
 							rhs2Access = "scalar";
 							rhs2Id = termChild.ID;
 						}
-					}
+					} 
 				}
 			} else if (rhs2Child.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-
+				rhs2Access = "arraysize";
+				rhs2Id = rhs2Child.ID;
 			}
 		}
 
@@ -592,7 +608,7 @@ public class SimpleNode implements Node {
 							+ "The variable on the left hand side of assignement for variable: " + lhsId
 							+ " is not an array type");
 				} else {
-					if (lhsArrayIndexId != null) {
+					if (lhsArrayIndexId != null && !lhsArrayAccess.equals("integer")) {
 						// ERROR: If the index of the left hand side of the
 						// assignment does not exist
 						if (!checkVariable(parentFunction, lhsArrayIndexId)) {
@@ -639,7 +655,7 @@ public class SimpleNode implements Node {
 				rhs1Type = getVariable(parentFunction, rhs1Id).getType();
 				if (rhs1Access.equals("array")) {
 					// ERROR: If the variable used for the index doesn't exist
-					if (rhs1ArrayIndexId != null) {
+					if (rhs1ArrayIndexId != null && !rhs1ArrayAccess.equals("integer")) {
 						if (!checkVariable(parentFunction, rhs1ArrayIndexId)) {
 							YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " + "Variable "
 									+ rhs1ArrayIndexId + " from right hand side of assignement for variable: " + lhsId
@@ -688,7 +704,7 @@ public class SimpleNode implements Node {
 					if (rhs2Access.equals("array")) {
 						// ERROR: If the variable used for the index doesn't
 						// exist
-						if (rhs2ArrayIndexId != null) {
+						if (rhs2ArrayIndexId != null && !rhs2ArrayAccess.equals("integer")) {
 							if (!checkVariable(parentFunction, rhs2ArrayIndexId)) {
 								YalToJvm.semanticErrorMessages.add("[Function-" + parentFunction + "] " + "Variable "
 										+ rhs2ArrayIndexId + " from right hand side of assignement for variable: "
