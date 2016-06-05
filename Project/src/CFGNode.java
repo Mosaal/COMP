@@ -31,6 +31,9 @@ public class CFGNode {
 	public String rhs1Type;
 	public String rhs1ArrayIndexId;
 	public String rhs1ArrayAccess;
+	public List<String> rhs1Args;
+	public Function rhs1Call;
+	public boolean rhs1OtherModule;
 	
 	public String rhs2Id;
 	public String rhs2Scope;
@@ -38,10 +41,13 @@ public class CFGNode {
 	public String rhs2Type;
 	public String rhs2ArrayIndexId;
 	public String rhs2ArrayAccess;
+	public List<String> rhs2Args;
+	public Function rhs2Call;
+	public boolean rhs2OtherModule;
 	
 	public String callModule;
 	public String callFuntion;
-	public String[] callParams; 
+	public String[] callParams;
 	
 	public boolean newVar;
 	
@@ -58,6 +64,8 @@ public class CFGNode {
 		type = t;
 		outs = new ArrayList<CFGNode>();
 		ins = new ArrayList<CFGNode>();
+		rhs1Args = new ArrayList<String>();
+		rhs2Args = new ArrayList<String>();
 		number = f.cfgNodeCount;
 		f.cfgNodeCount++;
 		f.cfgNodes.add(this);

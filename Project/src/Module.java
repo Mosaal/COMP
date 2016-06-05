@@ -147,6 +147,20 @@ public class Module {
 		}
 	}
 	
+	public Variable getVariable(Function f, String id) {
+		if (f.getReturnVar() != null && f.checkReturnVariable(id)) {
+			return f.getReturnVar();
+		} else if (f.checkParams(id)) {
+			return f.getParameter(id);
+		} else if (f.checkLocalVariable(id)) {
+			return f.getVariable(id);
+		} else if (checkGlobalVariable(id)) {
+			return getGlobalVariable(id);
+		} else {
+			return null;
+		}
+	}
+	
 	public Function getFunctionByID(String functionID) {
 		return functionMap.get(functionID);
 	}

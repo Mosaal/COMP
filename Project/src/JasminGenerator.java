@@ -554,6 +554,38 @@ public class JasminGenerator {
 			writer.println("\tiaload");
 			
 		}else if(node.rhs1Access.equals("call")){ //CALL
+			System.out.println("CAAAALLLL!");
+			String moduleName = getFunctionModule(node.rhs1Id);
+			String functionName = getFunctionName(node.rhs1Id);
+			String fullName;
+			if(node.rhs1OtherModule){
+				fullName = getFunctionFullNameOtherModule(f,functionName, node.rhs1Args);
+			}else{
+				fullName = getFunctionFullName(node.rhs1Id,node.rhs1Call);
+			}
+			System.out.println(fullName);
+			//Push arguments to stack
+			for (int i = 0; i < node.rhs1Args.size(); i++) {
+				try {
+					Integer.parseInt(node.rhs1Args.get(i));
+					pushInt(node.rhs1Args.get(i));
+				} catch (NumberFormatException e) {
+					Variable var = YalToJvm.getModule().getVariable(f, node.rhs1Args.get(i));
+					String scope = f.getVariableScope(node.rhs1Args.get(i));
+					int varNum = f.localVariables.indexOf(node.rhs1Args.get(i));
+					if(var.getType().equals("scalar")){
+						loadVarScalar(node.rhs1Args.get(i), varNum, scope);
+					}else if(var.getType().equals("array")){
+						loadVarArray(node.rhs1Args.get(i), varNum, scope);
+					}
+				}
+			}
+			//Invoke call
+			if(moduleName != null){
+				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
+			}else{
+				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
+			}
 			
 		}else if(node.rhs1Access.equals("size")){
 			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
@@ -581,6 +613,7 @@ public class JasminGenerator {
 				writer.println("\tiaload");
 				
 			}else if(node.rhs2Access.equals("call")){ //CALL
+				System.out.println("CAAAALLLL!");
 				
 			}else if(node.rhs2Access.equals("size")){
 				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
@@ -772,7 +805,7 @@ public class JasminGenerator {
 		}
 	}
 	
-	public static void pushInt(String n){
+	private static void pushInt(String n){
 		int rhs1Value = Integer.parseInt(n);
 		if(rhs1Value <= 127 && rhs1Value >= -128){
 			writer.println("\tbipush " + rhs1Value);
@@ -781,7 +814,7 @@ public class JasminGenerator {
 		}
 	}
 	
-	public static void loadVarScalar(String id, int varNum, String scope){
+	private static void loadVarScalar(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tgetstatic " + moduleName + "/" + id + " I");
 		}else{
@@ -793,7 +826,7 @@ public class JasminGenerator {
 		}
 	}
 	
-	public static void loadVarArray(String id, int varNum, String scope){
+	private static void loadVarArray(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tgetstatic " + moduleName + "/" + id + " [I");
 		}else{
@@ -805,7 +838,7 @@ public class JasminGenerator {
 		}
 	}
 	
-	public static void storeVarScalar(String id, int varNum, String scope){
+	private static void storeVarScalar(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tputstatic " + moduleName + "/" + id + " I");
 		}else{
@@ -815,6 +848,71 @@ public class JasminGenerator {
 				writer.println("\tistore " + varNum);
 			}
 		}
+	}
+	
+	private static String getFunctionModule(String fullPath){
+		String module = null;
+		for (int i = fullPath.length()-1; i >= 0; i--) {
+			if(fullPath.charAt(i) == '.'){
+				module = fullPath.substring(0, i);
+			}
+		}
+		return module;
+	}
+	
+	private static String getFunctionName(String fullPath){
+		String name = null;
+		for (int i = fullPath.length()-1; i >= 0; i--) {
+			if(fullPath.charAt(i) == '.'){
+				name = fullPath.substring(i+1, fullPath.length());
+			}
+		}
+		return name;
+	}
+	
+	private static String getFunctionFullName(String functionName, Function f){
+		String fullName = functionName + "(";
+		for (int i = 0; i < f.getNumParameters(); i++) {
+			if(f.getParameters().get(i).getType().equals("scalar")){
+				fullName += "I";
+			}else if(f.getParameters().get(i).getType().equals("array")){
+				fullName += "[I";
+			}
+		}
+		fullName += ")";
+		
+		Variable returnVar = f.getReturnVar();
+		if(returnVar == null){
+			fullName += "V";
+		}else{
+			Variable var = f.getReturnVar();
+			if(var.getType().equals("scalar")){
+				fullName += "I";
+			}else if(var.getType().equals("array")){
+				fullName += "[I";
+			}
+		}
+		return fullName;
+	}
+	
+	private static String getFunctionFullNameOtherModule(Function f, String functionName, List<String> args){
+		String fullName = functionName + "(";
+		for (int i = 0; i < args.size(); i++) {
+			try{
+				Integer.parseInt(args.get(i));
+				fullName += "I";
+			}catch(NumberFormatException e){
+				Variable var = YalToJvm.getModule().getVariable(f, args.get(i));
+				if(var.getType().equals("scalar")){
+					fullName += "I";
+				}else if(var.getType().equals("array")){
+					fullName += "[I";
+				}
+			}
+		}
+		fullName += ")";
+		fullName += "I";
+		return fullName;
 	}
 	
 }
