@@ -330,8 +330,11 @@ public class SimpleNode implements Node {
 	}
 
 	public CFGNode processCall(String call, Node[] args, boolean isCondition, Function parentFunction) {
+		boolean dot = true;
+		String fullName = null;
 		if (!dot(call)) {
-			String fullName = call + "(" + getRealFunctionName(args, parentFunction) + ")";
+			dot = false;
+			fullName = call + "(" + getRealFunctionName(args, parentFunction) + ")";
 
 			if (YalToJvm.getModule().functionExists(fullName)) {
 				if (isCondition) {
@@ -346,6 +349,20 @@ public class SimpleNode implements Node {
 		}
 		//CFG
 		CFGNode cfgNode = new CFGNode("call",parentFunction);
+		int numArgs;
+		if(args == null){
+			numArgs = 0;
+		}else{
+			numArgs = args.length;
+		}
+		String[] arguments = new String[numArgs];
+		for (int i = 0; i < numArgs; i++) {
+			arguments[i] = ((SimpleNode)args[i]).ID;
+		}
+		cfgNode.callArgs= arguments;
+		cfgNode.dot = dot;
+		cfgNode.callName = call;
+		cfgNode.callFullName = fullName;
 		return cfgNode;
 	}
 

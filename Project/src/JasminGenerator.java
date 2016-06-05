@@ -510,6 +510,9 @@ public class JasminGenerator {
 			case "assignment":
 				printAssignment(f, node);
 				break;
+			case "call":
+				printCall(f,node);
+				break;
 			default:
 				break;
 			}
@@ -541,6 +544,52 @@ public class JasminGenerator {
 
 		default:
 			break;
+		}
+	}
+	
+	private static void printCall(Function f, CFGNode node){
+		//Push variables to stack
+		for (int i = 0; i < node.callArgs.length; i++) {
+			try{
+				Integer.parseInt(node.callArgs[i]);
+				pushInt(node.callArgs[i]);
+			}catch(NumberFormatException e){
+				Variable var = YalToJvm.getModule().getVariable(f, node.callArgs[i]);
+				String scope = f.getVariableScope(node.callArgs[i]);
+				int varNum = f.localVariables.indexOf(var.getVariableID());
+				if(var.getType().equals("scalar")){
+					loadVarScalar(node.callArgs[i], varNum, scope);
+				}else if(var.getType().equals("array")){
+					loadVarArray(node.callArgs[i], varNum, scope);
+				}
+			}
+		}
+		//Invoke function
+		Function callFunction = YalToJvm.getModule().getFunctionByID(node.callFullName);
+		if(node.dot){
+			writer.print("\tinvokestatic /" + node.callName);
+		}else{
+			writer.print("\tinvokestatic " + moduleName + "/" + node.callName);
+		}
+		writer.print("(");
+		for (int i = 0; i < callFunction.getNumParameters(); i++) {
+			Variable var = callFunction.getParameters().get(i);
+			if(var.getType().equals("scalar")){
+				writer.print("I");
+			}else if(var.getType().equals("array")){
+				writer.print("[I");
+			}
+		}
+		writer.print(")");
+		Variable returnVar = callFunction.getReturnVar();
+		if(returnVar == null){
+			writer.println("V");
+		}else{
+			if(returnVar.getType().equals("scalar")){
+				writer.print("I");
+			}else if(returnVar.getType().equals("array")){
+				writer.print("[I");
+			}
 		}
 	}
 

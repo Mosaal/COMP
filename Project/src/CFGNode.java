@@ -47,6 +47,7 @@ public class CFGNode {
 	
 	public String callModule;
 	public String callFuntion;
+	public String callFullName;
 	public String[] callParams;
 	
 	public boolean newVar;
@@ -54,6 +55,9 @@ public class CFGNode {
 	/* Conditions */
 	
 	/* Call */
+	public boolean dot;
+	public String callName;
+	public String[] callArgs;
 	
 	/* For printing purposes */
 	public boolean visited;
