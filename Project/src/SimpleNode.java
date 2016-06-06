@@ -417,14 +417,25 @@ public class SimpleNode implements Node {
 	}
 
 	public CFGNode processCondition(SimpleNode lhs, SimpleNode rhs, Function parentFunction, String type) {
+		CFGNode cfgNode = new CFGNode(type, parentFunction);
+		
 		if (lhs.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 			SimpleNode index = (SimpleNode)lhs.jjtGetChild(0);
+			
+			cfgNode.lhsId = lhs.ID;
+			cfgNode.lhsAccess = "array";
+			cfgNode.lhsArrayIndexId = index.ID;
+			
 			processArrayAccess(lhs.ID, index.ID, parentFunction);
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+			cfgNode.lhsId = lhs.ID;
+			cfgNode.lhsAccess = "scalar";
+			
 			processScalarAccess(lhs.ID, parentFunction);
 		}
 
 		if (rhs.jjtGetNumChildren() == 1) {
+			cfgNode.twoSides = false;
 			SimpleNode rhsChild = (SimpleNode)rhs.jjtGetChild(0);
 
 			if (rhsChild.getId() == YalToJvmTreeConstants.JJTTERM) {
@@ -432,18 +443,40 @@ public class SimpleNode implements Node {
 					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 
 					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+						if (!dot(termChild.ID)) {
+							String fullName = termChild.ID + "(" + getRealFunctionName(termChild.jjtGetChildren(), parentFunction) + ")";
+							cfgNode.rhs1Call = YalToJvm.getModule().getFunctionByID(fullName);
+						} else {
+							cfgNode.rhs1OtherModule = true;
+						}
+						
+						for (int i = 0; i < termChild.jjtGetNumChildren(); i++)
+							cfgNode.rhs1Args.add(i, ((SimpleNode)termChild.jjtGetChild(i)).ID);
+						
 						processCall(termChild.ID, termChild.jjtGetChildren(), true, parentFunction);
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 						SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
+						
+						cfgNode.rhs1Id = termChild.ID;
+						cfgNode.rhs1Access = "array";
+						cfgNode.rhs1ArrayIndexId = index.ID;
+						
 						processArrayAccess(termChild.ID, index.ID, parentFunction);
 					} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+						cfgNode.rhs1Id = termChild.ID;
+						cfgNode.rhs1Access = "scalar";
+						
 						processScalarAccess(termChild.ID, parentFunction);
 					}
+				} else {
+					cfgNode.rhs1Id = rhsChild.ID;
+					cfgNode.rhs1Access = "integer";
 				}
 			} else if (rhsChild.getId() == YalToJvmTreeConstants.JJTARRAYSIZE) {
-				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Invalid placement of TODO!");
+				YalToJvm.semanticErrorMessages.add("[ Function - " + parentFunction + " ]: Invalid placement of an array size!");
 			}
 		} else if (rhs.jjtGetNumChildren() == 2) {
+			cfgNode.twoSides = true;
 			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
 			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
 
@@ -451,30 +484,71 @@ public class SimpleNode implements Node {
 				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
 
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					if (!dot(termChild.ID)) {
+						String fullName = termChild.ID + "(" + getRealFunctionName(termChild.jjtGetChildren(), parentFunction) + ")";
+						cfgNode.rhs1Call = YalToJvm.getModule().getFunctionByID(fullName);
+					} else {
+						cfgNode.rhs1OtherModule = true;
+					}
+					
+					for (int i = 0; i < termChild.jjtGetNumChildren(); i++)
+						cfgNode.rhs1Args.add(i, ((SimpleNode)termChild.jjtGetChild(i)).ID);
+					
 					processCall(termChild.ID, termChild.jjtGetChildren(), true, parentFunction);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
+					
+					cfgNode.rhs1Id = termChild.ID;
+					cfgNode.rhs1Access = "array";
+					cfgNode.rhs1ArrayIndexId = index.ID;
+					
 					processArrayAccess(termChild.ID, index.ID, parentFunction);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+					cfgNode.rhs1Id = termChild.ID;
+					cfgNode.rhs1Access = "scalar";
+					
 					processScalarAccess(termChild.ID, parentFunction);
 				}
+			} else {
+				cfgNode.rhs1Id = termLeft.ID;
+				cfgNode.rhs1Access = "integer";
 			}
 
 			if (termRight.ID == null) {
 				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
 
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					if (!dot(termChild.ID)) {
+						String fullName = termChild.ID + "(" + getRealFunctionName(termChild.jjtGetChildren(), parentFunction) + ")";
+						cfgNode.rhs2Call = YalToJvm.getModule().getFunctionByID(fullName);
+					} else {
+						cfgNode.rhs2OtherModule = true;
+					}
+					
+					for (int i = 0; i < termChild.jjtGetNumChildren(); i++)
+						cfgNode.rhs2Args.add(i, ((SimpleNode)termChild.jjtGetChild(i)).ID);
+					
 					processCall(termChild.ID, termChild.jjtGetChildren(), true, parentFunction);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTARRAYACCESS) {
 					SimpleNode index = (SimpleNode)termChild.jjtGetChild(0);
+					
+					cfgNode.rhs2Id = termChild.ID;
+					cfgNode.rhs2Access = "array";
+					cfgNode.rhs2ArrayIndexId = index.ID;
+					
 					processArrayAccess(termChild.ID, index.ID, parentFunction);
 				} else if (termChild.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
+					cfgNode.rhs2Id = termChild.ID;
+					cfgNode.rhs2Access = "scalar";
+					
 					processScalarAccess(termChild.ID, parentFunction);
 				}
+			} else {
+				cfgNode.rhs2Id = termRight.ID;
+				cfgNode.rhs2Access = "integer";
 			}
 		}
-		//TODO: Fill node
-		CFGNode cfgNode = new CFGNode(type,parentFunction);
+		
 		return cfgNode;
 	}
 
