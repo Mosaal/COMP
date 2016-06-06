@@ -17,6 +17,10 @@ public class Function {
 	public List<ArrayList<String>> cfgNodesIns;
 	public List<ArrayList<String>> cfgNodesOuts;
 	public List<String> localVariables;
+	
+	// Live range of function's return and local variables
+	public HashMap<String, Integer> varStart = new HashMap<String, Integer>();
+	public HashMap<String, Integer> varEnd = new HashMap<String, Integer>();
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){
 		functionID = id;
