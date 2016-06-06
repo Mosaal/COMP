@@ -144,7 +144,7 @@ public class JasminGenerator {
 			numLocal++;
 		}
 		writer.println("\t.limit locals " + numLocal);
-		writer.println("\t.limit stack " + 3);
+		writer.println("\t.limit stack " + 4);
 		writer.println();
 	}
 	
@@ -442,19 +442,20 @@ public class JasminGenerator {
 		switch (node.type) {
 		case "while":
 			if(!node.visited){
+				printComment("WHILE");
 				node.visited = true;
 				f.labelCount++;
 				int whileLabel = f.labelCount;
-				System.out.println("label" + whileLabel + ":");
+				writer.println("label" + whileLabel + ":");
 				f.labelCount++;
 				int whileLabel2 = f.labelCount;
-				System.out.print("\t" + node.number + "-WHILE");
-				System.out.println(" label" + whileLabel2);
+				writer.print("\t" + printCondition(f, node));
+				writer.println(" label" + whileLabel2);
 				
 				printCFG(f, node.outs.get(0));
 				
-				System.out.println("\tgoto label" + whileLabel);
-				System.out.println("label" + whileLabel2 + ":");
+				writer.println("\tgoto label" + whileLabel);
+				writer.println("label" + whileLabel2 + ":");
 				
 				if(!node.outs.get(1).type.equals("endif")){
 					printCFG(f, node.outs.get(1));
@@ -462,6 +463,8 @@ public class JasminGenerator {
 			}
 			break;
 		case "if":
+			printComment("CONDITION");
+			node.condInvert = false;
 			if(node.outs.size() == 2){
 				//If has both inner nodes
 				if(!node.outs.get(0).type.equals("endif") && !node.outs.get(1).type.equals("endif")){
@@ -486,7 +489,8 @@ public class JasminGenerator {
 						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(0));
 					}else if(node.outs.get(1).type.equals("endif")){
-						//TODO: CHANGE SIGN!
+						//CHANGE SIGN!
+						node.condInvert = true;
 						//If "else" side doesn't exist
 						f.labelCount++;
 						int iflabel = f.labelCount;
@@ -532,20 +536,17 @@ public class JasminGenerator {
 	}
 	
 	private static String printCondition(Function f, CFGNode node){
-		printComment("CONDITION");
-		
 		int numLhs, numRhs1, numRhs2;
 		numLhs = f.localVariables.indexOf(node.lhsId);
 		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
 		numRhs2 = f.localVariables.indexOf(node.rhs2Id);
-		
 		//Push rhs1 variable value to stack
 		if(node.rhs1Access.equals("integer")){ //INTEGER
 			pushInt(node.rhs1Id);
 		}else if(node.rhs1Access.equals("scalar")){ //SCALAR
-			loadVarScalar(node.rhs1Id, numRhs1, node.rhs1Scope);
+			loadVarScalar(node.rhs1Id, numRhs1, f.getVariableScope(node.rhs1Id));
 		}else if(node.rhs1Access.equals("array")){ //ARRAY
-			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			loadVarArray(node.rhs1Id, numRhs1, f.getVariableScope(node.rhs1Id));
 			String rhs1ArrayIndexId = node.rhs1ArrayIndexId;
 			int rhs1ArrayIndexNum = f.localVariables.indexOf(rhs1ArrayIndexId);
 			String rhs1ArrayIndexScope = f.getVariableScope(rhs1ArrayIndexId);
@@ -588,7 +589,7 @@ public class JasminGenerator {
 				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 			}
 		}else if(node.rhs1Access.equals("size")){ //SIZE
-			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			loadVarArray(node.rhs1Id, numRhs1, f.getVariableScope(node.rhs1Id));
 			writer.println("\tarraylength");
 		}
 		
@@ -597,9 +598,9 @@ public class JasminGenerator {
 			if(node.rhs2Access.equals("integer")){ //INTEGER
 				pushInt(node.rhs2Id);
 			}else if(node.rhs2Access.equals("scalar")){ //SCALAR
-				loadVarScalar(node.rhs2Id, numRhs2, node.rhs2Scope);
+				loadVarScalar(node.rhs2Id, numRhs2, f.getVariableScope(node.rhs2Id));
 			}else if(node.rhs2Access.equals("array")){ //ARRAY
-				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				loadVarArray(node.rhs2Id, numRhs2, f.getVariableScope(node.rhs2Id));
 				String rhs2ArrayIndexId = node.rhs2ArrayIndexId;
 				int rhs2ArrayIndexNum = f.localVariables.indexOf(rhs2ArrayIndexId);
 				String rhs2ArrayIndexScope = f.getVariableScope(rhs2ArrayIndexId);
@@ -642,17 +643,63 @@ public class JasminGenerator {
 					writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 				}
 			}else if(node.rhs2Access.equals("size")){ //SIZE
-				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				loadVarArray(node.rhs2Id, numRhs2, f.getVariableScope(node.rhs2Id));
 				writer.println("\tarraylength");
 			}
 			
 			//Make operation
-			printOperation(node.assignementOp);
+			printOperation(node.condOp);
 			
+			}
+		
+			//Get lhs value
+			if(node.lhsAccess.equals("scalar")){
+				loadVarScalar(node.lhsId, numLhs, f.getVariableScope(node.lhsId));
+			}else if(node.lhsAccess.equals("array")){
+				loadVarArray(node.lhsId, numLhs, f.getVariableScope(node.lhsId));
+				int lhsArrayIndexNum = f.localVariables.indexOf(node.lhsArrayIndexId);
+				String lhsArrayIndexScope = f.getVariableScope(node.lhsArrayIndexId);
+				if(node.lhsArrayAccess.equals("integer")){
+					pushInt(node.lhsArrayIndexId);
+				}else if(node.lhsArrayAccess.equals("scalar")){
+					loadVarScalar(node.lhsArrayIndexId, lhsArrayIndexNum, lhsArrayIndexScope);
+				}
+				writer.println("\tiaload");
 		}
 		
 		//Do a condition
-		return printCondition(f, node);
+		if(node.type.equals("while")){
+			return printConditionWhile(node.condSign);
+		}else{
+			return printConditionJump(node.condSign, node.condInvert);
+		}
+	}
+	
+	private static String printConditionWhile(String op){
+		String cond = "";
+		switch (op) {
+		case "<":
+			cond = "if_icmple";
+			break;
+		case "<=":
+			cond = "if_icmplt";
+			break;
+		case ">":
+			cond = "if_icmpge";
+			break;
+		case ">=":
+			cond = "if_icmpgt";
+			break;
+		case "==":
+			cond = "if_icmpeq";
+			break;
+		case "!=":
+			cond = "if_icmpne";
+			break;
+		default:
+			break;
+		}
+		return cond;
 	}
 	
 	private static String printConditionJump(String op, boolean invert){
@@ -688,16 +735,16 @@ public class JasminGenerator {
 			break;
 		case "==":
 			if(invert){
-				cond = "if_icmpne"; //IF NOT EQUAL
-			}else{
 				cond = "if_icmpeq"; //IF EQUAL
+			}else{
+				cond = "if_icmpne"; //IF NOT EQUAL
 			}
 			break;
 		case "!=":
 			if(invert){
-				cond = "if_icmpeq"; //IF EQUAL
-			}else{
 				cond = "if_icmpne"; //IF NOT EQUAL
+			}else{
+				cond = "if_icmpeq"; //IF EQUAL
 			}
 			break;
 		default:
