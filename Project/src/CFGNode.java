@@ -7,10 +7,10 @@ public class CFGNode {
 	public String type; //assignment, while, if, endif, call, start, end
 	public ArrayList<CFGNode> outs = new ArrayList<CFGNode>();
 	public ArrayList<CFGNode> ins = new ArrayList<CFGNode>();
-	public ArrayList<Variable> uses = new ArrayList<Variable>();
-	public ArrayList<Variable> defs = new ArrayList<Variable>();
-	public ArrayList<Variable> laIns = new ArrayList<Variable>();
-	public ArrayList<Variable> laOuts = new ArrayList<Variable>();
+	public ArrayList<String> uses = new ArrayList<String>();
+	public ArrayList<String> defs = new ArrayList<String>();
+	public ArrayList<String> laIns = new ArrayList<String>();
+	public ArrayList<String> laOuts = new ArrayList<String>();
 	public static int cfgNodeCount;
 	public int number;
 	

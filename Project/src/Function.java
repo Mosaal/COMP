@@ -14,8 +14,8 @@ public class Function {
 	public CFGNode cfgStartNode;
 	public CFGNode cfgEndNode;
 	public int labelCount;
-	public List<ArrayList<Variable>> cfgNodesIns;
-	public List<ArrayList<Variable>> cfgNodesOuts;
+	public List<ArrayList<String>> cfgNodesIns;
+	public List<ArrayList<String>> cfgNodesOuts;
 	public List<String> localVariables;
 
 	public Function(String id, Variable ret,ArrayList<Variable> p,SimpleNode n){

@@ -911,124 +911,178 @@ public class JasminGenerator {
 
 	private static void livenessAnalysis (Function f){
 		
+		// For each node of CFG
 		setUsesAndDefs(f);
 		
-		f.cfgNodesIns = new ArrayList<ArrayList<Variable>>();
-		f.cfgNodesOuts = new ArrayList<ArrayList<Variable>>();
+		// Create auxiliary structures for comparison
+		f.cfgNodesIns = new ArrayList<ArrayList<String>>();
+		f.cfgNodesOuts = new ArrayList<ArrayList<String>>();
 		
-		// Empty aux Ins and Outs sets
+		// Empty auxiliary structures
 		for(int i = 0; i < f.cfgNodes.size(); i++){
-			f.cfgNodesIns.add(new ArrayList<Variable>());
-			f.cfgNodesOuts.add(new ArrayList<Variable>());
+			f.cfgNodesIns.add(new ArrayList<String>());
+			f.cfgNodesOuts.add(new ArrayList<String>());
 		}
 		
 		do{
 			for(int i = 0; i < f.cfgNodes.size(); i++){
-				if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
-					f.cfgNodesIns.set(i, f.cfgNodes.get(i).laIns);
-					f.cfgNodesOuts.set(i, f.cfgNodes.get(i).laOuts);
-				}
+				f.cfgNodesIns.set(i, f.cfgNodes.get(i).laIns);
+				f.cfgNodesOuts.set(i, f.cfgNodes.get(i).laOuts);
 			}
 			
 			for(int i = f.cfgNodes.size() - 1; i > -1; i--){
-				if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if"))
-					nodeAnalysis(f.cfgNodes.get(i));
+				nodeAnalysis(f.cfgNodes.get(i));
 			}
 			
 		}while(compareIterations(f));
-		
-		System.out.println("INS: " + f.cfgNodesIns);
-		System.out.println("OUTS: " + f.cfgNodesOuts);
 	}
 	
 	private static void setUsesAndDefs (Function f){
-		for (int i = 0; i < f.cfgNodes.size(); i++){
-			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
+		
+		// List with Return and Locals Vars (in this order)
+		List<String> varList = f.localVariables.subList(f.getNumParameters(), f.localVariables.size());
+		
+		for (CFGNode node : f.cfgNodes){
+			if (node.type.equals("assignment") || node.type.equals("while") || node.type.equals("if")){
 				
-				// Assignment => DEFS
-				if (f.cfgNodes.get(i).type.equals("assignment") && f.checkLocalVariable(f.cfgNodes.get(i).lhsId)
-						&& !f.cfgNodes.get(i).defs.contains(f.getVariable(f.cfgNodes.get(i).lhsId))){
-					f.cfgNodes.get(i).defs.add(f.getVariable(f.cfgNodes.get(i).lhsId));
-				} // Condition => USES
-				else if (f.checkLocalVariable(f.cfgNodes.get(i).lhsId) && !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).lhsId))){
-					f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).lhsId));
+				// LHS is Local or Return Var
+				if (varList.contains(node.lhsId)){
+					
+					// Assignment => DEFS
+					if (node.type.equals("assignment")){
+						setDef(f, node);
+
+					// Contidion => USES
+					} else
+						setUse(f, node, node.lhsId);
 				}
 				
 				/* USES */
 				
-				// Local variable as LHS array index
-				if (f.cfgNodes.get(i).lhsArrayIndexId != null && f.checkLocalVariable(f.cfgNodes.get(i).lhsArrayIndexId)
-						&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).lhsArrayIndexId))){
-					f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).lhsArrayIndexId));
-				}
+				// Variable in LHS array index
+				if (node.lhsArrayIndexId != null && varList.contains(node.lhsArrayIndexId))
+					setUse(f, node, node.lhsArrayIndexId);
 				
 				//RHS 1
-				if(f.cfgNodes.get(i).rhs1Id != null && !f.cfgNodes.get(i).rhs1Access.equals("integer")){
-					if(f.checkLocalVariable(f.cfgNodes.get(i).rhs1Id)
-					&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs1Id))){
-						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs1Id));
-					}
+				if(!node.rhs1Access.equals("integer")){
+					if(varList.contains(node.rhs1Id))
+						setUse(f, node, node.rhs1Id);
 					
 					// Local variable as RHS1 array index
-					if (f.cfgNodes.get(i).rhs1ArrayIndexId != null && f.checkLocalVariable(f.cfgNodes.get(i).rhs1ArrayIndexId)
-							&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs1ArrayIndexId))){
-						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs1ArrayIndexId));
-					}
+					if (node.rhs1ArrayIndexId != null && varList.contains(node.rhs1ArrayIndexId))
+						setUse(f, node, node.rhs1ArrayIndexId);
 				}
 				
 				//RHS 2
-				if(f.cfgNodes.get(i).twoSides && f.cfgNodes.get(i).rhs2Id != null && !f.cfgNodes.get(i).rhs2Access.equals("integer")){
-					if(f.checkLocalVariable(f.cfgNodes.get(i).rhs2Id)
-					&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs2Id))){
-						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs2Id));
-					}
+				if(node.twoSides && !node.rhs2Access.equals("integer") && node.rhs2Id != null){
+					
+					if(varList.contains(node.rhs2Id))
+						setUse(f, node, node.rhs2Id);
 					
 					// Local variable as RHS2 array index
-					if (f.cfgNodes.get(i).rhs2ArrayIndexId != null && f.checkLocalVariable(f.cfgNodes.get(i).rhs2ArrayIndexId)
-							&& !f.cfgNodes.get(i).uses.contains(f.getVariable(f.cfgNodes.get(i).rhs2ArrayIndexId))){
-						f.cfgNodes.get(i).uses.add(f.getVariable(f.cfgNodes.get(i).rhs2ArrayIndexId));
+					if (node.rhs2ArrayIndexId != null && varList.contains(node.rhs2ArrayIndexId))
+						setUse(f, node, node.rhs2ArrayIndexId);
+				}
+				
+				for(int j = 0; j < node.rhs1Args.size(); j++){
+					try{
+						Integer.parseInt(node.rhs1Args.get(j));
+					} catch(NumberFormatException e){
+						if (varList.contains(node.rhs1Args.get(j)))
+							setUse(f, node, node.rhs1Args.get(j));
+					}				
+				}
+				for(int j = 0; j < node.rhs2Args.size(); j++){
+					try{
+						Integer.parseInt(node.rhs2Args.get(j));
+					} catch(NumberFormatException e){
+						if (varList.contains(node.rhs2Args.get(j)))
+							setUse(f, node, node.rhs2Args.get(j));
 					}
 				}
+				
+			} else if(node.type.equals("call")){
+				for(int j = 0; j < node.callArgs.length; j++){
+					try{
+						Integer.parseInt(node.callArgs[j]);
+					} catch(NumberFormatException e){
+						if (varList.contains(node.callArgs[j]))
+							setUse(f, node, node.callArgs[j]);
+					}
+				}
+			} else if(node.type.equals("end") && f.getReturnVar() != null){
+				node.uses.add(f.getReturnVar().getVariableID());
 			}
+		}
+	}
+	
+	private static void setDef (Function f, CFGNode n){
+		if (f.checkReturnVariable(n.lhsId)){
+			if (!n.defs.contains(f.getReturnVar().getVariableID()))
+				n.defs.add(f.getReturnVar().getVariableID());
+		} else if (!n.defs.contains(n.lhsId))
+			n.defs.add(n.lhsId);
+	}
+	
+	private static void setUse (Function f, CFGNode n, String s){
+		if(f.checkReturnVariable(s)){
+			if(!n.uses.contains(f.getReturnVar().getVariableID())){
+				n.uses.add(f.getReturnVar().getVariableID());
+			}
+		} else if (!n.uses.contains(s)){
+			n.uses.add(s);
 		}
 	}
 	
 	private static boolean compareIterations (Function f){
 		for (int i = 0; i < f.cfgNodes.size(); i++){
 			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
-				if (f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size()){
+				if (f.cfgNodesIns.get(i).size() != f.cfgNodes.get(i).laIns.size())
 					return true;
-				}
-				if (f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size()){
-				return true;
-				}
+				if (f.cfgNodesOuts.get(i).size() != f.cfgNodes.get(i).laOuts.size())
+					return true;
 			}
 		}
 		return false;
 	}
 	
-	private static void nodeAnalysis(CFGNode node){
+	private static void nodeAnalysis (CFGNode node){
 		
 		/* node 'OUT' SET */
 		// For each successor of node
-		for(int i = 0; i < node.outs.size(); i++){
+		for(CFGNode outNode : node.outs){
 			
-			// For each variable in the 'IN' set of the successor
-			for(int j = 0; j < node.outs.get(i).laIns.size(); j++){
+			if(outNode.type.equals("endif")){
 				
-				if(!node.laOuts.contains(node.outs.get(i).laIns.get(j)))
-					node.laOuts.add(node.outs.get(i).laIns.get(j));
+				// Each sucessor of 'endif' is considered successor of the previous node
+				for(int j = 0; j < outNode.outs.size(); j++){
+					
+					// For each variable in the 'IN' set of the successor
+					for(int k = 0; k < outNode.outs.get(j).laIns.size(); k++){
+						
+						if(!node.laOuts.contains(outNode.outs.get(j).laIns.get(k)))
+							node.laOuts.add(outNode.outs.get(j).laIns.get(k));
+					}
+				}
+			}else{
+				
+				// For each variable in the 'IN' set of the successor
+				for(int j = 0; j < outNode.laIns.size(); j++){
+				
+					if(!node.laOuts.contains(outNode.laIns.get(j)))
+					node.laOuts.add(outNode.laIns.get(j));
+				}
 			}
 		}
 		
 		/* node 'IN' SET */
-		for(int i = 0; i < node.uses.size(); i++){
-			if(!node.laIns.contains(node.uses.get(i)))
-				node.laIns.add(node.uses.get(i));
+		for(String useVar : node.uses){
+			if(!node.laIns.contains(useVar))
+				node.laIns.add(useVar);
 		}
-		for(int i = 0; i < node.laOuts.size(); i++){
-			if(!node.laIns.contains(node.laOuts.get(i)) && !node.defs.contains(node.laOuts.get(i)))
-				node.laIns.add(node.laOuts.get(i));
+		for(String varOutLA : node.laOuts){
+			if(!node.laIns.contains(varOutLA) && !node.defs.contains(varOutLA))
+				node.laIns.add(varOutLA);
 		}
 	}
 	
