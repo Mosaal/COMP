@@ -53,6 +53,9 @@ public class CFGNode {
 	public boolean newVar;
 	
 	/* Conditions */
+	public String condOp;
+	public String condSign;
+	public boolean condInvert;
 	
 	/* Call */
 	public boolean dot;

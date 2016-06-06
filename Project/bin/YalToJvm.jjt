@@ -18,14 +18,22 @@ public class YalToJvm {
 		SimpleNode root = parser.Module();
 		// root.dump("");
 
+		System.out.println("> Starting syntactic analysis...");
 		module = new Module(root.ID, root);
+		System.out.println("> Syntactic analysis done!");
+
+		System.out.println("> Starting semantic analysis...");
 		root.getAttributes();
 		module.getFunctions();
 		module.processFunctions();
-		//module.printSymbolTables();
 		printSemanticErrors();
+		System.out.println("> Semantic analysis done!");
+		System.out.println("> CFG built.");
+
 		if(semanticErrorMessages.size() == 0){
+			System.out.println("> Generating code...");
 			JasminGenerator.generate(root, module);
+			System.out.println("> Code generation finished.");
 		}
 	}
 

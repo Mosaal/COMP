@@ -88,8 +88,6 @@ public class Module {
 			
 			//Printing jasmin instructions
 			f.fillLocalVariables();
-			//System.out.println("CFG:");
-			//f.printCFG(f.cfgStartNode);
 		}
 	}
 

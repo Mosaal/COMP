@@ -2,6 +2,9 @@
 .class public while4
 .super java/lang/Object
 
+.field static a I = 0
+.field static b I = 1
+.field static c [I
 
 ;
 ; CONSTRUCTORS
@@ -9,6 +12,10 @@
 .method static <clinit>()V
 	.limit stack 2
 	.limit locals 0
+
+	bipush 10
+	newarray int
+	putstatic while4/c [I
 
 	return
 .end method
@@ -27,37 +34,29 @@
 ;
 ; FUNCTIONS
 ;
-.method public static f1(I[I)I
-	.limit locals 5
-	.limit stack 3
+.method public static f1([III)V
+	.limit locals 4
+	.limit stack 4
 
 	; ASSIGNMENT
-	bipush 0
-	istore_2
-
-	; ASSIGNMENT
-	bipush 0
-	istore 4
-
-	; ASSIGNMENT
-	aload_1
-	iload 4
-	iaload
+	iconst_0
 	istore_3
 
+	getstatic while4/a I
+	getstatic while4/b I
+	getstatic while4/c [I
+	invokestatic while4/f(II[I)I	return
+.end method
+
+.method public static f(II[I)I
+	.limit locals 4
+	.limit stack 4
+
 	; ASSIGNMENT
-	iload_2
+	iconst_2
+	istore_3
+
 	iload_3
-	iadd
-	istore_2
-
-	; ASSIGNMENT
-	iload 4
-	bipush 1
-	iadd
-	istore 4
-
-	iload_2
 	ireturn 
 .end method
 

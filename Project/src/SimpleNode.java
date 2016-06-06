@@ -424,13 +424,18 @@ public class SimpleNode implements Node {
 			
 			cfgNode.lhsId = lhs.ID;
 			cfgNode.lhsAccess = "array";
+			try{
+				Integer.parseInt(index.ID);
+				cfgNode.lhsArrayAccess = "integer";
+			}catch(NumberFormatException e){
+				cfgNode.lhsArrayAccess = "scalar";
+			}
 			cfgNode.lhsArrayIndexId = index.ID;
 			
 			processArrayAccess(lhs.ID, index.ID, parentFunction);
 		} else if (lhs.getId() == YalToJvmTreeConstants.JJTSCALARACCESS) {
 			cfgNode.lhsId = lhs.ID;
 			cfgNode.lhsAccess = "scalar";
-			
 			processScalarAccess(lhs.ID, parentFunction);
 		}
 
@@ -443,6 +448,8 @@ public class SimpleNode implements Node {
 					SimpleNode termChild = (SimpleNode)rhsChild.jjtGetChild(0);
 
 					if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+						cfgNode.rhs1Access = "call";
+						cfgNode.rhs1Id = termChild.ID;
 						if (!dot(termChild.ID)) {
 							String fullName = termChild.ID + "(" + getRealFunctionName(termChild.jjtGetChildren(), parentFunction) + ")";
 							cfgNode.rhs1Call = YalToJvm.getModule().getFunctionByID(fullName);
@@ -459,6 +466,12 @@ public class SimpleNode implements Node {
 						
 						cfgNode.rhs1Id = termChild.ID;
 						cfgNode.rhs1Access = "array";
+						try{
+							Integer.parseInt(index.ID);
+							cfgNode.rhs1ArrayAccess = "integer";
+						}catch(NumberFormatException e){
+							cfgNode.rhs1ArrayAccess = "scalar";
+						}
 						cfgNode.rhs1ArrayIndexId = index.ID;
 						
 						processArrayAccess(termChild.ID, index.ID, parentFunction);
@@ -477,6 +490,7 @@ public class SimpleNode implements Node {
 			}
 		} else if (rhs.jjtGetNumChildren() == 2) {
 			cfgNode.twoSides = true;
+			cfgNode.condOp = rhs.ID;
 			SimpleNode termLeft = (SimpleNode)rhs.jjtGetChild(0);
 			SimpleNode termRight = (SimpleNode)rhs.jjtGetChild(1);
 
@@ -484,6 +498,8 @@ public class SimpleNode implements Node {
 				SimpleNode termChild = (SimpleNode)termLeft.jjtGetChild(0);
 
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					cfgNode.rhs1Access = "call";
+					cfgNode.rhs1Id = termChild.ID;
 					if (!dot(termChild.ID)) {
 						String fullName = termChild.ID + "(" + getRealFunctionName(termChild.jjtGetChildren(), parentFunction) + ")";
 						cfgNode.rhs1Call = YalToJvm.getModule().getFunctionByID(fullName);
@@ -500,6 +516,12 @@ public class SimpleNode implements Node {
 					
 					cfgNode.rhs1Id = termChild.ID;
 					cfgNode.rhs1Access = "array";
+					try{
+						Integer.parseInt(index.ID);
+						cfgNode.rhs1ArrayAccess = "integer";
+					}catch(NumberFormatException e){
+						cfgNode.rhs1ArrayAccess = "scalar";
+					}
 					cfgNode.rhs1ArrayIndexId = index.ID;
 					
 					processArrayAccess(termChild.ID, index.ID, parentFunction);
@@ -518,6 +540,8 @@ public class SimpleNode implements Node {
 				SimpleNode termChild = (SimpleNode)termRight.jjtGetChild(0);
 
 				if (termChild.getId() == YalToJvmTreeConstants.JJTCALL) {
+					cfgNode.rhs2Access = "call";
+					cfgNode.rhs2Id = termChild.ID;
 					if (!dot(termChild.ID)) {
 						String fullName = termChild.ID + "(" + getRealFunctionName(termChild.jjtGetChildren(), parentFunction) + ")";
 						cfgNode.rhs2Call = YalToJvm.getModule().getFunctionByID(fullName);
@@ -534,6 +558,12 @@ public class SimpleNode implements Node {
 					
 					cfgNode.rhs2Id = termChild.ID;
 					cfgNode.rhs2Access = "array";
+					try{
+						Integer.parseInt(index.ID);
+						cfgNode.rhs2ArrayAccess = "integer";
+					}catch(NumberFormatException e){
+						cfgNode.rhs2ArrayAccess = "scalar";
+					}
 					cfgNode.rhs2ArrayIndexId = index.ID;
 					
 					processArrayAccess(termChild.ID, index.ID, parentFunction);
@@ -1019,6 +1049,7 @@ public class SimpleNode implements Node {
 				SimpleNode whileRhs = (SimpleNode) whileCondition.jjtGetChild(1);
 				CFGNode conditionNodeWhile = processCondition(whileLhs, whileRhs, parentFunction,"while");
 				//CFG
+				conditionNodeWhile.condSign = whileCondition.ID;
 				currentNode.outs.add(conditionNodeWhile);
 				conditionNodeWhile.ins.add(currentNode);
 				currentNode = conditionNodeWhile;
@@ -1033,7 +1064,9 @@ public class SimpleNode implements Node {
 				SimpleNode ifCondition = (SimpleNode) bodyChild.jjtGetChild(0);
 				SimpleNode ifLhs = (SimpleNode) ifCondition.jjtGetChild(0);
 				SimpleNode ifRhs = (SimpleNode) ifCondition.jjtGetChild(1);
+				
 				CFGNode conditionNodeIf = processCondition(ifLhs, ifRhs, parentFunction,"if");
+				conditionNodeIf.condSign = ifCondition.ID;
 				//CFG
 				currentNode.outs.add(conditionNodeIf);
 				conditionNodeIf.ins.add(currentNode);

@@ -144,7 +144,7 @@ public class JasminGenerator {
 			numLocal++;
 		}
 		writer.println("\t.limit locals " + numLocal);
-		writer.println("\t.limit stack " + 3);
+		writer.println("\t.limit stack " + 4);
 		writer.println();
 	}
 	
@@ -442,19 +442,20 @@ public class JasminGenerator {
 		switch (node.type) {
 		case "while":
 			if(!node.visited){
+				printComment("WHILE");
 				node.visited = true;
 				f.labelCount++;
 				int whileLabel = f.labelCount;
-				System.out.println("label" + whileLabel + ":");
+				writer.println("label" + whileLabel + ":");
 				f.labelCount++;
 				int whileLabel2 = f.labelCount;
-				System.out.print("\t" + node.number + "-WHILE");
-				System.out.println(" label" + whileLabel2);
+				writer.print("\t" + printCondition(f, node));
+				writer.println(" label" + whileLabel2);
 				
 				printCFG(f, node.outs.get(0));
 				
-				System.out.println("\tgoto label" + whileLabel);
-				System.out.println("label" + whileLabel2 + ":");
+				writer.println("\tgoto label" + whileLabel);
+				writer.println("label" + whileLabel2 + ":");
 				
 				if(!node.outs.get(1).type.equals("endif")){
 					printCFG(f, node.outs.get(1));
@@ -462,6 +463,8 @@ public class JasminGenerator {
 			}
 			break;
 		case "if":
+			printComment("CONDITION");
+			node.condInvert = false;
 			if(node.outs.size() == 2){
 				//If has both inner nodes
 				if(!node.outs.get(0).type.equals("endif") && !node.outs.get(1).type.equals("endif")){
@@ -486,7 +489,8 @@ public class JasminGenerator {
 						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(0));
 					}else if(node.outs.get(1).type.equals("endif")){
-						//TODO: CHANGE SIGN!
+						//CHANGE SIGN!
+						node.condInvert = true;
 						//If "else" side doesn't exist
 						f.labelCount++;
 						int iflabel = f.labelCount;
@@ -516,7 +520,6 @@ public class JasminGenerator {
 			default:
 				break;
 			}
-			System.out.println("\t" + node.number + "-" + node.type);
 			node.visited = true;
 			for (int i = 0; i < node.outs.size(); i++) {
 				if(!node.outs.get(i).visited){
@@ -532,20 +535,17 @@ public class JasminGenerator {
 	}
 	
 	private static String printCondition(Function f, CFGNode node){
-		printComment("CONDITION");
-		
 		int numLhs, numRhs1, numRhs2;
 		numLhs = f.localVariables.indexOf(node.lhsId);
 		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
 		numRhs2 = f.localVariables.indexOf(node.rhs2Id);
-		
 		//Push rhs1 variable value to stack
 		if(node.rhs1Access.equals("integer")){ //INTEGER
 			pushInt(node.rhs1Id);
 		}else if(node.rhs1Access.equals("scalar")){ //SCALAR
-			loadVarScalar(node.rhs1Id, numRhs1, node.rhs1Scope);
+			loadVarScalar(node.rhs1Id, numRhs1, f.getVariableScope(node.rhs1Id));
 		}else if(node.rhs1Access.equals("array")){ //ARRAY
-			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			loadVarArray(node.rhs1Id, numRhs1, f.getVariableScope(node.rhs1Id));
 			String rhs1ArrayIndexId = node.rhs1ArrayIndexId;
 			int rhs1ArrayIndexNum = f.localVariables.indexOf(rhs1ArrayIndexId);
 			String rhs1ArrayIndexScope = f.getVariableScope(rhs1ArrayIndexId);
@@ -588,7 +588,7 @@ public class JasminGenerator {
 				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 			}
 		}else if(node.rhs1Access.equals("size")){ //SIZE
-			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			loadVarArray(node.rhs1Id, numRhs1, f.getVariableScope(node.rhs1Id));
 			writer.println("\tarraylength");
 		}
 		
@@ -597,9 +597,9 @@ public class JasminGenerator {
 			if(node.rhs2Access.equals("integer")){ //INTEGER
 				pushInt(node.rhs2Id);
 			}else if(node.rhs2Access.equals("scalar")){ //SCALAR
-				loadVarScalar(node.rhs2Id, numRhs2, node.rhs2Scope);
+				loadVarScalar(node.rhs2Id, numRhs2, f.getVariableScope(node.rhs2Id));
 			}else if(node.rhs2Access.equals("array")){ //ARRAY
-				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				loadVarArray(node.rhs2Id, numRhs2, f.getVariableScope(node.rhs2Id));
 				String rhs2ArrayIndexId = node.rhs2ArrayIndexId;
 				int rhs2ArrayIndexNum = f.localVariables.indexOf(rhs2ArrayIndexId);
 				String rhs2ArrayIndexScope = f.getVariableScope(rhs2ArrayIndexId);
@@ -642,17 +642,63 @@ public class JasminGenerator {
 					writer.println("\tinvokestatic " + moduleName + "/" + fullName);
 				}
 			}else if(node.rhs2Access.equals("size")){ //SIZE
-				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				loadVarArray(node.rhs2Id, numRhs2, f.getVariableScope(node.rhs2Id));
 				writer.println("\tarraylength");
 			}
 			
 			//Make operation
-			printOperation(node.assignementOp);
+			printOperation(node.condOp);
 			
+			}
+		
+			//Get lhs value
+			if(node.lhsAccess.equals("scalar")){
+				loadVarScalar(node.lhsId, numLhs, f.getVariableScope(node.lhsId));
+			}else if(node.lhsAccess.equals("array")){
+				loadVarArray(node.lhsId, numLhs, f.getVariableScope(node.lhsId));
+				int lhsArrayIndexNum = f.localVariables.indexOf(node.lhsArrayIndexId);
+				String lhsArrayIndexScope = f.getVariableScope(node.lhsArrayIndexId);
+				if(node.lhsArrayAccess.equals("integer")){
+					pushInt(node.lhsArrayIndexId);
+				}else if(node.lhsArrayAccess.equals("scalar")){
+					loadVarScalar(node.lhsArrayIndexId, lhsArrayIndexNum, lhsArrayIndexScope);
+				}
+				writer.println("\tiaload");
 		}
 		
 		//Do a condition
-		return printCondition(f, node);
+		if(node.type.equals("while")){
+			return printConditionWhile(node.condSign);
+		}else{
+			return printConditionJump(node.condSign, node.condInvert);
+		}
+	}
+	
+	private static String printConditionWhile(String op){
+		String cond = "";
+		switch (op) {
+		case "<":
+			cond = "if_icmple";
+			break;
+		case "<=":
+			cond = "if_icmplt";
+			break;
+		case ">":
+			cond = "if_icmpge";
+			break;
+		case ">=":
+			cond = "if_icmpgt";
+			break;
+		case "==":
+			cond = "if_icmpeq";
+			break;
+		case "!=":
+			cond = "if_icmpne";
+			break;
+		default:
+			break;
+		}
+		return cond;
 	}
 	
 	private static String printConditionJump(String op, boolean invert){
@@ -660,44 +706,44 @@ public class JasminGenerator {
 		switch (op) {
 		case "<":
 			if(invert){
-				
+				cond = "if_icmpgt";
 			}else{
-				
+				cond = "if_icmple";
 			}
 			break;
 		case "<=":
 			if(invert){
-				
+				cond = "if_icmpge";
 			}else{
-				
+				cond = "if_icmplt";
 			}
 			break;
 		case ">":
 			if(invert){
-				
+				cond = "if_icmplt";
 			}else{
-				
+				cond = "if_icmpge";
 			}
 			break;
 		case ">=":
 			if(invert){
-				
+				cond = "if_icmple";
 			}else{
-				
+				cond = "if_icmpgt";
 			}
 			break;
 		case "==":
 			if(invert){
-				
+				cond = "if_icmpeq"; //IF EQUAL
 			}else{
-				
+				cond = "if_icmpne"; //IF NOT EQUAL
 			}
 			break;
 		case "!=":
 			if(invert){
-				
+				cond = "if_icmpne"; //IF NOT EQUAL
 			}else{
-				
+				cond = "if_icmpeq"; //IF EQUAL
 			}
 			break;
 		default:
@@ -706,8 +752,19 @@ public class JasminGenerator {
 		return cond;
 	}
 	
+	
 	private static void printCall(Function f, CFGNode node){
 		//Push variables to stack
+		/* If we have to support io.class
+		String module = getFunctionModule(node.callName);
+		if(module.equals("io")){
+			//printIO(f, node);
+			for (int i = 0; i < node.callArgs.length; i++) {
+				System.out.println(node.callArgs[i]);
+			}
+			return;
+		}*/
+		
 		for (int i = 0; i < node.callArgs.length; i++) {
 			try{
 				Integer.parseInt(node.callArgs[i]);
@@ -752,6 +809,7 @@ public class JasminGenerator {
 		}
 	}
 
+	
 	private static void printAssignment (Function f, CFGNode node) {
 		printComment("ASSIGNMENT");
 		
@@ -909,6 +967,7 @@ public class JasminGenerator {
 		printNewLine();
 	}
 
+	
 	private static void livenessAnalysis (Function f){
 		
 		// For each node of CFG
@@ -936,6 +995,7 @@ public class JasminGenerator {
 			
 		}while(compareIterations(f));
 	}
+	
 	
 	private static void setUsesAndDefs (Function f){
 		
@@ -1033,7 +1093,7 @@ public class JasminGenerator {
 			n.uses.add(s);
 		}
 	}
-	
+
 	private static boolean compareIterations (Function f){
 		for (int i = 0; i < f.cfgNodes.size(); i++){
 			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
@@ -1086,6 +1146,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void printOperation(String op){
 		switch (op) {
 		case "+":
@@ -1123,14 +1184,20 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void pushInt(String n){
-		int rhs1Value = Integer.parseInt(n);
-		if(rhs1Value <= 127 && rhs1Value >= -128){
-			writer.println("\tbipush " + rhs1Value);
+		int value = Integer.parseInt(n);
+		if(value == -1){
+			writer.println("\ticonst_m1");
+		}else if(value <= 5 && value >= 0){
+			writer.println("\ticonst_" + value);
+		}else if(value <= 127 && value >= -128){
+			writer.println("\tbipush " + value);
 		}else{
-			writer.println("\tsipush " + rhs1Value);
+			writer.println("\tsipush " + value);
 		}
 	}
+	
 	
 	private static void loadVarScalar(String id, int varNum, String scope){
 		if(scope.equals("global")){
@@ -1144,6 +1211,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void loadVarArray(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tgetstatic " + moduleName + "/" + id + " [I");
@@ -1155,6 +1223,7 @@ public class JasminGenerator {
 			}
 		}
 	}
+	
 	
 	private static void storeVarScalar(String id, int varNum, String scope){
 		if(scope.equals("global")){
@@ -1168,6 +1237,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void storeVarArray(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tputstatic " + moduleName + "/" + id + " [I");
@@ -1180,6 +1250,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static String getFunctionModule(String fullPath){
 		String module = null;
 		for (int i = fullPath.length()-1; i >= 0; i--) {
@@ -1190,6 +1261,7 @@ public class JasminGenerator {
 		return module;
 	}
 	
+	
 	private static String getFunctionName(String fullPath){
 		String name = null;
 		for (int i = fullPath.length()-1; i >= 0; i--) {
@@ -1199,6 +1271,7 @@ public class JasminGenerator {
 		}
 		return name;
 	}
+	
 	
 	private static String getFunctionFullName(String functionName, Function f){
 		String fullName = functionName + "(";
@@ -1224,6 +1297,7 @@ public class JasminGenerator {
 		}
 		return fullName;
 	}
+	
 	
 	private static String getFunctionFullNameOtherModule(Function f, String functionName, List<String> args){
 		String fullName = functionName + "(";

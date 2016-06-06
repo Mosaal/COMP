@@ -14,14 +14,22 @@ public class YalToJvm/*@bgen(jjtree)*/implements YalToJvmTreeConstants, YalToJvm
                 SimpleNode root = parser.Module();
                 // root.dump("");
 
+                System.out.println("> Starting syntactic analysis...");
                 module = new Module(root.ID, root);
+                System.out.println("> Syntactic analysis done!");
+
+                System.out.println("> Starting semantic analysis...");
                 root.getAttributes();
                 module.getFunctions();
                 module.processFunctions();
-                //module.printSymbolTables();
                 printSemanticErrors();
+                System.out.println("> Semantic analysis done!");
+                System.out.println("> CFG built.");
+
                 if(semanticErrorMessages.size() == 0){
+                        System.out.println("> Generating code...");
                         JasminGenerator.generate(root, module);
+                        System.out.println("> Code generation finished.");
                 }
         }
 
@@ -1210,36 +1218,6 @@ if (jjtc000) {
     finally { jj_save(8, xla); }
   }
 
-  static private boolean jj_3R_35()
- {
-    if (jj_scan_token(ID)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_27()
- {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3R_35()) {
-    jj_scanpos = xsp;
-    if (jj_3R_36()) return true;
-    }
-    return false;
-  }
-
-  static private boolean jj_3R_28()
- {
-    if (jj_scan_token(33)) return true;
-    if (jj_scan_token(SIZE)) return true;
-    return false;
-  }
-
-  static private boolean jj_3R_31()
- {
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
   static private boolean jj_3R_24()
  {
     if (jj_scan_token(ID)) return true;
@@ -1489,6 +1467,36 @@ if (jjtc000) {
     if (jj_3R_15()) return true;
     if (jj_scan_token(ASSIGN)) return true;
     if (jj_3R_16()) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_35()
+ {
+    if (jj_scan_token(ID)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_27()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_35()) {
+    jj_scanpos = xsp;
+    if (jj_3R_36()) return true;
+    }
+    return false;
+  }
+
+  static private boolean jj_3R_28()
+ {
+    if (jj_scan_token(33)) return true;
+    if (jj_scan_token(SIZE)) return true;
+    return false;
+  }
+
+  static private boolean jj_3R_31()
+ {
+    if (jj_3R_24()) return true;
     return false;
   }
 
