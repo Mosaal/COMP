@@ -144,7 +144,7 @@ public class JasminGenerator {
 			numLocal++;
 		}
 		writer.println("\t.limit locals " + numLocal);
-		writer.println("\t.limit stack " + 3);
+		writer.println("\t.limit stack " + 4);
 		writer.println();
 	}
 	
@@ -442,19 +442,20 @@ public class JasminGenerator {
 		switch (node.type) {
 		case "while":
 			if(!node.visited){
+				printComment("WHILE");
 				node.visited = true;
 				f.labelCount++;
 				int whileLabel = f.labelCount;
-				System.out.println("label" + whileLabel + ":");
+				writer.println("label" + whileLabel + ":");
 				f.labelCount++;
 				int whileLabel2 = f.labelCount;
-				System.out.print("\t" + node.number + "-WHILE");
-				System.out.println(" label" + whileLabel2);
+				writer.print("\t" + printCondition(f, node));
+				writer.println(" label" + whileLabel2);
 				
 				printCFG(f, node.outs.get(0));
 				
-				System.out.println("\tgoto label" + whileLabel);
-				System.out.println("label" + whileLabel2 + ":");
+				writer.println("\tgoto label" + whileLabel);
+				writer.println("label" + whileLabel2 + ":");
 				
 				if(!node.outs.get(1).type.equals("endif")){
 					printCFG(f, node.outs.get(1));
@@ -462,6 +463,7 @@ public class JasminGenerator {
 			}
 			break;
 		case "if":
+			printComment("CONDITION");
 			node.condInvert = false;
 			if(node.outs.size() == 2){
 				//If has both inner nodes
@@ -487,11 +489,11 @@ public class JasminGenerator {
 						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(0));
 					}else if(node.outs.get(1).type.equals("endif")){
-						//TODO: CHANGE SIGN!
+						//CHANGE SIGN!
+						node.condInvert = true;
 						//If "else" side doesn't exist
 						f.labelCount++;
 						int iflabel = f.labelCount;
-						node.condInvert = true;
 						writer.println("\t" + printCondition(f, node) + " label" + iflabel); //Print condition
 						printCFG(f, node.outs.get(0));
 						writer.println("label" + iflabel + ":");
@@ -534,8 +536,6 @@ public class JasminGenerator {
 	}
 	
 	private static String printCondition(Function f, CFGNode node){
-		printComment("CONDITION");
-		
 		int numLhs, numRhs1, numRhs2;
 		numLhs = f.localVariables.indexOf(node.lhsId);
 		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
@@ -668,7 +668,38 @@ public class JasminGenerator {
 		}
 		
 		//Do a condition
-		return printConditionJump(node.condSign, node.condInvert);
+		if(node.type.equals("while")){
+			return printConditionWhile(node.condSign);
+		}else{
+			return printConditionJump(node.condSign, node.condInvert);
+		}
+	}
+	
+	private static String printConditionWhile(String op){
+		String cond = "";
+		switch (op) {
+		case "<":
+			cond = "if_icmple";
+			break;
+		case "<=":
+			cond = "if_icmplt";
+			break;
+		case ">":
+			cond = "if_icmpge";
+			break;
+		case ">=":
+			cond = "if_icmpgt";
+			break;
+		case "==":
+			cond = "if_icmpeq";
+			break;
+		case "!=":
+			cond = "if_icmpne";
+			break;
+		default:
+			break;
+		}
+		return cond;
 	}
 	
 	private static String printConditionJump(String op, boolean invert){

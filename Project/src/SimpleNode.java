@@ -1049,6 +1049,7 @@ public class SimpleNode implements Node {
 				SimpleNode whileRhs = (SimpleNode) whileCondition.jjtGetChild(1);
 				CFGNode conditionNodeWhile = processCondition(whileLhs, whileRhs, parentFunction,"while");
 				//CFG
+				conditionNodeWhile.condSign = whileCondition.ID;
 				currentNode.outs.add(conditionNodeWhile);
 				conditionNodeWhile.ins.add(currentNode);
 				currentNode = conditionNodeWhile;
