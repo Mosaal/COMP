@@ -994,6 +994,8 @@ public class JasminGenerator {
 			}
 			
 		}while(compareIterations(f));
+		
+		liveRange(f);
 	}
 	
 	
@@ -1144,6 +1146,47 @@ public class JasminGenerator {
 			if(!node.laIns.contains(varOutLA) && !node.defs.contains(varOutLA))
 				node.laIns.add(varOutLA);
 		}
+	}
+	
+	
+	private static void liveRange(Function f){
+		
+		Boolean hasReturn = (f.getReturnVar() != null);
+		Boolean checkedReturn = false;
+		
+		// List with Locals Vars only
+		List<String> varList = f.localVariables.subList(hasReturn ? f.getNumParameters() + 1 : f.getNumParameters(), f.localVariables.size());
+		
+		HashMap<String, Integer> varStart = new HashMap<String, Integer>();
+		HashMap<String, Integer> varEnd = new HashMap<String, Integer>();
+		
+		for(String var : varList){
+			startSearch:
+			for(int i = 0; i < f.cfgNodesOuts.size(); i++){
+				for(String varName : f.cfgNodesOuts.get(i)){
+					if(var.equals(varName)){
+						varStart.put(var, i);
+						break startSearch;
+					} else if(hasReturn && !checkedReturn && f.getReturnVar().getVariableID().equals(varName)){
+						varStart.put(f.getReturnVar().getVariableID(), i);
+						checkedReturn = true;
+					}
+				}
+			}
+			endSearch:
+			for(int i = f.cfgNodesIns.size(); i > 0; i--){
+				for(String varName : f.cfgNodesIns.get(i-1)){
+					if(var.equals(varName)){
+						varEnd.put(var, i);
+						break endSearch;
+					}
+				}
+			}
+			System.out.println("VAR: " + var + " START IN NODE: " + varStart.get(var));
+			System.out.println("VAR: " + var + " END IN NODE: " + varEnd.get(var));
+		}
+		if(hasReturn)
+			varEnd.put(f.getReturnVar().getVariableID(), f.cfgNodeCount);
 	}
 	
 	

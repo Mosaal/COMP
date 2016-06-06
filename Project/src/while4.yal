@@ -1,34 +1,18 @@
 module while4 {
-	a = 0;
-	b = 1;
-	c = [10];
-
-	function i=f(x, y, z[]) {
-		i=2;
-	}
-
-	function f1(v[], N, x) {
+	function s = f(A[], N) {
+		s = 0;
 		i = 0;
-		f(a, b, c);
-
-		/*if (i < f(a, b, c)) {
-			i = i + 1;
-		} else {
-			i = i + 1;
+		while(i < N){
+		t = A[i];
+		s = s + t;
+		i = i + 1;
 		}
-		
-		while (i < N) {
-			v[i] = v[i] + x;
-			i = i + 1;
-		}*/
 	}
 
 	/*function main() {
 		A = [5];
 		A[0] = 1; A[1] = 2; A[2] = 3; A[3] = 4; A[4] = 5;
 		size_a = A.size;
-		f1(A, size_a, 2);
-		A4 = A[4];
-		io.print("A4: ", A4);
+		p = f(A, N);
 	}*/
 }
