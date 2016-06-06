@@ -467,7 +467,7 @@ public class JasminGenerator {
 				if(!node.outs.get(0).type.equals("endif") && !node.outs.get(1).type.equals("endif")){
 					f.labelCount++;
 					int iflabel = f.labelCount;
-					writer.println("\tIF label" + iflabel);
+					writer.println("\t" + printCondition(f, node) + " label" + iflabel); //Print condition
 					f.labelCount++;
 					int iflabel2 = f.labelCount;
 					printCFG(f, node.outs.get(0));
@@ -481,7 +481,7 @@ public class JasminGenerator {
 					if(node.outs.get(0).type.equals("endif")){
 						f.labelCount++;
 						int iflabel = f.labelCount;
-						writer.println("\tIF label" + iflabel);
+						writer.println("\t" + printCondition(f, node) + " label" + iflabel); //Print condition
 						printCFG(f, node.outs.get(1));
 						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(0));
@@ -490,7 +490,7 @@ public class JasminGenerator {
 						//If "else" side doesn't exist
 						f.labelCount++;
 						int iflabel = f.labelCount;
-						writer.println("\tIF label" + iflabel);
+						writer.println("\t" + printCondition(f, node) + " label" + iflabel); //Print condition
 						printCFG(f, node.outs.get(0));
 						writer.println("label" + iflabel + ":");
 						printCFG(f, node.outs.get(1));
@@ -532,19 +532,178 @@ public class JasminGenerator {
 	}
 	
 	private static String printCondition(Function f, CFGNode node){
-		String condJump = "";
-		return condJump;
+		printComment("CONDITION");
+		
+		int numLhs, numRhs1, numRhs2;
+		numLhs = f.localVariables.indexOf(node.lhsId);
+		numRhs1 = f.localVariables.indexOf(node.rhs1Id);
+		numRhs2 = f.localVariables.indexOf(node.rhs2Id);
+		
+		//Push rhs1 variable value to stack
+		if(node.rhs1Access.equals("integer")){ //INTEGER
+			pushInt(node.rhs1Id);
+		}else if(node.rhs1Access.equals("scalar")){ //SCALAR
+			loadVarScalar(node.rhs1Id, numRhs1, node.rhs1Scope);
+		}else if(node.rhs1Access.equals("array")){ //ARRAY
+			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			String rhs1ArrayIndexId = node.rhs1ArrayIndexId;
+			int rhs1ArrayIndexNum = f.localVariables.indexOf(rhs1ArrayIndexId);
+			String rhs1ArrayIndexScope = f.getVariableScope(rhs1ArrayIndexId);
+			if(node.rhs1ArrayAccess.equals("integer")){
+				pushInt(rhs1ArrayIndexId);
+			}else if(node.rhs1ArrayAccess.equals("scalar")){
+				loadVarScalar(rhs1ArrayIndexId, rhs1ArrayIndexNum, rhs1ArrayIndexScope);
+			}
+			writer.println("\tiaload");
+		}else if(node.rhs1Access.equals("call")){ //CALL
+			String otherModuleName = getFunctionModule(node.rhs1Id);
+			String functionName = getFunctionName(node.rhs1Id);
+			String fullName;
+			if(node.rhs1OtherModule){
+				fullName = getFunctionFullNameOtherModule(f,functionName, node.rhs1Args);
+			}else{
+				fullName = getFunctionFullName(node.rhs1Id,node.rhs1Call);
+			}
+			
+			//Push arguments to stack
+			for (int i = 0; i < node.rhs1Args.size(); i++) {
+				try {
+					Integer.parseInt(node.rhs1Args.get(i));
+					pushInt(node.rhs1Args.get(i));
+				} catch (NumberFormatException e) {
+					Variable var = YalToJvm.getModule().getVariable(f, node.rhs1Args.get(i));
+					String scope = f.getVariableScope(node.rhs1Args.get(i));
+					int varNum = f.localVariables.indexOf(node.rhs1Args.get(i));
+					if(var.getType().equals("scalar")){
+						loadVarScalar(node.rhs1Args.get(i), varNum, scope);
+					}else if(var.getType().equals("array")){
+						loadVarArray(node.rhs1Args.get(i), varNum, scope);
+					}
+				}
+			}
+			//Invoke call
+			if(otherModuleName != null){
+				writer.println("\tinvokestatic " + otherModuleName + "/" + fullName);
+			}else{
+				writer.println("\tinvokestatic " + moduleName + "/" + fullName);
+			}
+		}else if(node.rhs1Access.equals("size")){ //SIZE
+			loadVarArray(node.rhs1Id, numRhs1, node.rhs1Scope);
+			writer.println("\tarraylength");
+		}
+		
+		//Push rhs2 variable value to stack
+		if(node.twoSides){
+			if(node.rhs2Access.equals("integer")){ //INTEGER
+				pushInt(node.rhs2Id);
+			}else if(node.rhs2Access.equals("scalar")){ //SCALAR
+				loadVarScalar(node.rhs2Id, numRhs2, node.rhs2Scope);
+			}else if(node.rhs2Access.equals("array")){ //ARRAY
+				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				String rhs2ArrayIndexId = node.rhs2ArrayIndexId;
+				int rhs2ArrayIndexNum = f.localVariables.indexOf(rhs2ArrayIndexId);
+				String rhs2ArrayIndexScope = f.getVariableScope(rhs2ArrayIndexId);
+				if(node.rhs2ArrayAccess.equals("integer")){
+					pushInt(rhs2ArrayIndexId);
+				}else if(node.rhs2ArrayAccess.equals("scalar")){
+					loadVarScalar(rhs2ArrayIndexId, rhs2ArrayIndexNum, rhs2ArrayIndexScope);
+				}
+				writer.println("\tiaload");
+			}else if(node.rhs2Access.equals("call")){ //CALL
+				String otherModuleName = getFunctionModule(node.rhs2Id);
+				String functionName = getFunctionName(node.rhs2Id);
+				String fullName;
+				if(node.rhs2OtherModule){
+					fullName = getFunctionFullNameOtherModule(f,functionName, node.rhs2Args);
+				}else{
+					fullName = getFunctionFullName(node.rhs2Id,node.rhs2Call);
+				}
+				
+				//Push arguments to stack
+				for (int i = 0; i < node.rhs2Args.size(); i++) {
+					try {
+						Integer.parseInt(node.rhs2Args.get(i));
+						pushInt(node.rhs2Args.get(i));
+					} catch (NumberFormatException e) {
+						Variable var = YalToJvm.getModule().getVariable(f, node.rhs2Args.get(i));
+						String scope = f.getVariableScope(node.rhs2Args.get(i));
+						int varNum = f.localVariables.indexOf(node.rhs2Args.get(i));
+						if(var.getType().equals("scalar")){
+							loadVarScalar(node.rhs2Args.get(i), varNum, scope);
+						}else if(var.getType().equals("array")){
+							loadVarArray(node.rhs2Args.get(i), varNum, scope);
+						}
+					}
+				}
+				//Invoke call
+				if(otherModuleName != null){
+					writer.println("\tinvokestatic " + otherModuleName + "/" + fullName);
+				}else{
+					writer.println("\tinvokestatic " + moduleName + "/" + fullName);
+				}
+			}else if(node.rhs2Access.equals("size")){ //SIZE
+				loadVarArray(node.rhs2Id, numRhs2, node.rhs2Scope);
+				writer.println("\tarraylength");
+			}
+			
+			//Make operation
+			printOperation(node.assignementOp);
+			
+		}
+		
+		//Do a condition
+		return printCondition(f, node);
 	}
 	
-	private static void printConditionJump(String op, boolean invert){
+	private static String printConditionJump(String op, boolean invert){
+		String cond = "";
 		switch (op) {
 		case "<":
-			
+			if(invert){
+				
+			}else{
+				
+			}
 			break;
-
+		case "<=":
+			if(invert){
+				
+			}else{
+				
+			}
+			break;
+		case ">":
+			if(invert){
+				
+			}else{
+				
+			}
+			break;
+		case ">=":
+			if(invert){
+				
+			}else{
+				
+			}
+			break;
+		case "==":
+			if(invert){
+				
+			}else{
+				
+			}
+			break;
+		case "!=":
+			if(invert){
+				
+			}else{
+				
+			}
+			break;
 		default:
 			break;
 		}
+		return cond;
 	}
 	
 	private static void printCall(Function f, CFGNode node){
