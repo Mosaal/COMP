@@ -520,7 +520,6 @@ public class JasminGenerator {
 			default:
 				break;
 			}
-			System.out.println("\t" + node.number + "-" + node.type);
 			node.visited = true;
 			for (int i = 0; i < node.outs.size(); i++) {
 				if(!node.outs.get(i).visited){
@@ -756,6 +755,16 @@ public class JasminGenerator {
 	
 	private static void printCall(Function f, CFGNode node){
 		//Push variables to stack
+		/* If we have to support io.class
+		String module = getFunctionModule(node.callName);
+		if(module.equals("io")){
+			//printIO(f, node);
+			for (int i = 0; i < node.callArgs.length; i++) {
+				System.out.println(node.callArgs[i]);
+			}
+			return;
+		}*/
+		
 		for (int i = 0; i < node.callArgs.length; i++) {
 			try{
 				Integer.parseInt(node.callArgs[i]);
@@ -1125,11 +1134,15 @@ public class JasminGenerator {
 	
 	
 	private static void pushInt(String n){
-		int rhs1Value = Integer.parseInt(n);
-		if(rhs1Value <= 127 && rhs1Value >= -128){
-			writer.println("\tbipush " + rhs1Value);
+		int value = Integer.parseInt(n);
+		if(value == -1){
+			writer.println("\ticonst_m1");
+		}else if(value <= 5 && value >= 0){
+			writer.println("\ticonst_" + value);
+		}else if(value <= 127 && value >= -128){
+			writer.println("\tbipush " + value);
 		}else{
-			writer.println("\tsipush " + rhs1Value);
+			writer.println("\tsipush " + value);
 		}
 	}
 	
