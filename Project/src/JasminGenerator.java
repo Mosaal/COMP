@@ -707,30 +707,30 @@ public class JasminGenerator {
 		switch (op) {
 		case "<":
 			if(invert){
-				cond = "if_icmpge"; //IF GREATER OR EQUAL THAN
+				cond = "if_icmpgt";
 			}else{
-				cond = "if_icmplt"; //IF LESS THAN
+				cond = "if_icmple";
 			}
 			break;
 		case "<=":
 			if(invert){
-				cond = "if_icmpgt"; //IF GREATER THAN
+				cond = "if_icmpge";
 			}else{
-				cond = "if_icmple"; //IF LESS OR EQUAL THAN
+				cond = "if_icmplt";
 			}
 			break;
 		case ">":
 			if(invert){
-				cond = "if_icmple"; //IF LESS OR EQUAL THAN
+				cond = "if_icmplt";
 			}else{
-				cond = "if_icmpgt"; //IF GREATER THAN
+				cond = "if_icmpge";
 			}
 			break;
 		case ">=":
 			if(invert){
-				cond = "if_icmplt"; //IF LESS THAN
+				cond = "if_icmple";
 			}else{
-				cond = "if_icmpge"; //IF GREATE OR EQUAL THAN
+				cond = "if_icmpgt";
 			}
 			break;
 		case "==":
