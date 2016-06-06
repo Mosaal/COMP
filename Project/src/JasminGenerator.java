@@ -660,44 +660,44 @@ public class JasminGenerator {
 		switch (op) {
 		case "<":
 			if(invert){
-				
+				cond = "if_icmpge"; //IF GREATER OR EQUAL THAN
 			}else{
-				
+				cond = "if_icmplt"; //IF LESS THAN
 			}
 			break;
 		case "<=":
 			if(invert){
-				
+				cond = "if_icmpgt"; //IF GREATER THAN
 			}else{
-				
+				cond = "if_icmple"; //IF LESS OR EQUAL THAN
 			}
 			break;
 		case ">":
 			if(invert){
-				
+				cond = "if_icmple"; //IF LESS OR EQUAL THAN
 			}else{
-				
+				cond = "if_icmpgt"; //IF GREATER THAN
 			}
 			break;
 		case ">=":
 			if(invert){
-				
+				cond = "if_icmplt"; //IF LESS THAN
 			}else{
-				
+				cond = "if_icmpge"; //IF GREATE OR EQUAL THAN
 			}
 			break;
 		case "==":
 			if(invert){
-				
+				cond = "if_icmpne"; //IF NOT EQUAL
 			}else{
-				
+				cond = "if_icmpeq"; //IF EQUAL
 			}
 			break;
 		case "!=":
 			if(invert){
-				
+				cond = "if_icmpeq"; //IF EQUAL
 			}else{
-				
+				cond = "if_icmpne"; //IF NOT EQUAL
 			}
 			break;
 		default:
@@ -705,6 +705,7 @@ public class JasminGenerator {
 		}
 		return cond;
 	}
+	
 	
 	private static void printCall(Function f, CFGNode node){
 		//Push variables to stack
@@ -752,6 +753,7 @@ public class JasminGenerator {
 		}
 	}
 
+	
 	private static void printAssignment (Function f, CFGNode node) {
 		printComment("ASSIGNMENT");
 		
@@ -909,6 +911,7 @@ public class JasminGenerator {
 		printNewLine();
 	}
 
+	
 	private static void livenessAnalysis (Function f){
 		
 		setUsesAndDefs(f);
@@ -940,6 +943,7 @@ public class JasminGenerator {
 		System.out.println("INS: " + f.cfgNodesIns);
 		System.out.println("OUTS: " + f.cfgNodesOuts);
 	}
+	
 	
 	private static void setUsesAndDefs (Function f){
 		for (int i = 0; i < f.cfgNodes.size(); i++){
@@ -993,6 +997,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static boolean compareIterations (Function f){
 		for (int i = 0; i < f.cfgNodes.size(); i++){
 			if (f.cfgNodes.get(i).type.equals("assignment") || f.cfgNodes.get(i).type.equals("while") || f.cfgNodes.get(i).type.equals("if")){
@@ -1006,6 +1011,7 @@ public class JasminGenerator {
 		}
 		return false;
 	}
+	
 	
 	private static void nodeAnalysis(CFGNode node){
 		
@@ -1031,6 +1037,7 @@ public class JasminGenerator {
 				node.laIns.add(node.laOuts.get(i));
 		}
 	}
+	
 	
 	private static void printOperation(String op){
 		switch (op) {
@@ -1069,6 +1076,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void pushInt(String n){
 		int rhs1Value = Integer.parseInt(n);
 		if(rhs1Value <= 127 && rhs1Value >= -128){
@@ -1077,6 +1085,7 @@ public class JasminGenerator {
 			writer.println("\tsipush " + rhs1Value);
 		}
 	}
+	
 	
 	private static void loadVarScalar(String id, int varNum, String scope){
 		if(scope.equals("global")){
@@ -1090,6 +1099,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void loadVarArray(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tgetstatic " + moduleName + "/" + id + " [I");
@@ -1101,6 +1111,7 @@ public class JasminGenerator {
 			}
 		}
 	}
+	
 	
 	private static void storeVarScalar(String id, int varNum, String scope){
 		if(scope.equals("global")){
@@ -1114,6 +1125,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static void storeVarArray(String id, int varNum, String scope){
 		if(scope.equals("global")){
 			writer.println("\tputstatic " + moduleName + "/" + id + " [I");
@@ -1126,6 +1138,7 @@ public class JasminGenerator {
 		}
 	}
 	
+	
 	private static String getFunctionModule(String fullPath){
 		String module = null;
 		for (int i = fullPath.length()-1; i >= 0; i--) {
@@ -1136,6 +1149,7 @@ public class JasminGenerator {
 		return module;
 	}
 	
+	
 	private static String getFunctionName(String fullPath){
 		String name = null;
 		for (int i = fullPath.length()-1; i >= 0; i--) {
@@ -1145,6 +1159,7 @@ public class JasminGenerator {
 		}
 		return name;
 	}
+	
 	
 	private static String getFunctionFullName(String functionName, Function f){
 		String fullName = functionName + "(";
@@ -1170,6 +1185,7 @@ public class JasminGenerator {
 		}
 		return fullName;
 	}
+	
 	
 	private static String getFunctionFullNameOtherModule(Function f, String functionName, List<String> args){
 		String fullName = functionName + "(";
