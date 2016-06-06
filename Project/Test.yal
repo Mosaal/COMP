@@ -4,21 +4,22 @@ module while4 {
 	c;
 	d = [20];
 	
-	function f1(v[], N, x) {
-		c = 0;
-		i = 1;
+	function n=f1() {
+		d[8] = 9;
+		a = d[8];
 		
-		/*
-		if (i < N) {
+		if (d[9] < 10 + 10) {
 			s = 4;
 		} else {
 			s = 5;
 		}
-
+		
+		/*
 		while (c > j) {
 			g = c;
 		}
 		*/
+		n = 3;
 	}
 
 	/*function main() {
